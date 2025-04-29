@@ -1,0 +1,83 @@
+{
+  "author": "Unnamed",
+  "title": "Talk About",
+  "date": "2025-04-29T14:38:49.689Z",
+  "tables": [
+    {
+      "id": 0,
+      "name": "User",
+      "x": -718,
+      "y": -370,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": 0
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#175e7a",
+      "key": 1745936581501
+    },
+    {
+      "id": 1,
+      "name": "Post",
+      "x": -340.9999999999999,
+      "y": -376.99999999999994,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": 0
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#7c4af0",
+      "key": 1745936611911
+    },
+    {
+      "id": 2,
+      "name": "Comment",
+      "x": 8.999999999999886,
+      "y": -381,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": 0
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#ffe159",
+      "key": 1745936631168
+    }
+  ],
+  "relationships": [],
+  "notes": [],
+  "subjectAreas": [],
+  "database": "sqlite"
+}
