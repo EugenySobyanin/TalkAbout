@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.files.storage import default_storage  # Для работы с файлами
 from django.db import models
 
+from .utils import delete_folder_with_all_files, delete_old_avatar
 from talk_about.constants import DEFAULT_AVATAR_PATH
 
 
@@ -51,35 +52,39 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         """Автоматическое удаление старого аватара."""
-        if self.pk:  # Если пользователь уже существует
-            old_user = User.objects.get(pk=self.pk)
-            old_avatar = old_user.avatar
-
-            # Удаляем старый аватар только если он не дефолтный и изменился
-            if (
-                old_avatar and
-                old_avatar != self.avatar and
-                old_avatar.name != DEFAULT_AVATAR_PATH
-            ):
-                default_storage.delete(old_avatar.path)
+        delete_old_avatar(self)
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         """Удаляет папку пользователя со всем содержимым"""
         folder_path = f'users/user_{self.pk}'
-
-        # Полный физический путь к папке
-        full_path = default_storage.path(folder_path)
-
-        if default_storage.exists(folder_path):
-            # Удаляем все содержимое папки рекурсивно
-            for root, dirs, files in os.walk(full_path, topdown=False):
-                for name in files:
-                    os.remove(os.path.join(root, name))
-                for name in dirs:
-                    os.rmdir(os.path.join(root, name))
-
-            # Удаляем саму папку
-            os.rmdir(full_path)
-
+        delete_folder_with_all_files(folder_path)
         super().delete(*args, **kwargs)
+
+
+class PhotoUser(models.Model):
+    """Фотографии на странице пользователя."""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_photos'
+    )
+    image = models.ImageField(
+        'Изображение',
+        # Остановился на этом, думаю как тут указать путь
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+
+class Follow(models.Model):
+    """Подписки пользователя."""
+    follower = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_subscriptions'  # Подписки
+    )
+    following = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_subscribers'  # Подписчики
+    )
