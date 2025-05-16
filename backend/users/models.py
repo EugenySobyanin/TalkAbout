@@ -1,8 +1,6 @@
-import os
 import uuid
 
 from django.contrib.auth.models import AbstractUser
-from django.core.files.storage import default_storage  # Для работы с файлами
 from django.db import models
 
 from .utils import delete_folder_with_all_files, delete_old_avatar
@@ -60,31 +58,3 @@ class User(AbstractUser):
         folder_path = f'users/user_{self.pk}'
         delete_folder_with_all_files(folder_path)
         super().delete(*args, **kwargs)
-
-
-class PhotoUser(models.Model):
-    """Фотографии на странице пользователя."""
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='user_photos'
-    )
-    image = models.ImageField(
-        'Изображение',
-        # Остановился на этом, думаю как тут указать путь
-    )
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-
-
-class Follow(models.Model):
-    """Подписки пользователя."""
-    follower = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='user_subscriptions'  # Подписки
-    )
-    following = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='user_subscribers'  # Подписчики
-    )
