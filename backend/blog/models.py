@@ -52,3 +52,25 @@ class Follow(models.Model):
         on_delete=models.CASCADE,
         related_name='user_subscribers'  # Подписчики
     )
+
+
+class Post(models.Model):
+    """Публикации пользователей(на любую тематику)."""
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
+    title = models.CharField(
+        'Заголовок поста',
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+    text = models.TextField(
+        'Текст поста',
+        max_length=10000,
+        blank=True,
+        null=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
