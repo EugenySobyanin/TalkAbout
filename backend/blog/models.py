@@ -21,6 +21,10 @@ def user_photo_path(instance, filename):
     return f'users/user_{instance.user.id}/photos/{filename}'
 
 
+def post_photo_path():
+    pass
+
+
 class PhotoUser(models.Model):
     """Фотографии на странице пользователя."""
     user = models.ForeignKey(
@@ -74,3 +78,33 @@ class Post(models.Model):
         null=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+        default_related_name = 'posts'
+
+
+class PhotoPost(models.Model):
+    pass
+
+
+class CommentPost(models.Model):
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Автор комментария'
+    )
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        verbose_name='Публикация'
+    )
+    text = models.TextField(
+        'Teкс комментария',
+        max_length=5000,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-creared_at',)
+        default_related_name = 'comments'

@@ -3,8 +3,9 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .utils import delete_folder_with_all_files, delete_old_avatar
+from .utils import delete_old_avatar
 from talk_about.constants import DEFAULT_AVATAR_PATH
+from talk_about.utils import delete_folder_with_all_files
 
 
 def user_avatar_path(instance, filename):
