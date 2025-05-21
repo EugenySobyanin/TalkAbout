@@ -50,12 +50,12 @@ class User(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
-        """Автоматическое удаление старого аватара."""
+        # Автоматическое удаление старого аватара.
         delete_old_avatar(self)
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        """Удаляет папку пользователя со всем содержимым"""
+        # Удаляет папку пользователя со всем содержимым
         folder_path = f'users/user_{self.pk}'
         delete_folder_with_all_files(folder_path)
         super().delete(*args, **kwargs)
