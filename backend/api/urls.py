@@ -8,7 +8,7 @@ router = routers.DefaultRouter()
 router.register('posts', PostViewSet, basename='posts')
 
 urlpatterns = [
-    path('', include('router.urls')),
+    path('blog/', include(router.urls)),
     path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
 ]

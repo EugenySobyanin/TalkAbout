@@ -26,7 +26,7 @@ def user_photo_path(instance, filename):
 def post_photo_path(instance, filename):
     """
     Путь до фотографий прикрепленных к публикациям.
-    
+
     Args:
         instance: Экземпляр модели PhotoPost
         filename: Имя файла, который хочет добавить пользователь
