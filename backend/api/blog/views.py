@@ -13,4 +13,13 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=User.objects.get(pk=1))
+        serializer.save(author=self.request.user)
+
+    def get_queryset(self):
+        # Получаем ID пользователей, на которых подписан текущий пользователь
+        following_ids = self.request.user.user_subscriptions.values_list('following_id', flat=True)
+        # Добавляем ID текущего пользователя
+        all_authors_ids = list(following_ids) + [self.request.user.id]
+        return Post.objects.filter(
+            author_id__in=all_authors_ids
+        )

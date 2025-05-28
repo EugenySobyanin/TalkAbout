@@ -68,6 +68,9 @@ class Follow(models.Model):
         related_name='user_subscribers'  # Подписчики
     )
 
+    def __str__(self):
+        return f'{self.follower.first_name} {self.follower.last_name} ({self.follower.id}) подписан на {self.following.first_name} {self.following.last_name} ({self.following.id})'
+
 
 class Post(models.Model):
     """Публикации пользователей(на любую тематику)."""
