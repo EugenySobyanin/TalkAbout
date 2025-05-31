@@ -21,7 +21,6 @@ INSTALLED_APPS = [
     'djoser',
     'users.apps.UsersConfig',
     'blog.apps.BlogConfig',
-    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
