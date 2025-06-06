@@ -116,7 +116,7 @@ class PhotoPost(models.Model):
         'Изображение',
         upload_to=post_photo_path  # media/users/user_<ID>/posts/post_<ID>/<имя_файла>/
     )
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+    # uploaded_at = models.DateTimeField(auto_now_add=True)
 
     # По идее удаление отдельной фотографии поста не предусмотрено - предусмотрено удаление поста
     # def delete(self, *args, **kwargs):
