@@ -126,6 +126,8 @@ class PhotoPost(models.Model):
 
 
 class CommentPost(models.Model):
+    """Модель комментария к посту."""
+
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

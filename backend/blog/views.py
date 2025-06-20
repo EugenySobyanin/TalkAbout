@@ -1,14 +1,16 @@
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 
-from .serializers import PostSerializer
-from blog.models import Post
+from .serializers import PostSerializer, CommentPostSerializer
+from blog.models import Post, CommentPost
 
 
 User = get_user_model()
 
 
 class PostViewSet(viewsets.ModelViewSet):
+    """Вьюсет для публикаций."""
+
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
@@ -23,3 +25,9 @@ class PostViewSet(viewsets.ModelViewSet):
         return Post.objects.filter(
             author_id__in=all_authors_ids
         )
+
+
+class CommentPostViewSet(viewsets.ModelViewSet):
+    """Вьюсет для комментариев."""
+
+    serializer_class = CommentPostSerializer
