@@ -12,7 +12,7 @@ User = get_user_model()
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    """Вьюсет для публикаций."""
+    """Вьюсет для публикаций (обычных постов пользователей)."""
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer

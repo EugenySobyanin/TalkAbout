@@ -69,7 +69,10 @@ class Follow(models.Model):
     )
 
     def __str__(self):
-        return f'{self.follower.first_name} {self.follower.last_name} ({self.follower.id}) подписан на {self.following.first_name} {self.following.last_name} ({self.following.id})'
+        return (f'{self.follower.first_name} {self.follower.last_name} '
+                f'({self.follower.id}) подписан на '
+                f'{self.following.first_name} {self.following.last_name} '
+                f'({self.following.id})')
 
 
 class Post(models.Model):
