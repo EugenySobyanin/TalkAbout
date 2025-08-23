@@ -108,7 +108,7 @@ class Film(models.Model):
         blank=True,
     )
     budget_currency = models.CharField(
-        ' Валюта бюджета',
+        'Валюта бюджета',
         max_length=20,
         null=True,
         blank=True
@@ -148,10 +148,26 @@ class Film(models.Model):
                              blank=True,
                              verbose_name='Тип',
                              related_name='films')
-    genres = ...
-    counties = ...
-    networks = ...
-    persons = ...
+    genres = models.ManyToManyField(
+        'Genre',
+        through='FilmGenre',
+        verbose_name='Жанры'
+    )
+    countries = models.ManyToManyField(
+        'Country',
+        through='FilmCountry',
+        verbose_name='Страны'
+    )
+    networks = models.ManyToManyField(
+        'Network',
+        through='FilmNetwork',
+        verbose_name='Стриминговые сервисы'
+    )
+    persons = models.ManyToManyField(
+        'Person',
+        through='FilmPerson',
+        verbose_name='Персоны'
+    )
 
 
 class Type(BaseWithSlug):
@@ -161,7 +177,7 @@ class Type(BaseWithSlug):
     """
 
     name = models.CharField(
-        'Название типа',
+        'Тип',
         max_length=255,
         unique=True,
         help_text="Например: Фильм, Сериал, Мультфильм",
@@ -180,7 +196,7 @@ class Genre(BaseWithSlug):
     """
 
     name = models.CharField(
-        'Название жанра',
+        'Жанр',
         max_length=255,
         unique=True,
         help_text="Например: Драма, Комедия, Ужасы",
@@ -198,12 +214,35 @@ class FilmGenre(models.Model):
     Связь Фильма и Жанра (Many To Many).
     """
 
+    # При обратной связи получаем все объекты FilmGenre, где film == Film.id
+    # Потом можно получить все жанры фильма
+    film = models.ForeignKey(Film,
+                             on_delete=models.CASCADE,
+                             related_name='genres')
+    # При обратной свзи получаем все объекты FilmGenre, где genre == Genre.id
+    # Потом можно получить все фильмы в конкретном жанре
+    genre = models.ForeignKey(Genre,
+                              on_delete=models.CASCADE,
+                              related_name='films')
+
 
 class Country(BaseWithSlug):
     """Страна производства.
 
     США, Россия, Швеция и тд.
     """
+
+    name = models.CharField(
+        'Страна',
+        max_length=255,
+        unique=True,
+        help_text="Например: США, Россия, Италия",
+    )
+
+    class Meta:
+        verbose_name = 'Страна'
+        verbose_name_plural = 'Страны'
+        ordering = ['name']
 
 
 class FilmCountry(models.Model):
@@ -212,19 +251,16 @@ class FilmCountry(models.Model):
     Связь Фильма и Страны (Many To Many).
     """
 
-
-class Person(models.Model):
-    """Работник связанный с фильмом.
-
-    Режиссер, актер, актер озвучки, оператор и тд.
-    """
-
-
-class FilmPerson(models.Model):
-    """Промежуточная модель.
-
-    Связь Фильма и Персоны (Many To Many).
-    """
+    # При обратной связи получаем все объекты FilmCountry, где film == Film.id
+    # Потом можно получить все страны фильма
+    film = models.ForeignKey(Film,
+                             on_delete=models.CASCADE,
+                             related_name='countries')
+    # При обратной свзи получаем все объекты FilmCountry, где country == Country.id
+    # Потом можно получить все фильмы, снятые в конкретной стране
+    country = models.ForeignKey(Country,
+                                on_delete=models.CASCADE,
+                                related_name='films')
 
 
 class Network(BaseWithSlug):
@@ -233,12 +269,150 @@ class Network(BaseWithSlug):
     Netfilx, HBO и тд.
     """
 
+    name = models.CharField(
+        'Стриминговый сервис',
+        max_length=255,
+        unique=True,
+        help_text="Например: Netfilx, HBO, Apple TV",
+    )
+
+    class Meta:
+        verbose_name = 'Стриминговый сервис'
+        verbose_name_plural = 'Стриминговые сервисы'
+        ordering = ['name']
+
 
 class FilmNetwork(models.Model):
     """Промежуточная модель.
 
     Связь Фильма и Стримингового сервиса (Many To Many).
     """
+
+    # При обратной связи получаем все объекты FilmNetwork, где film == Film.id
+    # Потом можно получить все стриминговые сервисы фильма (это не нужно)
+    film = models.ForeignKey(Film,
+                             on_delete=models.CASCADE,
+                             related_name='networks')
+    # При обратной свзи получаем все объекты FilmNetwork, где network == Network.id
+    # Потом можно получить все фильмы, выпущенные этим сервисом
+    network = models.ForeignKey(Network,
+                                on_delete=models.CASCADE,
+                                related_name='films')
+
+
+class Person(models.Model):
+    """Работник связанный с фильмом.
+
+    Режиссер, актер, актер озвучки, оператор и тд.
+    """
+
+    kinopoisk_id = models.PositiveIntegerField(
+        'ID на Кинопоиск',
+        null=True,
+        blank=True,
+    )
+    name = models.CharField(
+        'Имя и фамилия на русском',
+        max_length=255,
+        null=True,
+        blank=True,
+        unique=True,
+    )
+    en_name = models.CharField(
+        'Имя и фамилия на английском',
+        max_length=255,
+        null=True,
+        blank=True,
+        unique=True,
+    )
+    qrowth = models.PositiveSmallIntegerField(
+        'Рост в см',
+        null=True,
+        blank=True,
+    )
+    birthday = models.DateField(
+        'Дата рождения',
+        null=True,
+        blank=True,
+
+    )
+    death = models.DateField(
+        'Дата смерти',
+        null=True,
+        blank=True,
+    )
+    # photo = ...
+
+
+class Profession(models.Model):
+    """Профессии.
+
+    Профессии людей, задействованных в ходе
+    съемки фильма.
+    """
+
+    profession = models.CharField(
+        'Профессия на русском',
+        max_length=255,
+        unique=True
+    )
+    en_profession = models.CharField(
+        'Профессия на английском',
+        max_length=255,
+        unique=True
+    )
+
+    class Meta:
+        verbose_name = 'Профессия'
+        verbose_name_plural = 'Профессии'
+        ordering = ['profession']
+
+    def __str__(self) -> str:
+        return self.profession
+
+
+class FilmPerson(models.Model):
+    """Промежуточная модель.
+
+    Связь Фильма и Персоны (Many To Many).
+    """
+
+    # При обратной свзяи получаем объекты FilmPerson, где film == Film.id
+    # Потом можем получить всех персон этого фильма
+    film = models.ForeignKey(Film,
+                             on_delete=models.CASCADE,
+                             related_name='persons')
+    # При обратной связи получаем объекты FilmPerson, где person = Person.id
+    # Потом можем получить все фильмы, где участвует конкретная персона
+    person = models.ForeignKey(Person,
+                               on_delete=models.CASCADE,
+                               related_name='films')
+    # Если это актер, то в этом поле краткое описание персонажа, которого он играет
+    description = models.CharField(
+        'Персонаж из фильма',
+        max_length=255,
+        null=True,
+        blank=True,
+    )
+
+
+class FilmPersonProfession(models.Model):
+    """Промежуточная модель.
+
+    Связь FilmPerson  и Profession (Many To Many).
+    Одна персона может иметь несколько профессий в
+    рамках одного фильма.
+    """
+    # При обратной связи получаем все объекты FilmPersonProfession, где film_person == FilmPerson.id
+    # Потом можем получить все профессии, которые были в этом фильме
+    film_person = models.ForeignKey(FilmPerson,
+                                    on_delete=models.CASCADE,
+                                    related_name='professions')
+    # При обратной связи получаем все объекты FilmPersonProfession, где profession == Profession.id
+    # Потом можем получить всех людей конкретной профессии по фильму
+    profession = models.ForeignKey(Profession,
+                                   on_delete=models.CASCADE,
+                                   related_name='film_persons')
 
 
 class Video(models.Model):

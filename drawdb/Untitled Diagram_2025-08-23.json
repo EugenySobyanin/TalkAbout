@@ -3,8 +3,8 @@
     {
       "id": 0,
       "name": "User",
-      "x": -590.45,
-      "y": -323.12500000000006,
+      "x": -1832.4963895589244,
+      "y": -675.0895027628142,
       "fields": [
         {
           "name": "id",
@@ -107,8 +107,8 @@
     {
       "id": 1,
       "name": "Film",
-      "x": -249.78022508105425,
-      "y": -304.83838949102204,
+      "x": -257.27092704980424,
+      "y": -288.91221885039704,
       "fields": [
         {
           "name": "id",
@@ -133,8 +133,36 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": "",
+          "comment": "Айди апи кинопоиска",
           "id": 1,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Дата создания записи",
+          "id": 2,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Дата последнего изменения записи",
+          "id": 3,
           "size": "",
           "values": []
         },
@@ -148,7 +176,7 @@
           "notNull": true,
           "increment": false,
           "comment": "Название на русском",
-          "id": 2,
+          "id": 4,
           "size": 255,
           "values": []
         },
@@ -162,7 +190,7 @@
           "notNull": false,
           "increment": false,
           "comment": "В api kinopoisk в этом поле всегда англ название",
-          "id": 3,
+          "id": 5,
           "size": 255,
           "values": []
         },
@@ -176,50 +204,8 @@
           "notNull": false,
           "increment": false,
           "comment": "Название на английском",
-          "id": 4,
-          "size": 255,
-          "values": []
-        },
-        {
-          "name": "type_id",
-          "type": "INTEGER",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "FK на Type, у фильма может быть только один тип",
-          "id": 5,
-          "size": "",
-          "values": []
-        },
-        {
-          "name": "year",
-          "type": "INTEGER",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "Год выпуска",
           "id": 6,
-          "size": "",
-          "values": []
-        },
-        {
-          "name": "description",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "Полное описание фильма",
-          "id": 7,
-          "size": 65535,
+          "size": 255,
           "values": []
         },
         {
@@ -232,6 +218,20 @@
           "notNull": false,
           "increment": false,
           "comment": "Короткое описание",
+          "id": 7,
+          "size": 65535,
+          "values": []
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Полное описание фильма",
           "id": 8,
           "size": 65535,
           "values": []
@@ -245,23 +245,23 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": "",
+          "comment": "Слоган",
           "id": 9,
           "size": 255,
           "values": []
         },
         {
-          "name": "status",
-          "type": "VARCHAR",
+          "name": "year",
+          "type": "INTEGER",
           "default": "",
           "check": "",
           "primary": false,
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": "",
+          "comment": "Год выпуска",
           "id": 10,
-          "size": 255,
+          "size": "",
           "values": []
         },
         {
@@ -307,84 +307,16 @@
           "values": []
         },
         {
-          "name": "logo",
-          "type": "VARCHAR",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "Ссылка на лого",
-          "id": 14,
-          "size": 255,
-          "values": []
-        },
-        {
-          "name": "poster",
-          "type": "VARCHAR",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "Ссылка на постер",
-          "id": 15,
-          "size": 255
-        },
-        {
-          "name": "backdrop",
-          "type": "VARCHAR",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "Непонятно что это, что-то типа обоев, ссылка на картинку",
-          "id": 16,
-          "size": 255,
-          "values": []
-        },
-        {
-          "name": "genre_id",
-          "type": "INTEGER",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "FK на Genre",
-          "id": 17,
-          "size": "",
-          "values": []
-        },
-        {
-          "name": "budget_currency",
-          "type": "VARCHAR",
-          "default": "$",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "Валюта бюджета фильма",
-          "id": 18,
-          "size": 255
-        },
-        {
           "name": "is_series",
           "type": "BOOLEAN",
-          "default": "False",
+          "default": "",
           "check": "",
           "primary": false,
           "unique": false,
           "notNull": true,
           "increment": false,
           "comment": "Сериал или нет",
-          "id": 19,
+          "id": 14,
           "size": "",
           "values": []
         },
@@ -398,7 +330,203 @@
           "notNull": false,
           "increment": false,
           "comment": "",
+          "id": 15,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "budget_currency",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Валюта бюджета фильма",
+          "id": 16,
+          "size": 255,
+          "values": []
+        },
+        {
+          "name": "series_length",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Для сериалов. Длина одной серии.",
+          "id": 17,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "total_series_length",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Для сериалов. Длина всего сериала.",
+          "id": 18,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "poster",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Ссылка на постер",
+          "id": 19,
+          "size": 255,
+          "values": []
+        },
+        {
+          "name": "logo",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Ссылка на лого",
           "id": 20,
+          "size": 255,
+          "values": []
+        },
+        {
+          "name": "backdrop",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Непонятно что это, что-то типа обоев, ссылка на картинку",
+          "id": 21,
+          "size": 255,
+          "values": []
+        },
+        {
+          "name": "fees O:O",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Данные о сборах. Одна запись из таблицы Fees может быть связана только с одним фильмом.",
+          "id": 22,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "type_id O:M",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "FK на Type, у фильма может быть только один тип (Фильм, сериал, мультфильм)",
+          "id": 23,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "facts O:M",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "",
+          "id": 24,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "videos O:M",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "",
+          "id": 25,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "genres M:N",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "\"Фильм  - Жанр\" - связь Многие ко Многим",
+          "id": 26,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "countries M:N",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "\"Фильм - Страна\" - связь Многие ко Многим",
+          "id": 27,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "persons M:N",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "\"Фильм - Персона\" - связь Многие ко Многим",
+          "id": 28,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "networks M:N",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Networks -  это сервисы (HBO, Netflix)",
+          "id": 29,
           "size": "",
           "values": []
         }
@@ -411,8 +539,8 @@
     {
       "id": 2,
       "name": "PhotoUser",
-      "x": -589.6389750810542,
-      "y": 32.57911050897819,
+      "x": -1917.0921454759284,
+      "y": -304.42728961350275,
       "fields": [
         {
           "name": "id",
@@ -476,8 +604,8 @@
     {
       "id": 3,
       "name": "Review",
-      "x": -276.8403276818949,
-      "y": -642.5295710904616,
+      "x": -2377.3641173800856,
+      "y": 913.1493529764564,
       "fields": [
         {
           "name": "id",
@@ -555,8 +683,8 @@
     {
       "id": 4,
       "name": "Post",
-      "x": -1294.8501252670753,
-      "y": -287.40694034377196,
+      "x": -2299.0858999248085,
+      "y": -842.6037718283231,
       "fields": [
         {
           "name": "id",
@@ -633,8 +761,8 @@
     {
       "id": 5,
       "name": "CommentPost",
-      "x": -1150.3351463792706,
-      "y": 335.31443840279024,
+      "x": -2219.0696548099404,
+      "y": -175.2620522244789,
       "fields": [
         {
           "name": "id",
@@ -713,8 +841,8 @@
     {
       "id": 6,
       "name": "CommentReview",
-      "x": -748.841135722938,
-      "y": -758.7420541874193,
+      "x": -2370.676132315562,
+      "y": 1449.9173689946235,
       "fields": [
         {
           "name": "id",
@@ -792,8 +920,8 @@
     {
       "id": 7,
       "name": "Person",
-      "x": 367.84005276666255,
-      "y": 548.8632586790595,
+      "x": 1763.0573710890476,
+      "y": 1748.0311104831699,
       "fields": [
         {
           "name": "id",
@@ -808,17 +936,18 @@
           "id": 0
         },
         {
-          "name": "photo",
-          "type": "VARCHAR",
+          "name": "kinopoisk_id",
+          "type": "INTEGER",
           "default": "",
           "check": "",
           "primary": false,
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": "Ссылка на фото",
+          "comment": "",
           "id": 1,
-          "size": 255
+          "size": "",
+          "values": []
         },
         {
           "name": "name",
@@ -847,8 +976,8 @@
           "size": 255
         },
         {
-          "name": "description",
-          "type": "VARCHAR",
+          "name": "growth",
+          "type": "INTEGER",
           "default": "",
           "check": "",
           "primary": false,
@@ -857,10 +986,39 @@
           "increment": false,
           "comment": "",
           "id": 4,
-          "size": 255
+          "size": "",
+          "values": []
         },
         {
-          "name": "profession",
+          "name": "birthday",
+          "type": "DATETIME",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "",
+          "id": 5,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "death",
+          "type": "DATETIME",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Если умер - то в этом поле указана дата смерти",
+          "id": 6,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "photo",
           "type": "VARCHAR",
           "default": "",
           "check": "",
@@ -868,22 +1026,10 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": "Профессия на русском",
-          "id": 5,
-          "size": 255
-        },
-        {
-          "name": "en_profession",
-          "type": "VARCHAR",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "Профессия на английском",
-          "id": 6,
-          "size": 255
+          "comment": "Ссылка на фото",
+          "id": 7,
+          "size": 255,
+          "values": []
         }
       ],
       "comment": "",
@@ -894,8 +1040,8 @@
     {
       "id": 8,
       "name": "Genre",
-      "x": 360.29571522420486,
-      "y": -166.52421029774916,
+      "x": 1675.1882905645944,
+      "y": 606.2508162054796,
       "fields": [
         {
           "name": "id",
@@ -944,8 +1090,8 @@
     {
       "id": 9,
       "name": "FilmType",
-      "x": 84.44252318868723,
-      "y": -385.7054063684673,
+      "x": 1706.686329164842,
+      "y": -2086.29506497267,
       "fields": [
         {
           "name": "id",
@@ -968,8 +1114,21 @@
           "unique": true,
           "notNull": true,
           "increment": false,
-          "comment": "",
+          "comment": "Сериал, фильм, мультфильм и тд. Можно использовать Enum.\nНужен ли slug в этой таблице?",
           "id": 1,
+          "size": 255
+        },
+        {
+          "name": "slug",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Slug",
+          "id": 2,
           "size": 255
         }
       ],
@@ -981,8 +1140,8 @@
     {
       "id": 10,
       "name": "Country",
-      "x": 364.56405694357795,
-      "y": 21.38488106963635,
+      "x": 1751.596863631933,
+      "y": 1224.7323732318382,
       "fields": [
         {
           "name": "id",
@@ -1008,6 +1167,19 @@
           "comment": "",
           "id": 1,
           "size": 255
+        },
+        {
+          "name": "slug",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "id": 2,
+          "size": 255
         }
       ],
       "comment": "",
@@ -1018,8 +1190,8 @@
     {
       "id": 11,
       "name": "PhotoPost",
-      "x": -1208.1081883892375,
-      "y": 49.666641059827896,
+      "x": -2222.264601822471,
+      "y": -485.9566658299298,
       "fields": [
         {
           "name": "id",
@@ -1068,9 +1240,9 @@
     },
     {
       "id": 12,
-      "name": "Trailer",
-      "x": 93.80054660331638,
-      "y": 209.06964739743717,
+      "name": "Video",
+      "x": 1715.634679307514,
+      "y": -197.1221028691109,
       "fields": [
         {
           "name": "id",
@@ -1176,8 +1348,8 @@
     {
       "id": 13,
       "name": "FilmGenre",
-      "x": 93.71061046086216,
-      "y": -167.13786285039083,
+      "x": 1288.5406484940484,
+      "y": 617.1449117268407,
       "fields": [
         {
           "name": "id",
@@ -1228,8 +1400,8 @@
     {
       "id": 14,
       "name": "FilmCountry",
-      "x": 93.3753211445736,
-      "y": 23.772699129047737,
+      "x": 1300.7634893450504,
+      "y": 1249.2259424278764,
       "fields": [
         {
           "name": "id",
@@ -1280,8 +1452,8 @@
     {
       "id": 15,
       "name": "FilmPerson",
-      "x": 87.40854709665558,
-      "y": 563.0254413924347,
+      "x": 1320.223868613566,
+      "y": 1764.8184328540838,
       "fields": [
         {
           "name": "id",
@@ -1322,6 +1494,19 @@
           "id": 2,
           "size": "",
           "values": []
+        },
+        {
+          "name": "description",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Описание какую роль исполнил в этом фильме.",
+          "id": 3,
+          "size": 255
         }
       ],
       "comment": "",
@@ -1332,8 +1517,8 @@
     {
       "id": 16,
       "name": "PlanFilm",
-      "x": -1064.5031454552434,
-      "y": 773.7410015022668,
+      "x": -2382.597624296849,
+      "y": 2018.424236804751,
       "fields": [
         {
           "name": "id",
@@ -1398,8 +1583,8 @@
     {
       "id": 17,
       "name": "WatchedFilm",
-      "x": -726.4472187930878,
-      "y": 968.6020913971919,
+      "x": -2390.469430103771,
+      "y": 2471.6916619617787,
       "fields": [
         {
           "name": "id",
@@ -1477,8 +1662,8 @@
     {
       "id": 18,
       "name": "RecommendedFilm",
-      "x": -359.71544718512985,
-      "y": 1004.8313073187621,
+      "x": -2384.208049472561,
+      "y": 2945.812920895365,
       "fields": [
         {
           "name": "id",
@@ -1529,8 +1714,8 @@
     {
       "id": 19,
       "name": "Follow",
-      "x": -1253.1584526389508,
-      "y": -653.373938010513,
+      "x": -2180.2936155987068,
+      "y": -1051.1649952502557,
       "fields": [
         {
           "name": "id",
@@ -1581,8 +1766,8 @@
     {
       "id": 20,
       "name": "Fees",
-      "x": 521.6766878453454,
-      "y": -586.9743063521826,
+      "x": 1712.7821594295972,
+      "y": -1467.900945991106,
       "fields": [
         {
           "name": "id",
@@ -1700,8 +1885,8 @@
     {
       "id": 21,
       "name": "SimilarFilms",
-      "x": 93.29846424833158,
-      "y": -694.0688622514353,
+      "x": 1704.6912191846204,
+      "y": -3951.144830849251,
       "fields": [
         {
           "name": "id",
@@ -1752,8 +1937,8 @@
     {
       "id": 22,
       "name": "SequelsAndPrequels",
-      "x": 355.61996072066006,
-      "y": -893.8182586477958,
+      "x": 1706.6921904484716,
+      "y": -3508.3593912950114,
       "fields": [
         {
           "name": "id",
@@ -1804,8 +1989,8 @@
     {
       "id": 23,
       "name": "AgregatorInfo",
-      "x": -324.02379139513585,
-      "y": -1203.7795987262157,
+      "x": 1718.1225954357333,
+      "y": -2801.8366330211315,
       "fields": [
         {
           "name": "id",
@@ -1883,8 +2068,8 @@
     {
       "id": 24,
       "name": "Facts",
-      "x": 122.11823016950497,
-      "y": -1217.590589043005,
+      "x": 1741.053793651806,
+      "y": -740.7571760217836,
       "fields": [
         {
           "name": "id",
@@ -1930,6 +2115,210 @@
       "indices": [],
       "color": "#175e7a",
       "key": 1753545249586
+    },
+    {
+      "id": 25,
+      "name": "Network",
+      "x": 1762.5713605156463,
+      "y": 2515.8303920429507,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": 0
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "id": 1,
+          "size": 255
+        },
+        {
+          "name": "slug",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "id": 2,
+          "size": 255
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#ffe159",
+      "key": 1755950756299
+    },
+    {
+      "id": 26,
+      "name": "FilmNetwork",
+      "x": 1352.1909378998423,
+      "y": 2514.7389547487596,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": 0
+        },
+        {
+          "name": "film_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "id": 1,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "network_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "id": 2,
+          "size": "",
+          "values": []
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#ffe159",
+      "key": 1755950758843
+    },
+    {
+      "id": 27,
+      "name": "Profession",
+      "x": 783.5442590431732,
+      "y": 1563.047898420821,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": 0
+        },
+        {
+          "name": "profession",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "id": 1,
+          "size": 255
+        },
+        {
+          "name": "en_profession",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "",
+          "id": 2,
+          "size": 255
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#32c9b0",
+      "key": 1755978293973
+    },
+    {
+      "id": 28,
+      "name": "FilmPersonProfession",
+      "x": 876.6239520018851,
+      "y": 2054.8189428860105,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": 0
+        },
+        {
+          "name": "film_person_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "id": 1,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "profession_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "id": 2,
+          "size": "",
+          "values": []
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#32c9b0",
+      "key": 1755978295394
     }
   ],
   "relationships": [
@@ -2023,13 +2412,13 @@
     },
     {
       "startTableId": 1,
-      "startFieldId": 5,
+      "startFieldId": 23,
       "endTableId": 9,
       "endFieldId": 0,
       "cardinality": "one_to_one",
       "updateConstraint": "No action",
       "deleteConstraint": "No action",
-      "name": "fk_Film_type_id_FilmType",
+      "name": "Type - One to Many",
       "id": 8
     },
     {
@@ -2132,7 +2521,7 @@
       "id": 17
     },
     {
-      "startTableId": 16,
+      "startTableId": 15,
       "startFieldId": 1,
       "endTableId": 0,
       "endFieldId": 0,
@@ -2143,7 +2532,7 @@
       "id": 18
     },
     {
-      "startTableId": 16,
+      "startTableId": 15,
       "startFieldId": 2,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2154,7 +2543,7 @@
       "id": 19
     },
     {
-      "startTableId": 17,
+      "startTableId": 16,
       "startFieldId": 1,
       "endTableId": 0,
       "endFieldId": 0,
@@ -2165,7 +2554,7 @@
       "id": 20
     },
     {
-      "startTableId": 17,
+      "startTableId": 16,
       "startFieldId": 2,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2176,7 +2565,7 @@
       "id": 21
     },
     {
-      "startTableId": 18,
+      "startTableId": 17,
       "startFieldId": 1,
       "endTableId": 0,
       "endFieldId": 0,
@@ -2187,7 +2576,7 @@
       "id": 22
     },
     {
-      "startTableId": 18,
+      "startTableId": 17,
       "startFieldId": 2,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2198,7 +2587,7 @@
       "id": 23
     },
     {
-      "startTableId": 19,
+      "startTableId": 18,
       "startFieldId": 1,
       "endTableId": 0,
       "endFieldId": 0,
@@ -2209,7 +2598,7 @@
       "id": 24
     },
     {
-      "startTableId": 19,
+      "startTableId": 18,
       "startFieldId": 2,
       "endTableId": 0,
       "endFieldId": 0,
@@ -2220,7 +2609,7 @@
       "id": 25
     },
     {
-      "startTableId": 20,
+      "startTableId": 19,
       "startFieldId": 1,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2231,7 +2620,7 @@
       "id": 26
     },
     {
-      "startTableId": 21,
+      "startTableId": 20,
       "startFieldId": 1,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2242,7 +2631,7 @@
       "id": 27
     },
     {
-      "startTableId": 21,
+      "startTableId": 20,
       "startFieldId": 2,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2253,7 +2642,7 @@
       "id": 28
     },
     {
-      "startTableId": 22,
+      "startTableId": 21,
       "startFieldId": 1,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2264,7 +2653,7 @@
       "id": 29
     },
     {
-      "startTableId": 22,
+      "startTableId": 21,
       "startFieldId": 2,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2275,7 +2664,7 @@
       "id": 30
     },
     {
-      "startTableId": 23,
+      "startTableId": 22,
       "startFieldId": 1,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2286,7 +2675,7 @@
       "id": 31
     },
     {
-      "startTableId": 24,
+      "startTableId": 23,
       "startFieldId": 1,
       "endTableId": 1,
       "endFieldId": 0,
@@ -2295,6 +2684,39 @@
       "deleteConstraint": "No action",
       "name": "fk_Facts_film_id_Film",
       "id": 32
+    },
+    {
+      "startTableId": 24,
+      "startFieldId": 0,
+      "endTableId": 25,
+      "endFieldId": 2,
+      "cardinality": "one_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "name": "fk_Network_id_FilmNetwork",
+      "id": 33
+    },
+    {
+      "startTableId": 28,
+      "startFieldId": 2,
+      "endTableId": 27,
+      "endFieldId": 0,
+      "cardinality": "one_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "name": "fk_FilmPersonProfession_profession_id_Profession",
+      "id": 34
+    },
+    {
+      "startTableId": 28,
+      "startFieldId": 1,
+      "endTableId": 15,
+      "endFieldId": 0,
+      "cardinality": "one_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "name": "fk_FilmPersonProfession_film_person_id_FilmPerson",
+      "id": 35
     }
   ],
   "notes": [],
