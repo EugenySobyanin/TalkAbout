@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'djoser',
     'users.apps.UsersConfig',
     'blog.apps.BlogConfig',
+    'gallery.apps.GalleryConfig',
 ]
 
 MIDDLEWARE = [
