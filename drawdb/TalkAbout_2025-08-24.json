@@ -1293,7 +1293,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": "",
+          "comment": "Какое-то простое название ролика",
           "id": 3,
           "size": 255,
           "values": []
@@ -1312,20 +1312,6 @@
           "size": 255
         },
         {
-          "name": "size",
-          "type": "INTEGER",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "",
-          "id": 5,
-          "size": "",
-          "values": []
-        },
-        {
           "name": "type",
           "type": "VARCHAR",
           "default": "",
@@ -1334,8 +1320,8 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": "",
-          "id": 6,
+          "comment": "Почти везде будет \"TRAILER\"",
+          "id": 5,
           "size": 255,
           "values": []
         }
@@ -1796,22 +1782,22 @@
           "values": []
         },
         {
-          "name": "world_value",
-          "type": "INTEGER",
+          "name": "type",
+          "type": "VARCHAR",
           "default": "",
           "check": "",
           "primary": false,
           "unique": false,
-          "notNull": false,
+          "notNull": true,
           "increment": false,
-          "comment": "",
+          "comment": "\"world\", \"russia\", \"usa\"\nВозможны и другие значения",
           "id": 2,
-          "size": "",
+          "size": 50,
           "values": []
         },
         {
-          "name": "world_currency",
-          "type": "VARCHAR",
+          "name": "value",
+          "type": "INTEGER",
           "default": "",
           "check": "",
           "primary": false,
@@ -1820,61 +1806,22 @@
           "increment": false,
           "comment": "",
           "id": 3,
-          "size": 255
+          "size": "",
+          "values": []
         },
         {
-          "name": "russia_value",
-          "type": "INTEGER",
+          "name": "currency",
+          "type": "VARCHAR",
           "default": "",
           "check": "",
           "primary": false,
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": "",
+          "comment": "Значок нужной валюты, обычно доллар",
           "id": 4,
-          "size": "",
+          "size": 5,
           "values": []
-        },
-        {
-          "name": "russia_currency",
-          "type": "VARCHAR",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "",
-          "id": 5,
-          "size": 255
-        },
-        {
-          "name": "usa_value",
-          "type": "INTEGER",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "",
-          "id": 6,
-          "size": "",
-          "values": []
-        },
-        {
-          "name": "usa_currency",
-          "type": "VARCHAR",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "comment": "",
-          "id": 7,
-          "size": 255
         }
       ],
       "comment": "Информация о сборах фильма",
@@ -2109,6 +2056,33 @@
           "comment": "",
           "id": 2,
           "size": 65535
+        },
+        {
+          "name": "type",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "\"FACT\",\"BLOOPER\" и возможно какие-то другие",
+          "id": 3,
+          "size": 255
+        },
+        {
+          "name": "spoiler",
+          "type": "BOOLEAN",
+          "default": "false",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Спойлер или нет",
+          "id": 4,
+          "size": "",
+          "values": []
         }
       ],
       "comment": "",

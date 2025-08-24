@@ -19,14 +19,15 @@ class MPAARating(models.TextChoices):
 class BaseWithSlug(models.Model):
     """Базовый класс с полем Slug."""
 
-    name = models.CharField(max_length=255)
-    slug = models.SlugField(
-        'Slug',
-        max_length=255,
-        blank=True,
-        unique=True,
-        help_text="Человекопонятный URL (автозаполнение)"
-    )
+    name = models.CharField('Название', max_length=255)
+    slug = models.SlugField('Slug',
+                            max_length=255,
+                            blank=True,
+                            unique=True,
+                            help_text="Человекопонятный URL (автозаполнение)")
+
+    class Meta:
+        abstract = True
 
     def __str__(self):
         return self.name
@@ -48,18 +49,21 @@ class Film(models.Model):
         'ID API Kinopoisk',
         null=True,
         blank=True,
+        db_index=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     name = models.CharField(
         'Название',
         max_length=255,
+        db_index=True,
     )
     alternative_name = models.CharField(
         'Альтернативное название',
         max_length=255,
         null=True,
         blank=True,
+        db_index=True,
     )
     en_name = models.CharField(
         'Название на английском',
@@ -80,6 +84,7 @@ class Film(models.Model):
             MaxValueValidator(lambda: timezone.now().year + 20,
                               message="Слишком будущий год")
         ],
+        db_index=True,
     )
     movie_length = models.PositiveIntegerField(
         'Длительность фильма в минутах',
@@ -310,6 +315,7 @@ class Person(models.Model):
         'ID на Кинопоиск',
         null=True,
         blank=True,
+        unique=True,
     )
     name = models.CharField(
         'Имя и фамилия на русском',
@@ -342,6 +348,14 @@ class Person(models.Model):
         blank=True,
     )
     # photo = ...
+
+    class Meta:
+        verbose_name = 'Персона'
+        verbose_name_plural = 'Персоны'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
 
 
 class Profession(models.Model):
@@ -423,6 +437,43 @@ class Video(models.Model):
     У одного трейлера один фильм, у одного фильма много трейлеров.
     """
 
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Фильм',
+        related_name='video'
+    )
+    url = models.URLField('Ссылка', max_length=255, null=True, blank=True)
+    name = models.CharField(
+        'Название видео',
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    site = models.CharField(
+        'Название сайта',
+        max_length=100,
+        null=True,
+        blank=True,
+        unique=True
+    )
+    type = models.CharField(
+        'Тип видео',
+        max_length=50,
+        null=True,
+        blank=True,
+        unique=True,
+    )
+
+    class Meta:
+        verbose_name = 'Видео'
+        verbose_name_plural = 'Видео'
+        ordering = ['film', 'type', 'name']
+
+    def __str__(self):
+        return self.name
+
 
 class Fact(models.Model):
     """Факт.
@@ -432,6 +483,31 @@ class Fact(models.Model):
     У одного факта один фильм, у одного фильма много фактов.
     """
 
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Фильм',
+        related_name='facts'
+    )
+    text = models.TextField('Текст', max_length=1000, default='')
+    type = models.CharField(
+        'Тип факта',
+        max_length=50,
+        null=True,
+        blank=True,
+        unique=True
+    )
+    spoiler = models.BooleanField('Спойлер или нет', default=False)
+
+    class Meta:
+        verbose_name = 'Факт'
+        verbose_name_plural = 'Факты'
+        ordering = ['film', 'type', 'id']
+
+    def __str__(self):
+        return self.text[:30]
+
 
 class Fees(models.Model):
     """Данные о сборах фильма.
@@ -440,6 +516,28 @@ class Fees(models.Model):
     Одна запись из Fees связана с одним фильмом,
     Один фильм связан с одной записью Fees.
     """
+
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Фильм',
+        related_name='fees'
+    )
+    type = models.CharField(
+        'Тип сброров',
+        max_length=50,
+    )
+    value = models.PositiveIntegerField('Сумма', null=True, blank=True)
+    currency = models.CharField('Валюта', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Сборы'
+        verbose_name_plural = 'Сборы'
+        ordering = ['film', 'type']
+
+    def __str__(self):
+        return ...
 
 
 class AgregatorInfo(models.Model):
