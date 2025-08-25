@@ -1,30 +1,38 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import (MinValueValidator,
+                                    MaxValueValidator,
+                                    MaxLengthValidator)
 from django.db import models
-from django.utils import timezone
 from django.utils.text import slugify
 
 
-class MPAARating(models.TextChoices):
-    """Возможные варианты рейтинга MPAAA."""
-
-    G = 'G', 'G (Для всех возрастов)'
-    PG = 'PG', 'PG (Родительский контроль)'
-    PG_13 = 'PG-13', 'PG-13 (Для детей от 13 лет)'
-    R = 'R', 'R (До 17 лет с родителями)'
-    NC_17 = 'NC-17', 'NC-17 (Только для взрослых 18+)'
-    NOT_RATED = 'NR', 'Не рейтингован'
-    UNRATED = 'UNRATED', 'Без рейтинга'
+from backend.gallery.constants import (
+    NAME_MAX_LENGTH,
+    FILM_TITLE_MAX_LENGTH,
+    SHORT_DESC_MAX_LENGTH,
+    SLOGAN_MAX_LENGTH,
+    FIRST_FILM_YEAR,
+    MIN_MOVIE_LENGTH,
+    MAX_MOVIE_LENGTH,
+    RATING_MPAA_MAX_LENGTH,
+    BUDGET_CURRENCY_MAX_LENGTH
+)
+from backend.gallery.validators import MaxYearValidator
 
 
 class BaseWithSlug(models.Model):
     """Базовый класс с полем Slug."""
 
-    name = models.CharField('Название', max_length=255)
-    slug = models.SlugField('Slug',
-                            max_length=255,
-                            blank=True,
-                            unique=True,
-                            help_text="Человекопонятный URL (автозаполнение)")
+    name = models.CharField(
+        'Название',
+        max_length=NAME_MAX_LENGTH
+    )
+    slug = models.SlugField(
+        'Slug',
+        max_length=NAME_MAX_LENGTH,
+        blank=True,
+        unique=True,
+        help_text="Человекопонятный URL (автозаполнение)"
+    )
 
     class Meta:
         abstract = True
@@ -52,37 +60,57 @@ class Film(models.Model):
         db_index=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
     name = models.CharField(
-        'Название',
-        max_length=255,
+        'Название (на русском)',
+        max_length=FILM_TITLE_MAX_LENGTH,
+        null=True,
+        blank=True,
         db_index=True,
     )
     alternative_name = models.CharField(
         'Альтернативное название',
-        max_length=255,
+        max_length=FILM_TITLE_MAX_LENGTH,
         null=True,
         blank=True,
         db_index=True,
     )
     en_name = models.CharField(
         'Название на английском',
-        max_length=255,
+        max_length=FILM_TITLE_MAX_LENGTH,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    description = models.TextField(
+        'Описание',
         null=True,
         blank=True,
     )
-    description = models.TextField('Описание', null=True, blank=True,)
-    short_description = models.TextField('Краткое описание',
-                                         null=True, blank=True,)
-    slogan = models.CharField('Слоган', max_length=255, null=True, blank=True,)
+    short_description = models.TextField(
+        'Краткое описание',
+        null=True,
+        blank=True,
+        validators=[
+            MaxLengthValidator(SHORT_DESC_MAX_LENGTH),
+        ],
+    )
+    slogan = models.CharField(
+        'Слоган',
+        max_length=SLOGAN_MAX_LENGTH,
+        null=True,
+        blank=True,
+    )
     year = models.IntegerField(
         'Год выпуска фильма',
         null=True,
         blank=True,
         validators=[
-            MinValueValidator(1888, message='Первый фильм вышел в 1888 году.'),
-            MaxValueValidator(lambda: timezone.now().year + 20,
-                              message="Слишком будущий год")
+            MinValueValidator(
+                FIRST_FILM_YEAR,
+                message=f'Первый фильм вышел в {FIRST_FILM_YEAR} году.'
+            ),
+            MaxYearValidator(),
         ],
         db_index=True,
     )
@@ -91,16 +119,21 @@ class Film(models.Model):
         null=True,
         blank=True,
         validators=[
-            MinValueValidator(1, 'Не может быть меньше 1'),
-            MaxValueValidator(1000,
-                              'Длительность не может быть больше 1000 минут.')
+            MinValueValidator(
+                MIN_MOVIE_LENGTH,
+                f'Не может быть меньше {MIN_MOVIE_LENGTH}'
+            ),
+            MaxValueValidator(
+                MAX_MOVIE_LENGTH,
+                f'Длительность не может быть больше {MAX_MOVIE_LENGTH} минут.')
         ],
     )
+    # pg-13, R и тд.
     rating_mpaa = models.CharField(
         'Рейтиг MPAA',
+        max_length=RATING_MPAA_MAX_LENGTH,
         null=True,
         blank=True,
-        choices=MPAARating.choices,
     )
     age_rating = models.PositiveSmallIntegerField(
         'Возрастной рейтинг',
@@ -114,7 +147,7 @@ class Film(models.Model):
     )
     budget_currency = models.CharField(
         'Валюта бюджета',
-        max_length=20,
+        max_length=BUDGET_CURRENCY_MAX_LENGTH,
         null=True,
         blank=True
     )
@@ -128,17 +161,24 @@ class Film(models.Model):
         null=True,
         blank=True,
         validators=[
-            MinValueValidator(1, 'Не может быть меньше 1'),
-            MaxValueValidator(1000,
-                              'Длительность не может быть больше 1000 минут.')
+            MinValueValidator(
+                MIN_MOVIE_LENGTH,
+                f'Не может быть меньше {MIN_MOVIE_LENGTH}'
+            ),
+            MaxValueValidator(
+                MAX_MOVIE_LENGTH,
+                f'Длительность не может быть больше {MAX_MOVIE_LENGTH} минут.')
         ],
     )
     total_series_length = models.PositiveIntegerField(
-        'Длительность сериала в минутах',
+        'Длительность всего сериала в минутах',
         null=True,
         blank=True,
         validators=[
-            MinValueValidator(1, 'Не может быть меньше 1'),
+            MinValueValidator(
+                MIN_MOVIE_LENGTH,
+                f'Не может быть меньше {MIN_MOVIE_LENGTH}'
+            ),
         ],
     )
     # seasons_info = ...
@@ -147,12 +187,14 @@ class Film(models.Model):
     # poster = ...
     # logo = ...
     # backdrop = ...
-    type = models.ForeignKey('Type',
-                             on_delete=models.SET_NULL,
-                             null=True,
-                             blank=True,
-                             verbose_name='Тип',
-                             related_name='films')
+    type = models.ForeignKey(
+        'Type',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Тип',
+        related_name='films'
+    )
     genres = models.ManyToManyField(
         'Genre',
         through='FilmGenre',
@@ -174,6 +216,14 @@ class Film(models.Model):
         verbose_name='Персоны'
     )
 
+    class Meta:
+        verbose_name = 'Фильм (серил и др.)'
+        verbose_name_plural = 'Фильмы (сериалы и др.)'
+        ordering = ['year', 'id']
+
+    def __str__(self):
+        return f'{self.name} {self.year}'
+
 
 class Type(BaseWithSlug):
     """Тип кинопроизведения.
@@ -183,7 +233,7 @@ class Type(BaseWithSlug):
 
     name = models.CharField(
         'Тип',
-        max_length=255,
+        max_length=NAME_MAX_LENGTH,
         unique=True,
         help_text="Например: Фильм, Сериал, Мультфильм",
     )
@@ -202,7 +252,7 @@ class Genre(BaseWithSlug):
 
     name = models.CharField(
         'Жанр',
-        max_length=255,
+        max_length=NAME_MAX_LENGTH,
         unique=True,
         help_text="Например: Драма, Комедия, Ужасы",
     )
@@ -221,14 +271,20 @@ class FilmGenre(models.Model):
 
     # При обратной связи получаем все объекты FilmGenre, где film == Film.id
     # Потом можно получить все жанры фильма
-    film = models.ForeignKey(Film,
-                             on_delete=models.CASCADE,
-                             related_name='genres')
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        verbose_name='Фильм (сериал и тд.)',
+        related_name='genres'
+    )
     # При обратной свзи получаем все объекты FilmGenre, где genre == Genre.id
     # Потом можно получить все фильмы в конкретном жанре
-    genre = models.ForeignKey(Genre,
-                              on_delete=models.CASCADE,
-                              related_name='films')
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+        verbose_name='Жанр',
+        related_name='films'
+    )
 
 
 class Country(BaseWithSlug):
@@ -239,7 +295,7 @@ class Country(BaseWithSlug):
 
     name = models.CharField(
         'Страна',
-        max_length=255,
+        max_length=NAME_MAX_LENGTH,
         unique=True,
         help_text="Например: США, Россия, Италия",
     )
@@ -524,7 +580,7 @@ class Fees(models.Model):
         verbose_name='Фильм',
         related_name='fees'
     )
-    type = models.CharField(
+    place = models.CharField(
         'Тип сброров',
         max_length=50,
     )
@@ -537,7 +593,7 @@ class Fees(models.Model):
         ordering = ['film', 'type']
 
     def __str__(self):
-        return ...
+        return f'{self.film.name[:20]} собрал {self.value} {self.currency} в {self.place}'
 
 
 class AgregatorInfo(models.Model):
@@ -546,6 +602,25 @@ class AgregatorInfo(models.Model):
     Агрегаторы: кинопоиск, imdb, критики.
     Many To Many
     """
+
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Фильм',
+        related_name='agregators'
+    )
+    rating = models.FloatField(
+        'Значение',
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(10)
+        ]
+    )
+    votes = models.PositiveIntegerField('Количество оценок')
+    source = models.CharField('Ресурс', max_length=30)
 
 
 class SequelsAndPrequels(models.Model):
