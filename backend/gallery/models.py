@@ -3,20 +3,36 @@ from django.core.validators import (MinValueValidator,
                                     MaxLengthValidator)
 from django.db import models
 from django.utils.text import slugify
+from django.utils import timezone
 
 
 from backend.gallery.constants import (
+    # Максимальные значения длины для полей
     NAME_MAX_LENGTH,
+    PERSON_NAME_MAX_LENGTH,
     FILM_TITLE_MAX_LENGTH,
     SHORT_DESC_MAX_LENGTH,
     SLOGAN_MAX_LENGTH,
-    FIRST_FILM_YEAR,
-    MIN_MOVIE_LENGTH,
-    MAX_MOVIE_LENGTH,
     RATING_MPAA_MAX_LENGTH,
-    BUDGET_CURRENCY_MAX_LENGTH
+    BUDGET_CURRENCY_MAX_LENGTH,
+    MOVIE_CHARACTER_MAX_LENGTH,
+    URL_MAX_LENGTH,
+    VIDEO_TITLE_MAX_LENGTH,
+    PROFESSION_MAX_LENGTH,
+
+    # Ограничения по длине в строковых методах
+    CUT_FACT_TEXT,
+    CUT_FILM_NAME,
+    CUT_PERSON_NAME,
+    CUT_VIDEO_NAME,
+
+    # Ограничения в валидаторах
+    FIRST_FILM_YEAR,
+    MAX_MOVIE_LENGTH,
+    MIN_MOVIE_LENGTH
 )
 from backend.gallery.validators import MaxYearValidator
+from backend.gallery.utils import cut_str
 
 
 class BaseWithSlug(models.Model):
@@ -286,6 +302,9 @@ class FilmGenre(models.Model):
         related_name='films'
     )
 
+    def __str__(self) -> str:
+        return f'{cut_str(self.film.name, CUT_FILM_NAME)} - {self.genre.name}'
+
 
 class Country(BaseWithSlug):
     """Страна производства.
@@ -314,14 +333,23 @@ class FilmCountry(models.Model):
 
     # При обратной связи получаем все объекты FilmCountry, где film == Film.id
     # Потом можно получить все страны фильма
-    film = models.ForeignKey(Film,
-                             on_delete=models.CASCADE,
-                             related_name='countries')
-    # При обратной свзи получаем все объекты FilmCountry, где country == Country.id
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        related_name='countries'
+    )
+    # При обратной свзи получаем все объекты FilmCountry,
+    # где country == Country.id
     # Потом можно получить все фильмы, снятые в конкретной стране
-    country = models.ForeignKey(Country,
-                                on_delete=models.CASCADE,
-                                related_name='films')
+    country = models.ForeignKey(
+        Country,
+        on_delete=models.CASCADE,
+        related_name='films'
+    )
+
+    def __str__(self) -> str:
+        return (f'{cut_str(self.film.name, CUT_FILM_NAME)} '
+                f'- {self.country.name}')
 
 
 class Network(BaseWithSlug):
@@ -332,7 +360,7 @@ class Network(BaseWithSlug):
 
     name = models.CharField(
         'Стриминговый сервис',
-        max_length=255,
+        max_length=NAME_MAX_LENGTH,
         unique=True,
         help_text="Например: Netfilx, HBO, Apple TV",
     )
@@ -351,14 +379,23 @@ class FilmNetwork(models.Model):
 
     # При обратной связи получаем все объекты FilmNetwork, где film == Film.id
     # Потом можно получить все стриминговые сервисы фильма (это не нужно)
-    film = models.ForeignKey(Film,
-                             on_delete=models.CASCADE,
-                             related_name='networks')
-    # При обратной свзи получаем все объекты FilmNetwork, где network == Network.id
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        related_name='networks'
+    )
+    # При обратной свзи получаем все объекты FilmNetwork,
+    # где network == Network.id
     # Потом можно получить все фильмы, выпущенные этим сервисом
-    network = models.ForeignKey(Network,
-                                on_delete=models.CASCADE,
-                                related_name='films')
+    network = models.ForeignKey(
+        Network,
+        on_delete=models.CASCADE,
+        related_name='films'
+    )
+
+    def __str__(self) -> str:
+        return (f'{cut_str(self.film.name, CUT_FILM_NAME)} '
+                f'- {self.network.name}')
 
 
 class Person(models.Model):
@@ -375,19 +412,19 @@ class Person(models.Model):
     )
     name = models.CharField(
         'Имя и фамилия на русском',
-        max_length=255,
+        max_length=PERSON_NAME_MAX_LENGTH,
         null=True,
         blank=True,
-        unique=True,
+        db_index=True,
     )
     en_name = models.CharField(
         'Имя и фамилия на английском',
-        max_length=255,
+        max_length=PERSON_NAME_MAX_LENGTH,
         null=True,
         blank=True,
-        unique=True,
+        db_index=True,
     )
-    qrowth = models.PositiveSmallIntegerField(
+    growth = models.PositiveSmallIntegerField(
         'Рост в см',
         null=True,
         blank=True,
@@ -411,7 +448,34 @@ class Person(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return self.name
+        return f'{cut_str(self.name, CUT_PERSON_NAME)}'
+
+    @property
+    def age(self):
+        """Возраст или возраст на момент смерти."""
+        if not self.birthday:
+            return None
+
+        end_date = timezone.now().date() if not self.death else self.death
+
+        # Проверка что дата смерти не раньше даты рождения
+        if self.death and self.death < self.birthday:
+            return None
+
+        # Точный расчет
+        age = end_date.year - self.birthday.year
+
+        # Проверяем, наступил ли день рождения в текущем году
+        has_birthday_occurred = (
+            (end_date.month > self.birthday.month) or
+            (end_date.month == self.birthday.month and 
+             end_date.day >= self.birthday.day)
+        )
+
+        if not has_birthday_occurred:
+            age -= 1
+
+        return max(0, age)  # Возраст не может быть отрицательным
 
 
 class Profession(models.Model):
@@ -423,12 +487,12 @@ class Profession(models.Model):
 
     profession = models.CharField(
         'Профессия на русском',
-        max_length=255,
+        max_length=PROFESSION_MAX_LENGTH,
         unique=True
     )
     en_profession = models.CharField(
         'Профессия на английском',
-        max_length=255,
+        max_length=PROFESSION_MAX_LENGTH,
         unique=True
     )
 
@@ -449,21 +513,31 @@ class FilmPerson(models.Model):
 
     # При обратной свзяи получаем объекты FilmPerson, где film == Film.id
     # Потом можем получить всех персон этого фильма
-    film = models.ForeignKey(Film,
-                             on_delete=models.CASCADE,
-                             related_name='persons')
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        related_name='persons'
+    )
     # При обратной связи получаем объекты FilmPerson, где person = Person.id
     # Потом можем получить все фильмы, где участвует конкретная персона
-    person = models.ForeignKey(Person,
-                               on_delete=models.CASCADE,
-                               related_name='films')
-    # Если это актер, то в этом поле краткое описание персонажа, которого он играет
+    person = models.ForeignKey(
+        Person,
+        on_delete=models.CASCADE,
+        related_name='films'
+    )
+    # Если это актер, то в этом поле краткое описание персонажа,
+    # которого он играет
     description = models.CharField(
-        'Персонаж из фильма',
-        max_length=255,
+        'Описание роли, которую исполнил актре в фильме',
+        max_length=MOVIE_CHARACTER_MAX_LENGTH,
         null=True,
         blank=True,
+        help_text='Описание роли, которую исполнил актре в фильме',
     )
+
+    def __str__(self) -> str:
+        return (f'{self.pk} - {cut_str(self.film.name, CUT_FILM_NAME)} '
+                f'- {cut_str(self.person.name, CUT_PERSON_NAME)}')
 
 
 class FilmPersonProfession(models.Model):
@@ -473,16 +547,28 @@ class FilmPersonProfession(models.Model):
     Одна персона может иметь несколько профессий в
     рамках одного фильма.
     """
-    # При обратной связи получаем все объекты FilmPersonProfession, где film_person == FilmPerson.id
+    # При обратной связи получаем все объекты FilmPersonProfession,
+    # где film_person == FilmPerson.id
     # Потом можем получить все профессии, которые были в этом фильме
-    film_person = models.ForeignKey(FilmPerson,
-                                    on_delete=models.CASCADE,
-                                    related_name='professions')
-    # При обратной связи получаем все объекты FilmPersonProfession, где profession == Profession.id
+    film_person = models.ForeignKey(
+        FilmPerson,
+        on_delete=models.CASCADE,
+        related_name='professions'
+    )
+    # При обратной связи получаем все объекты FilmPersonProfession,
+    # где profession == Profession.id
     # Потом можем получить всех людей конкретной профессии по фильму
-    profession = models.ForeignKey(Profession,
-                                   on_delete=models.CASCADE,
-                                   related_name='film_persons')
+    profession = models.ForeignKey(
+        Profession,
+        on_delete=models.CASCADE,
+        related_name='film_person_professions'
+    )
+
+    def __str__(self) -> str:
+        return (f'{self.pk} - '
+                f'{cut_str(self.film_person.film.name, CUT_FILM_NAME)} - '
+                f'{cut_str(self.film_person.person.name, CUT_PERSON_NAME)} - '
+                f'{self.profession.profession}')
 
 
 class Video(models.Model):
@@ -498,28 +584,32 @@ class Video(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Фильм',
-        related_name='video'
+        related_name='videos'
     )
-    url = models.URLField('Ссылка', max_length=255, null=True, blank=True)
+    url = models.URLField(
+        'Ссылка',
+        max_length=URL_MAX_LENGTH,
+        null=True,
+        blank=True,
+        unique=True,
+    )
     name = models.CharField(
         'Название видео',
-        max_length=255,
+        max_length=VIDEO_TITLE_MAX_LENGTH,
         null=True,
         blank=True
     )
     site = models.CharField(
         'Название сайта',
-        max_length=100,
+        max_length=NAME_MAX_LENGTH,
         null=True,
         blank=True,
-        unique=True
     )
     type = models.CharField(
         'Тип видео',
-        max_length=50,
+        max_length=NAME_MAX_LENGTH,
         null=True,
         blank=True,
-        unique=True,
     )
 
     class Meta:
@@ -527,8 +617,10 @@ class Video(models.Model):
         verbose_name_plural = 'Видео'
         ordering = ['film', 'type', 'name']
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return (f'{self.pk} - '
+                f'{cut_str(self.name, CUT_VIDEO_NAME)} '
+                f'- {self.type} - {cut_str(self.film.name, CUT_FILM_NAME)}')
 
 
 class Fact(models.Model):
@@ -546,31 +638,33 @@ class Fact(models.Model):
         verbose_name='Фильм',
         related_name='facts'
     )
-    text = models.TextField('Текст', max_length=1000, default='')
+    text = models.TextField('Текст', default='')
+    # Тип факта FACT, BLOOPER
     type = models.CharField(
         'Тип факта',
-        max_length=50,
+        max_length=NAME_MAX_LENGTH,
         null=True,
         blank=True,
-        unique=True
     )
     spoiler = models.BooleanField('Спойлер или нет', default=False)
 
     class Meta:
         verbose_name = 'Факт'
         verbose_name_plural = 'Факты'
-        ordering = ['film', 'type', 'id']
+        ordering = ['film', 'type', 'pk']
 
     def __str__(self):
-        return self.text[:30]
+        return (f'{self.pk} - '
+                f'{cut_str(self.film.name, CUT_FILM_NAME)} - '
+                f'{cut_str(self.text, CUT_FACT_TEXT)}')
 
 
 class Fees(models.Model):
     """Данные о сборах фильма.
 
-    One To One
+    One To Many
     Одна запись из Fees связана с одним фильмом,
-    Один фильм связан с одной записью Fees.
+    Один фильм может быть связан с несколькими записями из Fees.
     """
 
     film = models.ForeignKey(
@@ -582,7 +676,7 @@ class Fees(models.Model):
     )
     place = models.CharField(
         'Тип сброров',
-        max_length=50,
+        max_length=NAME_MAX_LENGTH,
     )
     value = models.PositiveIntegerField('Сумма', null=True, blank=True)
     currency = models.CharField('Валюта', null=True, blank=True)
@@ -590,17 +684,20 @@ class Fees(models.Model):
     class Meta:
         verbose_name = 'Сборы'
         verbose_name_plural = 'Сборы'
-        ordering = ['film', 'type']
+        ordering = ['film', 'place']
 
     def __str__(self):
-        return f'{self.film.name[:20]} собрал {self.value} {self.currency} в {self.place}'
+        return (f'{self.pk} - {cut_str(self.film.name, CUT_FILM_NAME)} '
+                f'собрал {self.value} {self.currency} в {self.place}')
 
 
 class AgregatorInfo(models.Model):
     """Данные агрегаторов.
 
     Агрегаторы: кинопоиск, imdb, критики.
-    Many To Many
+    Связь One To Many
+    Одна записись из AgregatorIngo может быть связан с одним Film
+    Один Film может быть связан со многими AgregatorInfo.
     """
 
     film = models.ForeignKey(
@@ -620,12 +717,69 @@ class AgregatorInfo(models.Model):
         ]
     )
     votes = models.PositiveIntegerField('Количество оценок')
-    source = models.CharField('Ресурс', max_length=30)
+    source = models.CharField('Ресурс', max_length=NAME_MAX_LENGTH)
+
+    class Meta:
+        verbose_name = 'Данные агрегатора'
+        verbose_name_plural = 'Данные агрегаторов'
+        ordering = ['film', 'source', 'pk']
+
+    def __str__(self) -> str:
+        return (f'{self.pk} - {self.source} - '
+                f'{cut_str(self.film.name, CUT_FILM_NAME)}')
 
 
 class SequelsAndPrequels(models.Model):
     """Данные о сиквелах и приквелах."""
+    # При обратной связи получаем все объекты SequelsAndPrequels,
+    # где film == Film.pk
+    # Потом мы можем извлечь все сиквелы и приквелы фильма
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        verbose_name='Фильм',
+        related_name='sequels_and_prequels'
+    )
+    # Для этого поля обратная связь не нужна, т.к по сути, в результате
+    # так же получаем сиквелы и приквелы
+    related_film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        verbose_name='Связанынй фильм (сиквел, приквел и тд.)'
+    )
+
+    class Meta:
+        verbose_name = 'Сиквелы, приквелы и тд.'
+        verbose_name_plural = 'Сиквелы, приквелы и тд.'
+
+    def __str__(self) -> str:
+        return (f'{self.pk} - {cut_str(self.film.name, CUT_FILM_NAME)} '
+                f'связан с - {cut_str(self.related_film.name, CUT_FILM_NAME)}')
 
 
 class SimilarFilms(models.Model):
-    """Данные о похожих фильмах."""
+    """Данные о схожих фильмах."""
+    # При обратной связи получаем все объекты SequelsAndPrequels,
+    # где film == Film.pk
+    # Потом мы можем извлечь все сиквелы и приквелы фильма
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        verbose_name='Фильм',
+        related_name='similar_films'
+    )
+    # Для этого поля обратная связь не нужна, т.к по сути, в результате
+    # так же получаем схожие фильмы (которые связаны с этим)
+    similar_film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        verbose_name='Похожий фильм'
+    )
+
+    class Meta:
+        verbose_name = 'Похожий фильм'
+        verbose_name_plural = 'Похожие фильмы'
+
+    def __str__(self) -> str:
+        return (f'{self.pk} - {cut_str(self.film.name, CUT_FILM_NAME)} '
+                f'связан с - {cut_str(self.similar_film.name, CUT_FILM_NAME)}')
