@@ -6,7 +6,7 @@ from django.utils.text import slugify
 from django.utils import timezone
 
 
-from backend.gallery.constants import (
+from gallery.constants import (
     # Максимальные значения длины для полей
     NAME_MAX_LENGTH,
     PERSON_NAME_MAX_LENGTH,
@@ -19,6 +19,7 @@ from backend.gallery.constants import (
     URL_MAX_LENGTH,
     VIDEO_TITLE_MAX_LENGTH,
     PROFESSION_MAX_LENGTH,
+    CURRENCY_MAX_LENGTH,
 
     # Ограничения по длине в строковых методах
     CUT_FACT_TEXT,
@@ -31,8 +32,8 @@ from backend.gallery.constants import (
     MAX_MOVIE_LENGTH,
     MIN_MOVIE_LENGTH
 )
-from backend.gallery.validators import MaxYearValidator
-from backend.gallery.utils import cut_str
+from gallery.validators import MaxYearValidator
+from gallery.utils import cut_str
 
 
 class BaseWithSlug(models.Model):
@@ -291,7 +292,7 @@ class FilmGenre(models.Model):
         Film,
         on_delete=models.CASCADE,
         verbose_name='Фильм (сериал и тд.)',
-        related_name='genres'
+        related_name='film_genres'
     )
     # При обратной свзи получаем все объекты FilmGenre, где genre == Genre.id
     # Потом можно получить все фильмы в конкретном жанре
@@ -336,7 +337,7 @@ class FilmCountry(models.Model):
     film = models.ForeignKey(
         Film,
         on_delete=models.CASCADE,
-        related_name='countries'
+        related_name='film_countries'
     )
     # При обратной свзи получаем все объекты FilmCountry,
     # где country == Country.id
@@ -382,7 +383,7 @@ class FilmNetwork(models.Model):
     film = models.ForeignKey(
         Film,
         on_delete=models.CASCADE,
-        related_name='networks'
+        related_name='film_networks'
     )
     # При обратной свзи получаем все объекты FilmNetwork,
     # где network == Network.id
@@ -516,7 +517,7 @@ class FilmPerson(models.Model):
     film = models.ForeignKey(
         Film,
         on_delete=models.CASCADE,
-        related_name='persons'
+        related_name='film_persons'
     )
     # При обратной связи получаем объекты FilmPerson, где person = Person.id
     # Потом можем получить все фильмы, где участвует конкретная персона
@@ -679,7 +680,12 @@ class Fees(models.Model):
         max_length=NAME_MAX_LENGTH,
     )
     value = models.PositiveIntegerField('Сумма', null=True, blank=True)
-    currency = models.CharField('Валюта', null=True, blank=True)
+    currency = models.CharField(
+        'Валюта',
+        max_length=CURRENCY_MAX_LENGTH,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'Сборы'

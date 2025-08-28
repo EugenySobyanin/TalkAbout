@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from backend.gallery.constants import MAX_FUTURE_PERIOD_RELEASE
+from gallery.constants import MAX_FUTURE_PERIOD_RELEASE
 
 
 class MaxYearValidator:
