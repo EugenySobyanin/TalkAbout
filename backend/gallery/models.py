@@ -1,10 +1,12 @@
+import uuid
+
+from django.core.files.storage import default_storage
 from django.core.validators import (MinValueValidator,
                                     MaxValueValidator,
                                     MaxLengthValidator)
 from django.db import models
-from django.utils.text import slugify
 from django.utils import timezone
-
+from slugify import slugify
 
 from gallery.constants import (
     # Максимальные значения длины для полей
@@ -32,8 +34,39 @@ from gallery.constants import (
     MAX_MOVIE_LENGTH,
     MIN_MOVIE_LENGTH
 )
-from gallery.validators import MaxYearValidator
+from gallery.validators import validate_max_future_year
 from gallery.utils import cut_str
+from talk_about.constants import DEFAULT_AVATAR_PATH
+
+
+def films_photos_path(instance, filename) -> str:
+    """
+    Формирует путь до картинок фильма (лого, постер, обои).
+
+    Args:
+        instance: Экземпляр модели Film
+        filename: Оригинальное имя файла
+    """
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+
+    # Временный путь, который обновится при сохранении модели Film
+    return f'films/film_{instance.pk}/{filename}'
+
+
+def persons_photos_path(instance, filename) -> str:
+    """
+    Формирует путь до фото персон.
+
+    Args:
+    instance: Экземпляр модели Person
+    filename: Имя файла, который хочет добавить пользователь
+    """
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+
+    # Временный путь, который обновится при сохранении модели Person
+    return f'persons/temp/{filename}'
 
 
 class BaseWithSlug(models.Model):
@@ -127,7 +160,7 @@ class Film(models.Model):
                 FIRST_FILM_YEAR,
                 message=f'Первый фильм вышел в {FIRST_FILM_YEAR} году.'
             ),
-            MaxYearValidator(),
+            validate_max_future_year,
         ],
         db_index=True,
     )
@@ -201,9 +234,21 @@ class Film(models.Model):
     # seasons_info = ...
     # start_series = ... # Год старта сериала
     # end_series = ...   # Год окончания сериала
-    # poster = ...
-    # logo = ...
-    # backdrop = ...
+    poster = models.ImageField(
+        'Постер',
+        # media/films/film_<ID>/<имя_файла>/
+        upload_to=films_photos_path,
+    )
+    logo = models.ImageField(
+        'Лого',
+        # media/films/film_<ID>/<имя_файла>/
+        upload_to=films_photos_path,
+    )
+    backdrop = models.ImageField(
+        'Обои',
+        # media/films/film_<ID>/<имя_файла>/
+        upload_to=films_photos_path,
+    )
     type = models.ForeignKey(
         'Type',
         on_delete=models.SET_NULL,
@@ -441,7 +486,12 @@ class Person(models.Model):
         null=True,
         blank=True,
     )
-    # photo = ...
+    photo = models.ImageField(
+        'Фото',
+        # media/persons/person_<ID>/<имя_файла>/
+        upload_to=persons_photos_path,
+        default=DEFAULT_AVATAR_PATH,
+    )
 
     class Meta:
         verbose_name = 'Персона'
@@ -450,6 +500,19 @@ class Person(models.Model):
 
     def __str__(self):
         return f'{cut_str(self.name, CUT_PERSON_NAME)}'
+
+    def save(self, *args, **kwargs):
+        # Сохраняем объект чтобы получить ID
+        super().save(*args, **kwargs)
+
+        # Если фото есть и оно во временной папке
+        if self.photo and 'temp' in self.photo.name:
+            # Перемещаем файл в постоянную папку
+            new_name = self.photo.name.replace('temp', f'person_{self.pk}')
+            default_storage.save(new_name, self.photo)
+            self.photo.name = new_name
+            # Сохраняем с новым путем
+            super().save(update_fields=['photo'])
 
     @property
     def age(self):

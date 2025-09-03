@@ -10,7 +10,7 @@ from talk_about.utils import delete_folder_with_all_files
 User = get_user_model()
 
 
-def user_photo_path(instance, filename):
+def user_photo_path(instance, filename) -> str:
     """
     Путь до личных фотогрфий пользователя.
 
@@ -117,7 +117,8 @@ class PhotoPost(models.Model):
     )
     image = models.ImageField(
         'Изображение',
-        upload_to=post_photo_path  # media/users/user_<ID>/posts/post_<ID>/<имя_файла>/
+        # media/users/user_<ID>/posts/post_<ID>/<имя_файла>/
+        upload_to=post_photo_path
     )
     # uploaded_at = models.DateTimeField(auto_now_add=True)
 
