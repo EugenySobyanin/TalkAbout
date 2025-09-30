@@ -9,7 +9,15 @@ from gallery.models import Film
 User = get_user_model()
 
 
-class UserFilmActivities(models.Model):
+class BaseCreatedUpdated(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+
+    class Meta:
+        abstract = True
+
+
+class UserFilmActivitie(BaseCreatedUpdated):
     """
     Пользовательские активности.
 
@@ -38,15 +46,13 @@ class UserFilmActivities(models.Model):
         ]
     )
     is_public = models.BooleanField('Публичный', default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
 
-class HistoryWatching(models.Model):
+class HistoryWatching(BaseCreatedUpdated):
     """История просмотров пользователей."""
 
     user_film_activities = models.ForeignKey(
-        UserFilmActivities,
+        UserFilmActivitie,
         on_delete=models.CASCADE,
         verbose_name='Пользователь-Фильм',
         related_name='watching_history',
@@ -60,22 +66,87 @@ class HistoryWatching(models.Model):
     )
 
 
-class Collections(models.Model):
+class Collection(BaseCreatedUpdated):
     """
     Подборки/Коллекции с фильмами.
 
     Подборки могут создавать и пользоватали и админы.
     """
-    # Остановился здесь_________________________________________________________________________________
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+        related_name='collections',
+    )
+    title = models.CharField(
+        'Название подборки',
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    description = models.CharField(
+        'Описание подборки',
+        max_length=500,
+        null=True,
+        blank=True
+    )
+    is_public = models.BooleanField('Публичный', default=False)
+    films = models.ManyToManyField(
+        Film,
+        through='CollectionFilms',
+        verbose_name='Фильмы',
+    )
 
 
-class CollectionFilms(models.Model):
-    """"""
+class CollectionFilms(BaseCreatedUpdated):
+    """Связь Подборка - Фильм (многие ко многиим)."""
+
+    collection = models.ForeignKey(
+        Collection,
+        on_delete=models.CASCADE,
+        verbose_name='Подборка',
+        # related_name=...
+    )
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        verbose_name='Фильм',
+        # related_name=...
+    )
 
 
-class Review(models.Model):
+class Review(BaseCreatedUpdated):
     """Рецензии к кинопроизведениям."""
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+    )
+    film = models.ForeignKey(
+        Film,
+        on_delete=models.CASCADE,
+        verbose_name='Фильм',
+    )
+    text = models.TextField('Текст рецензии')
+
+    class Meta:
+        default_related_name = 'reviews'
 
 
 class CommentReview(models.Model):
     """Комментарий к рецензии."""
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+    )
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        verbose_name='Комментарий',
+    )
+    text = models.CharField('Текст комментария', max_length=2000)
+    created_at = models.DateTimeField(auto_now_add=True)
