@@ -19,7 +19,7 @@ class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
         if not data or not isinstance(data, str):
             return None
-        
+
         if data.startswith('data:image'):
             try:
                 format, imgstr = data.split(';base64,')

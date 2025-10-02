@@ -35,7 +35,7 @@ class UserFilmActivitie(BaseCreatedUpdated):
         verbose_name='Фильм',
     )
     is_planned = models.BooleanField('Буду смотерь', default=False)
-    is_wathed = models.BooleanField('Просмотрено', default=False)
+    is_watched = models.BooleanField('Просмотрено', default=False)
     rating = models.SmallIntegerField(
         'Оценка',
         null=True,
