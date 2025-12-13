@@ -5,6 +5,7 @@ from .views import PostViewSet, CommentPostViewSet
 
 
 router = routers.DefaultRouter()
+
 router.register('posts', PostViewSet, basename='posts')
 router.register(
     r'posts/(?P<post_id>\d+)/comments',
