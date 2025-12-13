@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'blog.apps.BlogConfig',
     'gallery.apps.GalleryConfig',
+    'activities.apps.ActivitiesConfig',
 ]
 
 MIDDLEWARE = [
