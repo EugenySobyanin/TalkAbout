@@ -135,6 +135,7 @@ def add_user_activitie(request, film_id, user_id=None):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# Нужно переписать функцию выше хотя бы под APIView ______________________________________________________________________________________________________________________
 class UserFilmActivitieView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -150,7 +151,7 @@ class UserFilmActivitieView(APIView):
             ) if user != request.user else UserFilmActivitie.objects.filter(user=user, film=film)
         else:  # Получение записей текущего пользователя
             user_activities = UserFilmActivitie.objects.filter(user=request.user, film=film)
-        
+
         serializer = AddUserActivitieSerializer(user_activities, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
