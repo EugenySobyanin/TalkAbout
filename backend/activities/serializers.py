@@ -11,4 +11,4 @@ class AddUserActivitieSerializer(serializers.ModelSerializer):
         model = UserFilmActivitie
         fields = ('id', 'user', 'film',
                   'is_planned', 'is_watched', 'rating', 'is_public')
-        read_only_fields = ('rating', 'is_public')
+        # read_only_fields = ('rating', 'is_public')
