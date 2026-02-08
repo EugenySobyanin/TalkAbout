@@ -21,7 +21,7 @@ class UserFilmActivitie(BaseCreatedUpdated):
     """
     Пользовательские активности.
 
-    Основная модель для связит Пользователь - Фильм.
+    Основная модель для связи Пользователь - Фильм.
     """
     user = models.ForeignKey(
         User,
@@ -45,7 +45,7 @@ class UserFilmActivitie(BaseCreatedUpdated):
             MaxValueValidator(10, 'Максимальный балл 10.')
         ]
     )
-    is_public = models.BooleanField('Публичный', default=False)
+    is_public = models.BooleanField('Публичный', default=True)
 
 
 class HistoryWatching(BaseCreatedUpdated):
