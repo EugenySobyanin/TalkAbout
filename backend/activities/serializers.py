@@ -4,11 +4,21 @@ from activities.models import UserFilmActivitie
 from gallery.models import Film
 
 
-class AddUserActivitieSerializer(serializers.ModelSerializer):
-    """Сериализатор для фильмов."""
+class AddUserActivitySerializer(serializers.ModelSerializer):
+    """Сериализатор для добавления активностей."""
 
     class Meta:
         model = UserFilmActivitie
         fields = ('id', 'user', 'film',
                   'is_planned', 'is_watched', 'rating', 'is_public')
-        # read_only_fields = ('rating', 'is_public')
+
+
+class UserActivitySerializer(serializers.ModelSerializer):
+    """Сериализатор активностей."""
+    # Нужен серилизатор для пользователя
+    # Нужен сериализатор для фильма
+
+    class Meta:
+        model = UserFilmActivitie
+        fields = ('id', 'user', 'film',
+                  'is_planned', 'is_watched', 'rating', 'is_public')
