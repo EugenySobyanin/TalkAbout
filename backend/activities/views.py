@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 
 from activities.models import UserFilmActivitie, HistoryWatching
-from activities.serializers import AddUserActivitySerializer
+from activities.serializers import AddUserActivitySerializer, ActivitySerializer
 from gallery.models import Film
 
 
@@ -16,7 +16,9 @@ User = get_user_model()
 
 
 class UserActivitiesView(APIView):
-    """Получение списков планируемых и просмотренных фильмов."""
+    """Получение списков планируемых и просмотренных фильмов.
+
+    Для текущего пользователя и списков других пользователей."""
 
     permission_classes = [IsAuthenticated]
 
@@ -44,18 +46,20 @@ class UserActivitiesView(APIView):
         # Сортировка по дате добавления
         queryset = queryset.order_by('-created_at')
 
-        serializer = AddUserActivitySerializer(queryset, many=True)
+        serializer = ActivitySerializer(queryset, many=True)
         return Response(serializer.data)
 
 
 class UserFilmActivityView(APIView):
-    """Отдельные записи user_activity."""
+    """Отдельные записи user_activity.
+
+    Добавление, изменение, удаление."""
 
     permission_classes = [IsAuthenticated]
 
     def post(self, request, film_id):
         """Добавить/обновить активность для фильма.
-        
+
         Используется для управления основными статусами:
         - Добавить в планируемые (is_planned=True)
         - Добавить в просмотренные (is_watched=True)
@@ -78,7 +82,7 @@ class UserFilmActivityView(APIView):
         # Пытаемся найти существующую запись
         try:
             activity = UserFilmActivitie.objects.get(user=request.user, film=film)
-            
+
             # Если пользователь пытается установить тот же статус, что уже есть
             if 'is_planned' in data and activity.is_planned == data['is_planned'] and \
                'is_watched' in data and activity.is_watched == data['is_watched']:
@@ -96,11 +100,11 @@ class UserFilmActivityView(APIView):
                     # Ничего не меняется, возвращаем текущее состояние
                     serializer = AddUserActivitySerializer(activity)
                     return Response(serializer.data, status=status.HTTP_200_OK)
-            
+
             # Обновляем существующую запись
             serializer = AddUserActivitySerializer(activity, data=data, partial=True)
             status_code = status.HTTP_200_OK
-            
+
         except UserFilmActivitie.DoesNotExist:
             # Создаем новую запись
             serializer = AddUserActivitySerializer(data=data)
@@ -151,7 +155,7 @@ class UserFilmActivityView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, film_id):
