@@ -66,54 +66,7 @@ class HistoryWatching(BaseCreatedUpdated):
     )
 
 
-class Collection(BaseCreatedUpdated):
-    """
-    Подборки/Коллекции с фильмами.
 
-    Подборки могут создавать и пользоватали и админы.
-    """
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name='Пользователь',
-        related_name='collections',
-    )
-    title = models.CharField(
-        'Название подборки',
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    description = models.CharField(
-        'Описание подборки',
-        max_length=500,
-        null=True,
-        blank=True
-    )
-    is_public = models.BooleanField('Публичный', default=False)
-    films = models.ManyToManyField(
-        Film,
-        through='CollectionFilms',
-        verbose_name='Фильмы',
-    )
-
-
-class CollectionFilms(BaseCreatedUpdated):
-    """Связь Подборка - Фильм (многие ко многиим)."""
-
-    collection = models.ForeignKey(
-        Collection,
-        on_delete=models.CASCADE,
-        verbose_name='Подборка',
-        # related_name=...
-    )
-    film = models.ForeignKey(
-        Film,
-        on_delete=models.CASCADE,
-        verbose_name='Фильм',
-        # related_name=...
-    )
 
 
 class Review(BaseCreatedUpdated):

@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'blog.apps.BlogConfig',
     'gallery.apps.GalleryConfig',
     'activities.apps.ActivitiesConfig',
+    'compilations.apps.CompilationsConfig',
 ]
 
 MIDDLEWARE = [
