@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'gallery.apps.GalleryConfig',
     'activities.apps.ActivitiesConfig',
     'compilations.apps.CompilationsConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
