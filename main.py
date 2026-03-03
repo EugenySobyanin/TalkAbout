@@ -26,5 +26,23 @@ def start_game():
             break
 
 
+def rand_counter(start, end):
+    data = {key: 0 for key in range(start, end + 1)}
+
+    while (True):
+        for el in data:
+            random_int = randint(start, end)
+            data[random_int] += 1
+            if data[random_int] == 10:
+                print_dict(data)
+                return
+
+
+def print_dict(data):
+    for key, value in data.items():
+        print(f'{key} - {value}')
+
+
 if __name__ == '__main__':
-    start_game()
+    # start_game()
+    rand_counter(1, 28)
