@@ -18,6 +18,18 @@ def user_avatar_path(instance, filename):
 class User(AbstractUser):
     """Модель пользователя."""
 
+    class Role(models.TextChoices):
+        ADMIN = 'ADMIN', 'Администратор'
+        MODERATOR = 'MODERATOR', 'Модератор'
+        USER = 'USER', 'Пользователь'
+
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,
+        default=Role.USER,
+        verbose_name='Роль'
+    )
+
     email = models.EmailField(
         'Email', max_length=254, unique=True,
         blank=False, null=False
@@ -47,7 +59,7 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return f'{self.id} - {self.first_name} {self.last_name}'
+        return f'{self.pk} - {self.first_name} {self.last_name}'
 
     def save(self, *args, **kwargs):
         # Автоматическое удаление старого аватара.
@@ -59,3 +71,11 @@ class User(AbstractUser):
         folder_path = f'users/user_{self.pk}'
         delete_folder_with_all_files(folder_path)
         super().delete(*args, **kwargs)
+
+    @property
+    def is_admin(self):
+        return self.role == self.Role.ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == self.Role.MODERATOR

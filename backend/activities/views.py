@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 
-from activities.models import UserFilmActivitie, HistoryWatching
+from activities.models import UserFilmActivity, HistoryWatching
 from activities.serializers import AddUserActivitySerializer, ActivitySerializer
 from gallery.models import Film
 
@@ -35,7 +35,7 @@ class UserActivitiesView(APIView):
             target_user = request.user
 
         # Базовый queryset
-        queryset = UserFilmActivitie.objects.filter(user=target_user)
+        queryset = UserFilmActivity.objects.filter(user=target_user)
 
         # Фильтрация
         if is_planned is not None:
@@ -81,7 +81,7 @@ class UserFilmActivityView(APIView):
 
         # Пытаемся найти существующую запись
         try:
-            activity = UserFilmActivitie.objects.get(user=request.user, film=film)
+            activity = UserFilmActivity.objects.get(user=request.user, film=film)
 
             # Если пользователь пытается установить тот же статус, что уже есть
             if 'is_planned' in data and activity.is_planned == data['is_planned'] and \
@@ -105,7 +105,7 @@ class UserFilmActivityView(APIView):
             serializer = AddUserActivitySerializer(activity, data=data, partial=True)
             status_code = status.HTTP_200_OK
 
-        except UserFilmActivitie.DoesNotExist:
+        except UserFilmActivity.DoesNotExist:
             # Создаем новую запись
             serializer = AddUserActivitySerializer(data=data)
             status_code = status.HTTP_201_CREATED
@@ -129,7 +129,7 @@ class UserFilmActivityView(APIView):
         """
         film = get_object_or_404(Film, pk=film_id)
         activity = get_object_or_404(
-            UserFilmActivitie,
+            UserFilmActivity,
             user=request.user,
             film=film
         )
@@ -162,7 +162,7 @@ class UserFilmActivityView(APIView):
         """Удалить активность (убрать из списков)"""
         film = get_object_or_404(Film, pk=film_id)
         activity = get_object_or_404(
-            UserFilmActivitie,
+            UserFilmActivity,
             user=request.user,
             film=film
         )
