@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from activities.models import UserFilmActivitie
+from activities.models import UserFilmActivity
 from gallery.models import Film
 
 
@@ -28,7 +28,7 @@ class AddUserActivitySerializer(serializers.ModelSerializer):
     """Сериализатор для добавления активностей."""
 
     class Meta:
-        model = UserFilmActivitie
+        model = UserFilmActivity
         fields = ('id', 'user', 'film',
                   'is_planned', 'is_watched', 'rating', 'is_public')
 
@@ -40,6 +40,6 @@ class ActivitySerializer(serializers.ModelSerializer):
     film = FilmSerializer(many=False, read_only=True)
 
     class Meta:
-        model = UserFilmActivitie
+        model = UserFilmActivity
         fields = ('user', 'film',
                   'is_planned', 'is_watched', 'rating', 'is_public')

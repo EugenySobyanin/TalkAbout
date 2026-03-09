@@ -102,7 +102,7 @@ class Film(models.Model):
     """
     Главная модель Кинопроизведения.
 
-    Не только фильмы, но у сериалы, мультфильмы и тд.
+    Только фильмы и полнометражные анимационные фильмы.
     """
 
     kinopoisk_api_id = models.PositiveIntegerField(
@@ -111,8 +111,13 @@ class Film(models.Model):
         blank=True,
         db_index=True
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        db_index=True
+    )
     name = models.CharField(
         'Название (на русском)',
         max_length=FILM_TITLE_MAX_LENGTH,
@@ -180,9 +185,8 @@ class Film(models.Model):
                 f'Длительность не может быть больше {MAX_MOVIE_LENGTH} минут.')
         ],
     )
-    # pg-13, R и тд.
     rating_mpaa = models.CharField(
-        'Рейтиг MPAA',
+        'Рейтиг MPAA: pg-13, R и тд.',
         max_length=RATING_MPAA_MAX_LENGTH,
         null=True,
         blank=True,
@@ -203,36 +207,36 @@ class Film(models.Model):
         null=True,
         blank=True
     )
-    is_series = models.BooleanField(
-        'Сериал или нет',
-        default=False,
-        blank=True
-    )
-    series_length = models.PositiveIntegerField(
-        'Длительность одной серии в минутах',
-        null=True,
-        blank=True,
-        validators=[
-            MinValueValidator(
-                MIN_MOVIE_LENGTH,
-                f'Не может быть меньше {MIN_MOVIE_LENGTH}'
-            ),
-            MaxValueValidator(
-                MAX_MOVIE_LENGTH,
-                f'Длительность не может быть больше {MAX_MOVIE_LENGTH} минут.')
-        ],
-    )
-    total_series_length = models.PositiveIntegerField(
-        'Длительность всего сериала в минутах',
-        null=True,
-        blank=True,
-        validators=[
-            MinValueValidator(
-                MIN_MOVIE_LENGTH,
-                f'Не может быть меньше {MIN_MOVIE_LENGTH}'
-            ),
-        ],
-    )
+    # is_series = models.BooleanField(
+    #     'Сериал или нет',
+    #     default=False,
+    #     blank=True
+    # )
+    # series_length = models.PositiveIntegerField(
+    #     'Длительность одной серии в минутах',
+    #     null=True,
+    #     blank=True,
+    #     validators=[
+    #         MinValueValidator(
+    #             MIN_MOVIE_LENGTH,
+    #             f'Не может быть меньше {MIN_MOVIE_LENGTH}'
+    #         ),
+    #         MaxValueValidator(
+    #             MAX_MOVIE_LENGTH,
+    #             f'Длительность не может быть больше {MAX_MOVIE_LENGTH} минут.')
+    #     ],
+    # )
+    # total_series_length = models.PositiveIntegerField(
+    #     'Длительность всего сериала в минутах',
+    #     null=True,
+    #     blank=True,
+    #     validators=[
+    #         MinValueValidator(
+    #             MIN_MOVIE_LENGTH,
+    #             f'Не может быть меньше {MIN_MOVIE_LENGTH}'
+    #         ),
+    #     ],
+    # )
     # seasons_info = ...
     # start_series = ... # Год старта сериала
     # end_series = ...   # Год окончания сериала

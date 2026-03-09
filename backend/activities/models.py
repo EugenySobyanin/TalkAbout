@@ -10,14 +10,19 @@ User = get_user_model()
 
 
 class BaseCreatedUpdated(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        db_index=True
+    )
 
     class Meta:
         abstract = True
 
 
-class UserFilmActivitie(BaseCreatedUpdated):
+class UserFilmActivity(BaseCreatedUpdated):
     """
     Пользовательские активности.
 
@@ -34,8 +39,14 @@ class UserFilmActivitie(BaseCreatedUpdated):
         on_delete=models.CASCADE,
         verbose_name='Фильм',
     )
-    is_planned = models.BooleanField('Буду смотерь', default=False)
-    is_watched = models.BooleanField('Просмотрено', default=False)
+    is_planned = models.BooleanField(
+        'Буду смотерь',
+        default=False
+    )
+    is_watched = models.BooleanField(
+        'Просмотрено',
+        default=False
+    )
     rating = models.SmallIntegerField(
         'Оценка',
         null=True,
@@ -45,14 +56,21 @@ class UserFilmActivitie(BaseCreatedUpdated):
             MaxValueValidator(10, 'Максимальный балл 10.')
         ]
     )
-    is_public = models.BooleanField('Публичный', default=True)
+    is_public_for_planned = models.BooleanField(
+        'Публичный для планируемого',
+        default=True
+    )
+    is_public_for_watched = models.BooleanField(
+        'Публичный для просмотренного',
+        default=True
+    )
 
 
 class HistoryWatching(BaseCreatedUpdated):
     """История просмотров пользователей."""
 
     user_film_activities = models.ForeignKey(
-        UserFilmActivitie,
+        UserFilmActivity,
         on_delete=models.CASCADE,
         verbose_name='Пользователь-Фильм',
         related_name='watching_history',
