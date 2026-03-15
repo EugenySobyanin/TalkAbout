@@ -65,6 +65,9 @@ class UserFilmActivity(BaseCreatedUpdated):
         default=True
     )
 
+    def __str__(self) -> str:
+        return f'{self.user} - {self.film} ({self.film.pk})- is_watched = {self.is_watched} - is_planned = {self.is_planned}'
+
 
 class HistoryWatching(BaseCreatedUpdated):
     """История просмотров пользователей."""
