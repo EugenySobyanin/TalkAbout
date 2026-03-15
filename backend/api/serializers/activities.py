@@ -34,6 +34,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserFilmActivity
         fields = (
+            'id',
             'user', 'film',
             'is_planned', 'is_watched',
             'rating',
@@ -49,7 +50,7 @@ class AddActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserFilmActivity
-        fields = ('film_id', 'film', 'is_planned', 'is_watched', 'rating')
+        fields = ('id', 'film_id', 'film', 'is_planned', 'is_watched')
 
     def validate_film_id(self, value):
         """Проверяем, что фильм с таким ID существует."""
@@ -60,12 +61,21 @@ class AddActivitySerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        """Создаем активность, преобразуя film_id в film."""
+        """Создаем или обновляем активность."""
+        print(validated_data)
         film_id = validated_data.pop('film_id')
         film = Film.objects.get(pk=film_id)
+        user = validated_data.get('user')
+        print(user)
 
-        # user будет передан из perform_create
-        return UserFilmActivity.objects.create(
-            film=film,
-            **validated_data
-        )
+        # Проверяем существование активности
+        try:
+            activity = UserFilmActivity.objects.get(film=film, user=user)
+            # Если активность существует, обновляем её
+            return self.update(activity, validated_data)
+        except UserFilmActivity.DoesNotExist:
+            # Если активности нет, создаем новую
+            return UserFilmActivity.objects.create(
+                film=film,
+                **validated_data
+            )
