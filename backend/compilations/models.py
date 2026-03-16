@@ -40,12 +40,18 @@ class Compilation(BaseCreatedUpdated):
         null=True,
         blank=True
     )
-    is_public = models.BooleanField('Публичный', default=False)
+    is_public = models.BooleanField(
+        'Публичный',
+        default=False
+    )
     films = models.ManyToManyField(
         Film,
         through='CompilationsFilms',
         verbose_name='Фильмы',
     )
+
+    def __str__(self) -> str:
+        return self.title or "Без названия"
 
 
 class CompilationsFilms(BaseCreatedUpdated):
