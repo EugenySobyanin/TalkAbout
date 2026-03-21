@@ -31,3 +31,12 @@ class FilmsPermissions(BasePermission):
             request.user.is_authenticated and
             (request.user.is_admin or request.user.is_moderator)
         )
+
+
+class IsOwnerOrPublicReadOnly(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # Для небезопасных методов (PUT, DELETE, etc.)
+        if request.method not in SAFE_METHODS:
+            return obj.user == request.user
+        # Для безопасных методов (GET) - публичные или свои
+        return obj.is_public or obj.user == request.user
