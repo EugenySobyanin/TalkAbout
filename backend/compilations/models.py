@@ -51,7 +51,7 @@ class Compilation(BaseCreatedUpdated):
     )
 
     def __str__(self) -> str:
-        return self.title or "Без названия"
+        return f'{self.pk} - {self.title or "Без названия"}'
 
 
 class CompilationsFilms(BaseCreatedUpdated):
