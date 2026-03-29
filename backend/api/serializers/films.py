@@ -11,6 +11,7 @@ class FilmSerializer(serializers.ModelSerializer):
         model = Film
         fields = [
             'id',
+            'kinopoisk_api_id',
             'name',
             'alternative_name',
             'en_name',
