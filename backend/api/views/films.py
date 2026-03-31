@@ -1,6 +1,6 @@
 from rest_framework import filters, viewsets, permissions
 
-from api.serializers.films import FilmSerializer, ListFilmSerilizer
+from api.serializers.films import FilmSerializer, SeaarchListFilmSerilizer
 from api.permissions import FilmsPermissions
 from gallery.models import Film
 
@@ -17,5 +17,5 @@ class FilmViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return ListFilmSerilizer
+            return SeaarchListFilmSerilizer
         return super().get_serializer_class()

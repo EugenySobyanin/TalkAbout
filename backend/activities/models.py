@@ -38,6 +38,7 @@ class UserFilmActivity(BaseCreatedUpdated):
         Film,
         on_delete=models.CASCADE,
         verbose_name='Фильм',
+        related_name='film_activities',
     )
     is_planned = models.BooleanField(
         'Буду смотерь',

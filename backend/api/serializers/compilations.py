@@ -41,14 +41,25 @@ class CompilationSerializer(serializers.ModelSerializer):
 
         # Обновляем связи с фильмами, если они были переданы
         if films_data is not None:
-            # Удаляем старые связи
-            CompilationsFilms.objects.filter(collection=instance).delete()
+            # Получаем существующие ID фильмов
+            existing_film_ids = set(
+                CompilationsFilms.objects.filter(collection=instance)
+                .values_list('film_id', flat=True)
+            )
 
-            # Создаем новые связи
+            # Создаем список для новых связей
+            new_relations = []
             for film in films_data:
-                CompilationsFilms.objects.create(
-                    collection=instance,
-                    film=film
-                )
+                if film.id not in existing_film_ids:
+                    new_relations.append(
+                        CompilationsFilms(
+                            collection=instance,
+                            film=film
+                        )
+                    )
+
+            # Массовое создание новых связей
+            if new_relations:
+                CompilationsFilms.objects.bulk_create(new_relations)
 
         return instance
