@@ -13,7 +13,11 @@ class FilmViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
     # permission_classes = [FilmsPermissions]
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name', 'alternative_name', 'en_name']
+    search_fields = [
+        'name__icontains',
+        'alternative_name__icontains',
+        'en_name__icontains'
+    ]
 
     def get_serializer_class(self):
         if self.action == 'list':
