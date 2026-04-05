@@ -57,10 +57,10 @@ class SeaarchListFilmSerilizer(serializers.ModelSerializer):
         # Используем аннотацию, если она есть в queryset
         if hasattr(obj, 'avg_rating'):
             return round(obj.avg_rating, 1) if obj.avg_rating else None
-        
+
         # Если аннотации нет, вычисляем
         result = obj.film_activities.filter(
             rating__isnull=False
         ).aggregate(Avg('rating'))['rating__avg']
-        
+
         return round(result, 1) if result else None

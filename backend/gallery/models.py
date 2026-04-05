@@ -291,8 +291,8 @@ class Film(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Фильм (серил и др.)'
-        verbose_name_plural = 'Фильмы (сериалы и др.)'
+        verbose_name = 'Фильм'
+        verbose_name_plural = 'Фильмы'
         ordering = ['year', 'id']
 
     def __str__(self):
