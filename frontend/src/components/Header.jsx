@@ -23,7 +23,9 @@ function Header() {
   }, [])
 
   useEffect(() => {
-    if (searchTerm.length > 1) {
+    console.log('Search term changed:', searchTerm)
+
+    if (searchTerm.length > 0) {
       const delayDebounce = setTimeout(() => {
         searchFilms(searchTerm).then(data => {
           setSearchResults(data)
@@ -38,7 +40,7 @@ function Header() {
   }, [searchTerm])
 
   const handleFilmSelect = (filmId) => {
-    navigate(`/film/${filmId}`)
+    navigate(`/film/${filmId}/`)
     setSearchTerm('')
     setShowDropdown(false)
   }
@@ -49,7 +51,14 @@ function Header() {
         <Link to="/" className="logo">
           <img src="/logo.png" alt="Logo" className="logo-img" />
         </Link>
-        <span className="app-name">TalkAbout</span>
+        <span className="app-name">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>TalkAbout
+        </span>
       </div>
 
       <div className="search-container" ref={dropdownRef}>

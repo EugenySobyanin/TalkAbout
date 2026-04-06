@@ -18,6 +18,7 @@ class FilmViewSet(viewsets.ModelViewSet):
         'alternative_name__icontains',
         'en_name__icontains'
     ]
+    ordering = ['-kinopoisk_rating', '-year']
 
     def get_serializer_class(self):
         if self.action == 'list':
