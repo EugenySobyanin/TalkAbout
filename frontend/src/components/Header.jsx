@@ -71,19 +71,55 @@ function Header() {
         />
         {showDropdown && searchResults.length > 0 && (
           <div className="search-dropdown">
-            {searchResults.map((film) => (
-              <div
-                key={film.id}
-                className="search-item"
-                onClick={() => handleFilmSelect(film.id)}
-              >
-                <span>{film.name || film.alternative_name}</span>
-                <span className="film-year">{film.year}</span>
-              </div>
-            ))}
-          </div>
+  {searchResults.map((film) => (
+    <div
+      key={film.id}
+      className="search-item"
+      onClick={() => handleFilmSelect(film.id)}
+    >
+      {/* Постер фильма */}
+      <div className="search-item-poster">
+        {film.poster ? (
+          <img 
+            src={film.poster} 
+            alt={film.name || film.alternative_name}
+            onError={(e) => {
+              e.target.src = '/placeholder-poster.jpg' // Заглушка при ошибке
+            }}
+          />
+        ) : (
+          <div className="no-poster">📽️</div>
         )}
       </div>
+      
+      {/* Информация о фильме */}
+      <div className="search-item-info">
+        <div className="search-item-title">
+          {film.name || film.alternative_name}
+        </div>
+        <div className="search-item-year">
+          {film.year || 'Год неизвестен'}
+        </div>
+        
+        {/* Рейтинги */}
+        <div className="search-item-ratings">
+          {film.kinopoisk_rating && (
+            <span className="rating kp">
+              🎬 KP: {film.kinopoisk_rating.toFixed(1)}
+            </span>
+          )}
+          {film.imdb_rating && (
+            <span className="rating imdb">
+              ⭐ IMDb: {film.imdb_rating.toFixed(1)}
+            </span>
+          )}
+          </div>
+        </div>
+      </div>
+  ))}
+  </div>
+  )}
+</div>
 
       <div className="header-right">
         {user ? (
