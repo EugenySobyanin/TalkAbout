@@ -1,3 +1,4 @@
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -100,4 +101,125 @@
 .login-link {
   background-color: #4caf50;
   text-decoration: none;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-top: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.search-item {
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.search-item:last-child {
+  border-bottom: none;
+}
+
+.search-item:hover {
+  background-color: #3a3a3a;
+}
+
+/* Постер */
+.search-item-poster {
+  flex-shrink: 0;
+  width: 50px;
+  height: 75px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #1a1a1a;
+}
+
+.search-item-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-poster {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background-color: #1a1a1a;
+}
+
+/* Информация о фильме */
+.search-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search-item-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.3;
+}
+
+.search-item-year {
+  font-size: 13px;
+  color: #888;
+}
+
+/* Рейтинги */
+.search-item-ratings {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.rating {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.rating.kp {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.rating.imdb {
+  background-color: rgba(245, 197, 24, 0.2);
+  color: #f5c518;
+}
+
+/* Стилизация скроллбара */
+.search-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.search-dropdown::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #777;
 }
