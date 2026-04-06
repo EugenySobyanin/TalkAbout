@@ -185,6 +185,26 @@ class Film(models.Model):
                 f'Длительность не может быть больше {MAX_MOVIE_LENGTH} минут.')
         ],
     )
+    kinopoisk_rating = models.FloatField(
+        'Рейтинг Кинопоиска',
+        null=True,
+        blank=True,
+        db_index=True,  # Индекс для быстрой сортировки
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(10)
+        ]
+    )
+    imdb_rating = models.FloatField(
+        'Рейтинг IMDb',
+        null=True,
+        blank=True,
+        db_index=True,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(10)
+        ]
+    )
     rating_mpaa = models.CharField(
         'Рейтиг MPAA: pg-13, R и тд.',
         max_length=RATING_MPAA_MAX_LENGTH,
