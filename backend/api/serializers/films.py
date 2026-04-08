@@ -49,6 +49,7 @@ class SeaarchListFilmSerilizer(serializers.ModelSerializer):
             'rating',
             'kinopoisk_rating',
             'imdb_rating',
+            'short_description',
         ]
 
     def get_rating(self, obj):
