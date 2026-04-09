@@ -1,14 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import Layout from './components/Layout';
-import HomePage from './pages/HomePage';
-import ProfilePage from './pages/ProfilePage';
-import DiaryPage from './pages/DiaryPage';
-import SubscriptionsPage from './pages/SubscriptionsPage';
-import FeedPage from './pages/FeedPage';
-import CompilationsPage from './pages/CompilationsPage';
-import RecommendationsPage from './pages/RecommendationsPage';
-import RandomFilmPage from './pages/RandomFilmPage';
+import Layout from './components/Layout/Layout';
+
+import HomePage from './pages/HomePage/HomePage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
+import DiaryPage from './pages/DiaryPage/DiaryPage';
+import SubscriptionsPage from './pages/SubscriptionsPage/SubscriptionsPage';
+import FeedPage from './pages/FeedPage/FeedPage';
+import CompilationsPage from './pages/CompilationsPage/CompilationsPage';
+import RecommendationsPage from './pages/RecommendationsPage/RecommendationsPage';
+import RandomFilmPage from './pages/RandomFilmPage/RandomFilmPage';
+import FilmPage from './pages/FilmPage/FilmPage';
 
 function App() {
   return (
@@ -24,6 +26,7 @@ function App() {
             <Route path="/compilations" element={<CompilationsPage />} />
             <Route path="/recommendations" element={<RecommendationsPage />} />
             <Route path="/random-film" element={<RandomFilmPage />} />
+            <Route path="/film/:id" element={<FilmPage />} />
           </Routes>
         </Layout>
       </AuthProvider>
