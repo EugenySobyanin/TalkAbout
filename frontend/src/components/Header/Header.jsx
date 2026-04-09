@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { searchFilms } from '../api/films'
+import { useAuth } from '../../contexts/AuthContext'
+import { searchFilms } from '../../api/films'
 import './Header.css'
 
 function Header() {

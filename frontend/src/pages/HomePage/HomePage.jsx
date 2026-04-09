@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { searchFilms } from '../api/films'
+import { searchFilms } from "../../api/films";
 import './HomePage.css'
 
 function HomePage() {
