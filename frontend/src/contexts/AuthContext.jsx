@@ -1,44 +1,124 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
-import { getCurrentUser, login as loginApi, logout as logoutApi } from '../api/auth'
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import * as authService from '../api/auth';
 
-const AuthContext = createContext()
+const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within AuthProvider');
+    }
+    return context;
+};
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      getCurrentUser()
-        .then(setUser)
-        .catch(() => {
-          localStorage.removeItem('auth_token')
-        })
-        .finally(() => setLoading(false))
-    } else {
-      setLoading(false)
-    }
-  }, [])
+    useEffect(() => {
+        const initAuth = async () => {
+            try {
+                authService.initAuth();
+                const token = localStorage.getItem('auth_token');
+                if (token) {
+                    const userData = await authService.getCurrentUser();
+                    setUser(userData);
+                }
+            } catch (err) {
+                console.error('Auth initialization error:', err);
+                localStorage.removeItem('auth_token');
+            } finally {
+                setLoading(false);
+            }
+        };
+        initAuth();
+    }, []);
 
-  const login = async (username, password) => {
-    const data = await loginApi(username, password)
-    localStorage.setItem('auth_token', data.auth_token)
-    const userData = await getCurrentUser()
-    setUser(userData)
-    return userData
-  };
+    const login = async (username, password) => {
+        try {
+            setError(null);
+            const response = await authService.login(username, password);
+            const userData = await authService.getCurrentUser();
+            setUser(userData);
+            return { success: true, data: response };
+        } catch (err) {
+            const errorMessage = err.response?.data?.non_field_errors?.[0] || 
+                                err.response?.data?.detail || 
+                                'Ошибка входа';
+            setError(errorMessage);
+            return { success: false, error: errorMessage };
+        }
+    };
 
-  const logout = async () => {
-    await logoutApi()
-    setUser(null)
-  };
+    const register = async (userData) => {
+        try {
+            setError(null);
+            await authService.register(userData);
+            return { success: true };
+        } catch (err) {
+            const errorMessage = err.response?.data?.email?.[0] || 
+                                err.response?.data?.username?.[0] || 
+                                err.response?.data?.password?.[0] || 
+                                'Ошибка регистрации';
+            setError(errorMessage);
+            return { success: false, error: errorMessage };
+        }
+    };
 
-  return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    const logout = async () => {
+        try {
+            await authService.logout();
+            setUser(null);
+        } catch (err) {
+            console.error('Logout error:', err);
+            // Даже если запрос не удался, очищаем локальные данные
+            localStorage.removeItem('auth_token');
+            setUser(null);
+        }
+    };
+
+    const resetPassword = async (email) => {
+        try {
+            setError(null);
+            await authService.resetPassword(email);
+            return { success: true };
+        } catch (err) {
+            const errorMessage = err.response?.data?.email?.[0] || 'Ошибка отправки email';
+            setError(errorMessage);
+            return { success: false, error: errorMessage };
+        }
+    };
+
+    const confirmResetPassword = async (uid, token, newPassword) => {
+        try {
+            setError(null);
+            await authService.confirmResetPassword(uid, token, newPassword);
+            return { success: true };
+        } catch (err) {
+            const errorMessage = err.response?.data?.new_password?.[0] || 
+                                err.response?.data?.token?.[0] || 
+                                'Ошибка сброса пароля';
+            setError(errorMessage);
+            return { success: false, error: errorMessage };
+        }
+    };
+
+    const value = {
+        user,
+        loading,
+        error,
+        login,
+        register,
+        logout,
+        resetPassword,
+        confirmResetPassword,
+        isAuthenticated: !!user
+    };
+
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
 };

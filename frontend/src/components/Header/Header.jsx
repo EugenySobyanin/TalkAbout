@@ -10,8 +10,11 @@ function Header() {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [showDropdown, setShowDropdown] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
   const dropdownRef = useRef(null)
+  const searchInputRef = useRef(null)
 
+  // Закрытие дропдауна при клике вне
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -22,29 +25,58 @@ function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Поиск фильмов с debounce
   useEffect(() => {
-    console.log('Search term changed:', searchTerm)
-
-    if (searchTerm.length > 0) {
-      const delayDebounce = setTimeout(() => {
-        searchFilms(searchTerm).then(data => {
+    if (searchTerm.trim().length > 0) {
+      setIsSearching(true)
+      const delayDebounce = setTimeout(async () => {
+        try {
+          const data = await searchFilms(searchTerm)
           setSearchResults(data)
           setShowDropdown(true)
-        })
+        } catch (error) {
+          console.error('Ошибка поиска:', error)
+          setSearchResults([])
+        } finally {
+          setIsSearching(false)
+        }
       }, 300)
       return () => clearTimeout(delayDebounce)
     } else {
       setSearchResults([])
       setShowDropdown(false)
+      setIsSearching(false)
     }
   }, [searchTerm])
 
+  // Обработчик выбора фильма
   const handleFilmSelect = (filmId) => {
-    navigate(`/film/${filmId}/`)
+    navigate(`/film/${filmId}`)
     setSearchTerm('')
     setShowDropdown(false)
+    setSearchResults([])
   }
 
+  // Обработчик выхода
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
+
+  // Обработчик перехода на страницу входа
+  const handleLoginClick = () => {
+    navigate('/login')
+  }
+
+  // Очистка поиска
+  const handleClearSearch = () => {
+    setSearchTerm('')
+    setSearchResults([])
+    setShowDropdown(false)
+    searchInputRef.current?.focus()
+  }
+
+  // Форматирование длительности
   const formatDuration = (minutes) => {
     if (!minutes) return null
     const hours = Math.floor(minutes / 60)
@@ -55,108 +87,164 @@ function Header() {
     return `${mins}мин`
   }
 
+  // Обработка нажатия клавиш в поиске
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      handleClearSearch()
+    }
+  }
+
   return (
     <header className="header">
       <div className="header-left">
         <Link to="/" className="logo">
-          <img src="/logo.png" alt="Logo" className="logo-img" />
+          <img src="/logo.png" alt="TalkAbout" className="logo-img" />
         </Link>
-        <span className="app-name">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>TalkAbout
-        </span>
+        <Link to="/" className="app-name-link">
+          <span className="app-name">
+            <span className="letter">T</span>
+            <span className="letter">a</span>
+            <span className="letter">l</span>
+            <span className="letter">k</span>
+            <span className="letter">A</span>
+            <span className="letter">b</span>
+            <span className="letter">o</span>
+            <span className="letter">u</span>
+            <span className="letter">t</span>
+          </span>
+        </Link>
       </div>
 
       <div className="search-container" ref={dropdownRef}>
-        <input
-          type="text"
-          placeholder="Поиск фильмов..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-input"
-        />
+        <div className="search-input-wrapper">
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Поиск фильмов..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            className="search-input"
+          />
+          {isSearching && (
+            <span className="search-spinner">⟳</span>
+          )}
+          {searchTerm && !isSearching && (
+            <button 
+              className="clear-search-btn"
+              onClick={handleClearSearch}
+              aria-label="Очистить поиск"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
         {showDropdown && searchResults.length > 0 && (
           <div className="search-dropdown">
-            {searchResults.map((film) => (
-              <div
-                key={film.id}
-                className="search-item"
-                onClick={() => handleFilmSelect(film.id)}
-              >
-                {/* Постер фильма */}
-                <div className="search-item-poster">
-                  {film.poster ? (
-                    <img 
-                      src={film.poster} 
-                      alt={film.name || film.alternative_name}
-                      onError={(e) => {
-                        e.target.src = '/placeholder-poster.jpg'
-                      }}
-                    />
-                  ) : (
-                    <div className="no-poster">📽️</div>
-                  )}
-                </div>
-                
-                {/* Информация о фильме */}
-                <div className="search-item-info">
-                  <div className="search-item-header">
-                    <div className="search-item-title">
-                      {film.name || film.alternative_name || 'Без названия'}
-                      {film.en_name && film.en_name !== film.name && film.en_name !== film.alternative_name && (
-                        <span className="search-item-en-name"> ({film.en_name})</span>
-                      )}
+            <div className="search-results-header">
+              <span>Найдено: {searchResults.length}</span>
+            </div>
+            <div className="search-results-list">
+              {searchResults.map((film) => (
+                <div
+                  key={film.id}
+                  className="search-item"
+                  onClick={() => handleFilmSelect(film.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      handleFilmSelect(film.id)
+                    }
+                  }}
+                >
+                  {/* Постер фильма */}
+                  <div className="search-item-poster">
+                    {film.poster ? (
+                      <img 
+                        src={film.poster} 
+                        alt={film.name || film.alternative_name || 'Постер фильма'}
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.onerror = null
+                          e.target.src = '/placeholder-poster.jpg'
+                        }}
+                      />
+                    ) : (
+                      <div className="no-poster">🎬</div>
+                    )}
+                  </div>
+                  
+                  {/* Информация о фильме */}
+                  <div className="search-item-info">
+                    <div className="search-item-header">
+                      <div className="search-item-title">
+                        {film.name || film.alternative_name || film.en_name || 'Без названия'}
+                        {film.en_name && 
+                         film.en_name !== film.name && 
+                         film.en_name !== film.alternative_name && (
+                          <span className="search-item-en-name"> ({film.en_name})</span>
+                        )}
+                      </div>
+                      
+                      <div className="search-item-meta">
+                        <span className="search-item-year">
+                          {film.year || 'Год неизвестен'}
+                        </span>
+                        {film.movie_length && (
+                          <>
+                            <span className="meta-separator">•</span>
+                            <span className="search-item-duration">
+                              🕐 {formatDuration(film.movie_length)}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
                     
-                    <div className="search-item-meta">
-                      <span className="search-item-year">
-                        {film.year || 'Год неизвестен'}
-                      </span>
-                      {film.movie_length && (
-                        <>
-                          <span className="meta-separator">•</span>
-                          <span className="search-item-duration">
-                            🕐 {formatDuration(film.movie_length)}
-                          </span>
-                        </>
+                    {/* Краткое описание */}
+                    {film.short_description && (
+                      <div className="search-item-description">
+                        {film.short_description.length > 120 
+                          ? film.short_description.substring(0, 120) + '...' 
+                          : film.short_description}
+                      </div>
+                    )}
+                    
+                    {/* Рейтинги */}
+                    <div className="search-item-ratings">
+                      {film.rating && (
+                        <span className="rating user-rating" title="Рейтинг пользователей">
+                          👥 {film.rating}
+                        </span>
+                      )}
+                      {film.kinopoisk_rating && (
+                        <span className="rating kp" title="Рейтинг Кинопоиска">
+                          🎬 {film.kinopoisk_rating.toFixed(1)}
+                        </span>
+                      )}
+                      {film.imdb_rating && (
+                        <span className="rating imdb" title="Рейтинг IMDb">
+                          ⭐ {film.imdb_rating.toFixed(1)}
+                        </span>
                       )}
                     </div>
                   </div>
-                  
-                  {/* Краткое описание */}
-                  {film.short_description && (
-                    <div className="search-item-description">
-                      {film.short_description.length > 120 
-                        ? film.short_description.substring(0, 120) + '...' 
-                        : film.short_description}
-                    </div>
-                  )}
-                  
-                  {/* Рейтинги */}
-                  <div className="search-item-ratings">
-                    {film.rating && (
-                      <span className="rating user-rating" title="Рейтинг пользователей">
-                        👥 {film.rating}
-                      </span>
-                    )}
-                    {film.kinopoisk_rating && (
-                      <span className="rating kp" title="Рейтинг Кинопоиска">
-                        🎬kp {film.kinopoisk_rating.toFixed(1)}
-                      </span>
-                    )}
-                    {film.imdb_rating && (
-                      <span className="rating imdb" title="Рейтинг IMDb">
-                        ⭐imdb {film.imdb_rating.toFixed(1)}
-                      </span>
-                    )}
-                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+        )}
+
+        {showDropdown && searchTerm && searchResults.length === 0 && !isSearching && (
+          <div className="search-dropdown empty">
+            <div className="no-results">
+              <span className="no-results-icon">🔍</span>
+              <p>Ничего не найдено</p>
+              <p className="no-results-hint">Попробуйте изменить запрос</p>
+            </div>
           </div>
         )}
       </div>
@@ -164,16 +252,35 @@ function Header() {
       <div className="header-right">
         {user ? (
           <div className="user-info">
-            <img 
-              src={user.avatar || '/default-avatar.png'} 
-              alt={user.username}
-              className="avatar"
-            />
-            <span className="username">{user.username}</span>
-            <button onClick={logout} className="logout-btn">Выйти</button>
+            <Link to="/profile" className="user-profile-link">
+              <img 
+                src={user.avatar || '/default-avatar.png'} 
+                alt={user.username}
+                className="avatar"
+                onError={(e) => {
+                  e.target.onerror = null
+                  e.target.src = '/default-avatar.png'
+                }}
+              />
+              <span className="username">{user.username}</span>
+            </Link>
+            <button 
+              onClick={handleLogout} 
+              className="logout-btn"
+              title="Выйти"
+            >
+              <span className="logout-icon">🚪</span>
+              <span className="logout-text">Выйти</span>
+            </button>
           </div>
         ) : (
-          <Link to="/login" className="login-link">Войти</Link>
+          <button 
+            onClick={handleLoginClick} 
+            className="login-btn"
+          >
+            <span className="login-icon">🔐</span>
+            <span>Войти</span>
+          </button>
         )}
       </div>
     </header>
