@@ -24,9 +24,5 @@ export const getFilmDetails = async (id) => {
     // Добавляем базовый URL ко всем путям изображений
     return {
         ...data,
-        poster_url: data.poster_url ? BASE_URL + data.poster_url : null,
-        logo_url: data.logo_url ? BASE_URL + data.logo_url : null,
-        backdrop_url: data.backdrop_url ? BASE_URL + data.backdrop_url : null,
-        // Если есть другие поля с изображениями, добавьте их здесь
     }
 }

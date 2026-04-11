@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import (MinValueValidator,
                                     MaxValueValidator,)
 from django.db import models
+from django.utils import timezone
 
 from gallery.models import Film
 
@@ -48,6 +49,12 @@ class UserFilmActivity(BaseCreatedUpdated):
         'Просмотрено',
         default=False
     )
+    watched_at = models.DateTimeField(
+        'Дата просмотра',
+        null=True,
+        blank=True,
+        help_text='Когда фильм был отмечен как просмотренный'
+    )
     rating = models.SmallIntegerField(
         'Оценка',
         null=True,
@@ -68,6 +75,17 @@ class UserFilmActivity(BaseCreatedUpdated):
 
     def __str__(self) -> str:
         return f'{self.user} - {self.film} ({self.film.pk})- is_watched = {self.is_watched} - is_planned = {self.is_planned}'
+
+    def save(self, *args, **kwargs):
+        """Автоматически устанавливает watched_at при отметке как просмотренного."""
+        # Если фильм отмечается как просмотренный и дата не установлена
+        if self.is_watched and not self.watched_at:
+            self.watched_at = timezone.now()
+        # Если снимается отметка "просмотрено" - очищаем дату
+        elif not self.is_watched and self.watched_at:
+            self.watched_at = None
+
+        super().save(*args, **kwargs)
 
 
 class HistoryWatching(BaseCreatedUpdated):

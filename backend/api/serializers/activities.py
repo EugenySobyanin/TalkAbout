@@ -23,7 +23,13 @@ class FilmSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Film
-        fields = ('id', 'name', 'year')
+        fields = (
+            'id',
+            'name',
+            'year',
+            'poster',
+            'description',
+        )
 
 
 class ActivitySerializer(serializers.ModelSerializer):
