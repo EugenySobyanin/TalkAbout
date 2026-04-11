@@ -79,7 +79,7 @@ function FilmPage() {
       
       <div className="film-content">
         <div className="film-main">
-          <FilmActions filmId={film.id} />
+          <FilmActions filmId={film.id} activity={film.activity} />
           
           <FilmInfo film={film} />
           

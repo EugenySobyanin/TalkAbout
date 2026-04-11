@@ -16,12 +16,13 @@ export const getUserFilmActivity = async (filmId) => {
 }
 
 // Создание или обновление активности
-export const createOrUpdateActivity = async (activityData) => {
+export const createOrUpdateActivity = async (activityData, activiy) => {
+  console.log('Попали в createOrUpdateActivity')
   try {
-    const existingActivity = await getUserFilmActivity(activityData.film)
+    // const existingActivity = await getUserFilmActivity(activityData.film)
     
-    if (existingActivity) {
-      const response = await api.patch(`/activities/${existingActivity.id}/`, activityData)
+    if (activiy) {
+      const response = await api.patch(`/activities/${activiy.id}/`, activityData)
       return response.data
     } else {
       const response = await api.post('/activities/', activityData)
@@ -34,26 +35,27 @@ export const createOrUpdateActivity = async (activityData) => {
 }
 
 // Установка оценки
-export const rateFilm = async (filmId, rating) => {
+export const rateFilm = async (filmId, rating, activity) => {
   return await createOrUpdateActivity({
     film: filmId,
     rating: rating
-  })
+  }, activity)
 }
 
 // Добавление в "Буду смотреть"
-export const addToWatchlist = async (filmId) => {
+export const addToWatchlist = async (filmId, activity, isPlanned) => {
   return await createOrUpdateActivity({
     film: filmId,
-    is_planned: true
-  })
+    is_planned: isPlanned,
+  }, activity)
 }
 
 // Отметка как "Просмотрено"
-export const markAsWatched = async (filmId) => {
+export const markAsWatched = async (filmId, activity, isWatched) => {
+  console.log('Попали в markAsWatched.')
   return await createOrUpdateActivity({
     film: filmId,
-    is_watched: true,
-    is_planned: false
-  })
+    is_watched: isWatched,
+    // is_planned: false
+  }, activity)
 }

@@ -10,11 +10,13 @@ function Sidebar() {
     { path: '/feed', label: 'Лента', icon: '📰' },
     { path: '/compilations', label: 'Подборки', icon: '📚' },
     { path: '/recommendations', label: 'Рекомендации', icon: '⭐' },
-    //{ path: '/random-film', label: 'Подбор фильма', icon: '🎲' },
-  ];
+  ]
 
   return (
     <aside className="sidebar">
+      {/* <div className="sidebar-header">
+        <span className="sidebar-title">МЕНЮ</span>
+      </div> */}
       <nav>
         <ul className="menu">
           {menuItems.map((item) => (
@@ -24,14 +26,19 @@ function Sidebar() {
                 className={({ isActive }) => isActive ? 'menu-link active' : 'menu-link'}
               >
                 <span className="menu-icon">{item.icon}</span>
-                <span>{item.label}</span>
+                <span className="menu-label">{item.label}</span>
+                <span className="menu-arrow">▶</span>
               </NavLink>
             </li>
           ))}
         </ul>
       </nav>
+      <div className="sidebar-footer">
+        <div className="blood-splatter"></div>
+        <div className="blood-splatter small"></div>
+      </div>
     </aside>
-  );
+  )
 }
 
 export default Sidebar

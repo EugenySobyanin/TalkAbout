@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../contexts/AuthContext'
 import { getUserFilmActivity, rateFilm, addToWatchlist, markAsWatched } from '../../../api/activities'
 
-function FilmActions({ filmId }) {
+function FilmActions({ filmId,  activity }) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [userRating, setUserRating] = useState(0)
@@ -18,13 +18,13 @@ function FilmActions({ filmId }) {
     if (user) {
       loadUserActivity()
     }
-  }, [user, filmId])
+  }, [user, activity])
 
   const loadUserActivity = async () => {
     try {
-      const activity = await getUserFilmActivity(filmId)
+      //const activity = await getUserFilmActivity(filmId)
       if (activity) {
-        setUserRating(activity.rating || 0)
+        setUserRating(activity.current_user_rating || 0)
         setIsWatched(activity.is_watched || false)
         setIsPlanned(activity.is_planned || false)
       }
@@ -42,7 +42,7 @@ function FilmActions({ filmId }) {
     try {
       setLoading(true)
       setUserRating(rating)
-      await rateFilm(filmId, rating)
+      await rateFilm(filmId, rating, activity)
     } catch (error) {
       console.error('Error rating film:', error)
       setUserRating(0)
@@ -59,11 +59,17 @@ function FilmActions({ filmId }) {
     
     try {
       setLoading(true)
-      setIsWatched(!isWatched)
-      if (!isWatched) {
-        setIsPlanned(false)
-      }
-      await markAsWatched(filmId)
+      
+      const newWatchedState = !isWatched  // ← сохраняем новое значение
+      setIsWatched(newWatchedState)
+      
+      // if (!newWatchedState) {
+      //   setIsPlanned(false)
+      // }
+
+      console.log('Отправляем is_watched:', newWatchedState)  // ← проверьте в консоли
+      await markAsWatched(filmId, activity, newWatchedState)  // ← передаём НОВОЕ значение
+      
     } catch (error) {
       console.error('Error marking as watched:', error)
       setIsWatched(!isWatched)
@@ -80,11 +86,13 @@ function FilmActions({ filmId }) {
     
     try {
       setLoading(true)
-      setIsPlanned(!isPlanned)
-      if (!isPlanned) {
-        setIsWatched(false)
-      }
-      await addToWatchlist(filmId)
+
+      const newIsPlanned = !isPlanned
+      setIsPlanned(newIsPlanned)
+      // if (!isPlanned) {
+      //   setIsWatched(false)
+      // }
+      await addToWatchlist(filmId, activity, newIsPlanned)
     } catch (error) {
       console.error('Error updating watchlist:', error)
       setIsPlanned(!isPlanned)
