@@ -431,7 +431,8 @@ class SearchListFilmSerilizer(serializers.ModelSerializer):
 
     def get_poster_url(self, obj):
         if obj.poster:
-            return obj.poster.url
+            request = self.context.get('request')
+            return request.build_absolute_uri(obj.poster.url)
         return None
 
     def get_rating(self, obj):
