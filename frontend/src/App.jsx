@@ -4,7 +4,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthPage from './components/Auth/AuthPage';
 import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
-import FilmPage from './pages/FilmPage/FilmPage'; // ← Импортируем правильный компонент
+import FilmPage from './pages/FilmPage/FilmPage';
+import DiaryPageComponent from './pages/DiaryPage/DiaryPage'; // ← Переименовываем импорт
 import './App.css';
 
 // Страницы
@@ -25,13 +26,14 @@ const ProfilePage = () => {
     )
 }
 
-const DiaryPage = () => {
-    return (
-        <div className="page-container">
-            <h1>Дневник</h1>
-        </div>
-    )
-}
+// ← Удаляем этот компонент или переименовываем
+// const DiaryPage = () => {
+//     return (
+//         <div className="page-container">
+//             <DiaryPage />
+//         </div>
+//     )
+// }
 
 const SubscriptionsPage = () => {
     return (
@@ -77,7 +79,6 @@ const ProtectedRoute = ({ children }) => {
         )
     }
     
-    // Если пользователь не авторизован - происходит редирект на страницу логина
     return isAuthenticated ? children : <Navigate to="/login" replace />
 }
 
@@ -93,8 +94,6 @@ const PublicRoute = ({ children }) => {
         );
     }
 
-    // Если НЕ авторизован → показываем страницу
-    // Если авторизован → редирект на главную
     return !isAuthenticated ? children : <Navigate to="/" replace />;
 };
 
@@ -144,7 +143,7 @@ const AppContent = () => {
                 <Route path="/diary" element={
                     <ProtectedRoute>
                         <MainLayout>
-                            <DiaryPage />
+                            <DiaryPageComponent /> {/* ← Используем переименованный компонент */}
                         </MainLayout>
                     </ProtectedRoute>
                 } />
@@ -184,7 +183,7 @@ const AppContent = () => {
                 {/* Публичный маршрут с Header и Sidebar */}
                 <Route path="/film/:id" element={
                     <MainLayout>
-                        <FilmPage />  {/* ← Используем правильный компонент */}
+                        <FilmPage />
                     </MainLayout>
                 } />
                 

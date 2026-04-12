@@ -1,0 +1,349 @@
+/* DiaryPage.css - Темная сдержанная тема */
+
+:root {
+  --pulp-primary: #FFD700;
+  --pulp-dark: #0D1117;
+  --pulp-darker: #0A0E13;
+  --pulp-paper: #161B22;
+  --pulp-text: #E6EDF3;
+  --pulp-text-secondary: #8B949E;
+  --pulp-border: #30363D;
+  --pulp-hover: #21262D;
+  --pulp-success: #238636;
+}
+
+/* Контейнер */
+.pulp-container {
+  min-height: 100vh;
+  background: var(--pulp-dark);
+  padding: 24px;
+  position: relative;
+}
+
+.pulp-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 215, 0, 0.01) 0px,
+    rgba(255, 215, 0, 0.01) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+  pointer-events: none;
+}
+
+/* Заголовок */
+.pulp-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.pulp-icon {
+  font-size: 56px !important;
+  color: var(--pulp-primary);
+  opacity: 0.9;
+}
+
+.pulp-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--pulp-text);
+  margin: 0;
+}
+
+.pulp-title span {
+  color: var(--pulp-primary);
+}
+
+/* Табы */
+.pulp-tabs {
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--pulp-border);
+}
+
+.pulp-tabs .MuiTabs-indicator {
+  background-color: var(--pulp-primary);
+  height: 2px;
+}
+
+.pulp-tab {
+  color: var(--pulp-text-secondary) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  min-height: 48px !important;
+  padding: 12px 24px !important;
+}
+
+.pulp-tab:hover {
+  color: var(--pulp-text) !important;
+  background-color: var(--pulp-hover) !important;
+}
+
+.pulp-tab.Mui-selected {
+  color: var(--pulp-primary) !important;
+  font-weight: 600 !important;
+}
+
+/* Контейнер таблицы */
+.pulp-table-container {
+  background-color: var(--pulp-paper) !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--pulp-border) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Заголовки таблицы */
+.pulp-table-head .MuiTableCell-head {
+  background-color: var(--pulp-darker) !important;
+  color: var(--pulp-text) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  border-bottom: 1px solid var(--pulp-border) !important;
+  padding: 16px !important;
+}
+
+/* Строки таблицы */
+.pulp-table-row {
+  transition: background-color 0.15s ease !important;
+}
+
+.pulp-table-row:hover {
+  background-color: var(--pulp-hover) !important;
+}
+
+.pulp-table-row .MuiTableCell-body {
+  border-bottom: 1px solid var(--pulp-border) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  color: var(--pulp-text) !important;
+  padding: 12px 16px !important;
+}
+
+/* Постер */
+.pulp-poster {
+  width: 60px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--pulp-border);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.pulp-poster:hover {
+  transform: scale(1.05);
+  border-color: var(--pulp-primary);
+}
+
+/* Номер фильма */
+.pulp-film-number {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-weight: 500 !important;
+  color: var(--pulp-text-secondary) !important;
+  font-size: 1rem !important;
+}
+
+/* Название фильма - ограничиваем ширину */
+.pulp-film-name {
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+  color: var(--pulp-text) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Год */
+.pulp-film-year {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 1rem !important;
+  color: var(--pulp-text-secondary) !important;
+}
+
+/* Дата */
+.pulp-film-date {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-size: 0.9rem !important;
+  color: var(--pulp-text-secondary) !important;
+}
+
+/* Статус публичности */
+.pulp-visibility-status {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-size: 0.75rem !important;
+  text-transform: none;
+  color: var(--pulp-text-secondary) !important;
+  margin-top: 2px;
+}
+
+/* Рейтинг в строке */
+.pulp-rating-value {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-weight: 500;
+  font-size: 0.9rem !important;
+  color: var(--pulp-primary) !important;
+}
+
+/* Кнопки действий */
+.pulp-icon-button {
+  color: var(--pulp-text-secondary) !important;
+  transition: all 0.15s ease !important;
+  padding: 6px !important;
+}
+
+.pulp-icon-button:hover {
+  background-color: rgba(255, 215, 0, 0.1) !important;
+  color: var(--pulp-text) !important;
+}
+
+.pulp-icon-button.watched:hover {
+  color: var(--pulp-success) !important;
+}
+
+.pulp-icon-button.delete:hover {
+  color: #F85149 !important;
+}
+
+.pulp-icon-button .MuiSvgIcon-root {
+  font-size: 1.3rem !important;
+}
+
+/* Раскрывающийся блок */
+.pulp-collapse-box {
+  background-color: var(--pulp-darker);
+  border-top: 1px solid var(--pulp-border);
+  border-bottom: 1px solid var(--pulp-border);
+  padding: 20px 24px;
+}
+
+.pulp-collapse-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: var(--pulp-text) !important;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-bottom: 12px !important;
+}
+
+.pulp-collapse-description {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+  color: var(--pulp-text-secondary) !important;
+}
+
+/* Чипы */
+.pulp-chip {
+  background-color: var(--pulp-hover) !important;
+  border: 1px solid var(--pulp-border) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-size: 0.8rem !important;
+  color: var(--pulp-text) !important;
+  height: 28px !important;
+}
+
+.pulp-chip .MuiChip-label {
+  font-weight: 400 !important;
+  padding: 0 12px !important;
+}
+
+.pulp-chip .MuiChip-icon {
+  color: var(--pulp-primary) !important;
+  font-size: 16px !important;
+  margin-left: 8px;
+}
+
+/* Пустое состояние */
+.pulp-empty-message {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  font-size: 1.1rem !important;
+  color: var(--pulp-text-secondary) !important;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Анимация загрузки */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.pulp-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.pulp-loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--pulp-border);
+  border-top-color: var(--pulp-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Адаптив для Rating компонента */
+.pulp-table-row .MuiRating-root {
+  font-size: 1.2rem !important;
+}
+
+.pulp-table-row .MuiRating-icon {
+  padding: 2px;
+}
+
+.pulp-table-row .MuiRating-iconFilled {
+  color: var(--pulp-primary) !important;
+}
+
+.pulp-table-row .MuiRating-iconEmpty {
+  color: var(--pulp-border) !important;
+}
+
+/* Убираем лишние анимации */
+@media (prefers-reduced-motion: reduce) {
+  .pulp-poster:hover,
+  .pulp-icon-button:hover {
+    transform: none;
+  }
+}
+
+/* Скроллбар */
+.pulp-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.pulp-table-container::-webkit-scrollbar-track {
+  background: var(--pulp-dark);
+}
+
+.pulp-table-container::-webkit-scrollbar-thumb {
+  background: var(--pulp-border);
+  border-radius: 4px;
+}
+
+.pulp-table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--pulp-text-secondary);
+}

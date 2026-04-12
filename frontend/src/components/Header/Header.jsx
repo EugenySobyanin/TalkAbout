@@ -97,23 +97,31 @@ function Header() {
   return (
     <header className="header">
       <div className="header-left">
-        <Link to="/" className="logo">
-          <img src="/logo.png" alt="TalkAbout" className="logo-img" />
-        </Link>
-        <Link to="/" className="app-name-link">
-          <span className="app-name">
-            <span className="letter">T</span>
-            <span className="letter">a</span>
-            <span className="letter">l</span>
-            <span className="letter">k</span>
-            <span className="letter">A</span>
-            <span className="letter">b</span>
-            <span className="letter">o</span>
-            <span className="letter">u</span>
-            <span className="letter">t</span>
-          </span>
-        </Link>
-      </div>
+      <Link to="/" className="logo-link">
+        <div className="film-strip-logo">
+          <div className="film-strip">
+            <span className="film-hole"></span>
+            <span className="film-hole"></span>
+            <span className="film-hole"></span>
+            <span className="film-hole"></span>
+          </div>
+          <div className="film-frame">
+            <span className="frame-icon">🎬</span>
+          </div>
+        </div>
+      </Link>
+      <Link to="/" className="app-name-link">
+        <span className="app-name">
+          <span className="letter">F</span>
+          <span className="letter">r</span>
+          <span className="letter">a</span>
+          <span className="letter">m</span>
+          <span className="letter">e</span>
+          <span className="letter">2</span>
+          <span className="letter">5</span>
+        </span>
+      </Link>
+    </div>
 
       <div className="search-container" ref={dropdownRef}>
         <div className="search-input-wrapper">

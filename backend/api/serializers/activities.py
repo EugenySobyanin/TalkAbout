@@ -42,10 +42,15 @@ class ActivitySerializer(serializers.ModelSerializer):
         model = UserFilmActivity
         fields = (
             'id',
-            'user', 'film',
-            'is_planned', 'is_watched',
+            'user',
+            'film',
+            'is_planned',
+            'planned_at',
+            'is_watched',
+            'watched_at',
             'rating',
-            'is_public_for_planned', 'is_public_for_watched'
+            'is_public_for_planned',
+            'is_public_for_watched',
         )
 
 
