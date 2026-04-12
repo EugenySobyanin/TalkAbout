@@ -15,14 +15,32 @@ export const getUserFilmActivity = async (filmId) => {
   }
 }
 
-// Создание или обновление активности
-export const createOrUpdateActivity = async (activityData, activiy) => {
-  console.log('Попали в createOrUpdateActivity')
+// Получение всех активностей пользователя
+export const getUserActivities = async (params = {}) => {
   try {
-    // const existingActivity = await getUserFilmActivity(activityData.film)
-    
-    if (activiy) {
-      const response = await api.patch(`/activities/${activiy.id}/`, activityData)
+    const response = await api.get('/activities/', { params })
+    return response.data
+  } catch (error) {
+    console.error('Error fetching user activities:', error)
+    return []
+  }
+}
+
+// Получение планируемых фильмов
+export const getPlannedFilms = async () => {
+  return getUserActivities({ is_planned: true })
+}
+
+// Получение просмотренных фильмов
+export const getWatchedFilms = async () => {
+  return getUserActivities({ is_watched: true })
+}
+
+// Создание или обновление активности
+export const createOrUpdateActivity = async (activityData, activity) => {
+  try {
+    if (activity) {
+      const response = await api.patch(`/activities/${activity.id}/`, activityData)
       return response.data
     } else {
       const response = await api.post('/activities/', activityData)
@@ -30,6 +48,32 @@ export const createOrUpdateActivity = async (activityData, activiy) => {
     }
   } catch (error) {
     console.error('Error creating/updating activity:', error)
+    throw error
+  }
+}
+
+// Обновление публичности
+export const toggleVisibility = async (activityId, field, value) => {
+  try {
+    const response = await api.patch(`/activities/${activityId}/`, {
+      [field]: value
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error toggling visibility:', error)
+    throw error
+  }
+}
+
+// Удаление из планируемых
+export const removeFromPlanned = async (activityId) => {
+  try {
+    const response = await api.patch(`/activities/${activityId}/`, {
+      is_planned: false
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error removing from planned:', error)
     throw error
   }
 }
@@ -52,10 +96,36 @@ export const addToWatchlist = async (filmId, activity, isPlanned) => {
 
 // Отметка как "Просмотрено"
 export const markAsWatched = async (filmId, activity, isWatched) => {
-  console.log('Попали в markAsWatched.')
   return await createOrUpdateActivity({
     film: filmId,
     is_watched: isWatched,
-    // is_planned: false
   }, activity)
+}
+
+// Обновление оценки
+export const updateRating = async (activityId, rating) => {
+  try {
+    const response = await api.patch(`/activities/${activityId}/`, {
+      rating: rating
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error updating rating:', error)
+    throw error
+  }
+}
+
+// Отметить как просмотренное с оценкой
+export const markAsWatchedWithRating = async (activityId, rating) => {
+  try {
+    const response = await api.patch(`/activities/${activityId}/`, {
+      is_planned: false,
+      is_watched: true,
+      rating: rating
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error marking as watched:', error)
+    throw error
+  }
 }

@@ -5,9 +5,9 @@
 /* ========== ОСНОВНАЯ ШАПКА ========== */
 .header {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 3rem;
+  padding: 1.2rem 3rem;
   background: linear-gradient(180deg, #0a0a0a 0%, #151515 100%);
   color: #ffffff;
   position: fixed;
@@ -17,7 +17,7 @@
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 140, 0, 0.3);
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
-  min-height: 90px;
+  min-height: 85px;
   font-family: 'Oswald', sans-serif;
 }
 
@@ -25,39 +25,189 @@
 .header-left {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.2rem;
   flex-shrink: 0;
 }
 
-.logo-img {
-  height: 45px;
-  width: auto;
-  filter: drop-shadow(0 0 8px rgba(255, 140, 0, 0.3));
-  transition: filter 0.3s ease;
+/* Стилизованная кинолента */
+.logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
 }
 
-.logo-img:hover {
-  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
+.film-strip-logo {
+  position: relative;
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
 }
 
+.film-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  border: 2px solid #ff8c00;
+  border-radius: 4px;
+  box-shadow: 
+    0 0 15px rgba(255, 140, 0, 0.3),
+    inset 0 0 10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 8px 0;
+  transition: all 0.3s ease;
+}
+
+.film-strip::before,
+.film-strip::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    #ff8c00 20%, 
+    #ffd700 50%, 
+    #ff8c00 80%, 
+    transparent 100%
+  );
+}
+
+.film-strip::before {
+  top: 12px;
+}
+
+.film-strip::after {
+  bottom: 12px;
+}
+
+.film-hole {
+  display: block;
+  width: 12px;
+  height: 6px;
+  background: #0a0a0a;
+  margin: 0 auto;
+  border-radius: 2px;
+  box-shadow: 
+    inset 0 1px 3px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 140, 0, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.film-frame {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.frame-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+  animation: subtlePulse 2s ease-in-out infinite;
+}
+
+/* Анимация для иконки */
+@keyframes subtlePulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+  }
+  50% { 
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
+  }
+}
+
+/* Эффекты при наведении */
+.logo-link:hover .film-strip-logo {
+  transform: translateY(-2px);
+}
+
+.logo-link:hover .film-strip {
+  border-color: #ffd700;
+  box-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.4),
+    inset 0 0 12px rgba(0, 0, 0, 0.6);
+}
+
+.logo-link:hover .frame-icon {
+  animation: none;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+}
+
+.logo-link:hover .film-strip::before,
+.logo-link:hover .film-strip::after {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    #ffd700 20%, 
+    #ffed4e 50%, 
+    #ffd700 80%, 
+    transparent 100%
+  );
+}
+
+/* ========== НАЗВАНИЕ FRAME25 ========== */
 .app-name-link {
   text-decoration: none;
 }
 
 .app-name {
   font-family: 'Bebas Neue', cursive;
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: bold;
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   text-transform: uppercase;
   color: #ffd700;
-  text-shadow: 3px 3px 0 #8b0000, 5px 5px 0 rgba(0, 0, 0, 0.4);
+  text-shadow: 
+    3px 3px 0 #8b0000, 
+    5px 5px 0 rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(255, 215, 0, 0.3);
   transition: all 0.3s ease;
+  display: inline-block;
 }
 
 .app-name:hover {
-  text-shadow: 4px 4px 0 #cc0000, 6px 6px 0 rgba(0, 0, 0, 0.5);
+  text-shadow: 
+    4px 4px 0 #cc0000, 
+    6px 6px 0 rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(255, 215, 0, 0.5);
   transform: scale(1.02);
+}
+
+.letter {
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.app-name:hover .letter {
+  animation: letterBounce 0.5s ease;
+}
+
+.app-name:hover .letter:nth-child(1) { animation-delay: 0s; }
+.app-name:hover .letter:nth-child(2) { animation-delay: 0.05s; }
+.app-name:hover .letter:nth-child(3) { animation-delay: 0.1s; }
+.app-name:hover .letter:nth-child(4) { animation-delay: 0.15s; }
+.app-name:hover .letter:nth-child(5) { animation-delay: 0.2s; }
+.app-name:hover .letter:nth-child(6) { animation-delay: 0.25s; }
+.app-name:hover .letter:nth-child(7) { animation-delay: 0.3s; }
+
+@keyframes letterBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 /* ========== ПРАВАЯ ЧАСТЬ (ПОИСК + ЮЗЕР) ========== */
@@ -354,6 +504,10 @@
 }
 
 /* Нет результатов */
+.search-dropdown.empty {
+  padding: 0;
+}
+
 .no-results {
   padding: 30px 20px;
   text-align: center;
@@ -399,7 +553,7 @@
   height: 40px;
   border-radius: 6px;
   object-fit: cover;
-  border: 1px solid rgba(255, 140, 0, 0.3);
+  /* border: 1px solid rgba(255, 140, 0, 0.3); */
   transition: all 0.3s ease;
 }
 
@@ -530,8 +684,18 @@
     width: 320px;
   }
   
+  .film-strip-logo {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .frame-icon {
+    font-size: 24px;
+  }
+  
   .app-name {
     font-size: 2rem;
+    letter-spacing: 5px;
   }
   
   .username {
@@ -553,9 +717,22 @@
     font-size: 0.9rem;
   }
   
+  .film-strip-logo {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .frame-icon {
+    font-size: 22px;
+  }
+  
   .app-name {
     font-size: 1.6rem;
-    letter-spacing: 3px;
+    letter-spacing: 4px;
+  }
+  
+  .header-left {
+    gap: 0.8rem;
   }
   
   .header-right {
@@ -570,17 +747,35 @@
   }
   
   .header-left {
-    gap: 0.8rem;
+    gap: 0.5rem;
   }
   
-  .logo-img {
-    height: 35px;
+  .film-strip-logo {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .film-strip {
+    border-width: 1.5px;
+  }
+  
+  .film-hole {
+    width: 10px;
+    height: 5px;
+  }
+  
+  .frame-icon {
+    font-size: 20px;
   }
   
   .app-name {
     font-size: 1.3rem;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-shadow: 2px 2px 0 #8b0000, 3px 3px 0 rgba(0, 0, 0, 0.4);
+  }
+  
+  .app-name:hover {
+    text-shadow: 3px 3px 0 #cc0000, 4px 4px 0 rgba(0, 0, 0, 0.5);
   }
   
   .header-right {
@@ -637,12 +832,31 @@
     width: 150px;
   }
   
-  .app-name {
-    font-size: 1.1rem;
+  .film-strip-logo {
+    width: 35px;
+    height: 35px;
   }
   
-  .logo-img {
-    height: 30px;
+  .film-strip::before {
+    top: 8px;
+  }
+  
+  .film-strip::after {
+    bottom: 8px;
+  }
+  
+  .film-hole {
+    width: 8px;
+    height: 4px;
+  }
+  
+  .frame-icon {
+    font-size: 18px;
+  }
+  
+  .app-name {
+    font-size: 1.1rem;
+    letter-spacing: 2px;
   }
   
   .login-btn {

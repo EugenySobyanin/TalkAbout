@@ -45,6 +45,12 @@ class UserFilmActivity(BaseCreatedUpdated):
         'Буду смотерь',
         default=False
     )
+    planned_at = models.DateTimeField(
+        'Дата добавления в планируемые',
+        null=True,
+        blank=True,
+        help_text='Когда фильм был отмечен как планируемый'
+    )
     is_watched = models.BooleanField(
         'Просмотрено',
         default=False
@@ -84,6 +90,13 @@ class UserFilmActivity(BaseCreatedUpdated):
         # Если снимается отметка "просмотрено" - очищаем дату
         elif not self.is_watched and self.watched_at:
             self.watched_at = None
+
+        # Если фильм отмечается как планируемый
+        if self.is_planned and not self.planned_at:
+            self.planned_at = timezone.now()
+        # Если снимается отметка "буду смотреть"- очищаем дату
+        elif not self.is_planned and self.planned_at:
+            self.planned_at = None
 
         super().save(*args, **kwargs)
 

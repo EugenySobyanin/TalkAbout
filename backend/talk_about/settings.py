@@ -115,6 +115,13 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+DJOSER = {
+    'SERIALIZERS': {
+        'user': 'api.serializers.users.CustomUserSerializer',
+        'current_user': 'api.serializers.users.CustomUserSerializer',
+    }
+}
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Your API Title',
     'DESCRIPTION': 'Your API description',
