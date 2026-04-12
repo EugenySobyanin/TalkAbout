@@ -66,8 +66,9 @@ function FilmActions({ filmId,  activity }) {
       // if (!newWatchedState) {
       //   setIsPlanned(false)
       // }
-
+      
       console.log('Отправляем is_watched:', newWatchedState)  // ← проверьте в консоли
+      console.log('Активити: ', activity)
       await markAsWatched(filmId, activity, newWatchedState)  // ← передаём НОВОЕ значение
       
     } catch (error) {

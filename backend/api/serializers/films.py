@@ -407,7 +407,8 @@ class FilmDetailSerializer(serializers.ModelSerializer):
                 user=request.user,
                 film=obj
             ).first()
-            return ActivityInFilmDetailSerializer(activity).data
+            if activity:
+                return ActivityInFilmDetailSerializer(activity).data
         return None
 
 

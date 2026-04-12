@@ -49,6 +49,9 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
         return UserFilmActivity.objects.filter(**filters)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 # class ActivityViewSet(viewsets.ModelViewSet):
 #     serializer_class = ActivitySerializer
 #     filterset_class = ActivityFilter  # Используем django-filter

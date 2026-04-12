@@ -43,6 +43,7 @@ export const createOrUpdateActivity = async (activityData, activity) => {
       const response = await api.patch(`/activities/${activity.id}/`, activityData)
       return response.data
     } else {
+      console.log('Отправляется OPTIONS вместо POST')
       const response = await api.post('/activities/', activityData)
       return response.data
     }
@@ -89,7 +90,7 @@ export const rateFilm = async (filmId, rating, activity) => {
 // Добавление в "Буду смотреть"
 export const addToWatchlist = async (filmId, activity, isPlanned) => {
   return await createOrUpdateActivity({
-    film: filmId,
+    film_id: filmId,
     is_planned: isPlanned,
   }, activity)
 }
@@ -97,7 +98,7 @@ export const addToWatchlist = async (filmId, activity, isPlanned) => {
 // Отметка как "Просмотрено"
 export const markAsWatched = async (filmId, activity, isWatched) => {
   return await createOrUpdateActivity({
-    film: filmId,
+    film_id: filmId,
     is_watched: isWatched,
   }, activity)
 }
