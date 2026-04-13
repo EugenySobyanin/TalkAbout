@@ -40,7 +40,7 @@ function FilmHeader({ film }) {
             </div>
           )}
           
-          {film.en_name && film.en_name !== film.name && (
+          {film.en_name && film.en_name !== film.name && film.en_name !== film.alternative_name && (
             <div className="film-en-name">{film.en_name}</div>
           )}
           
@@ -55,26 +55,45 @@ function FilmHeader({ film }) {
               <span className="meta-item">{film.rating_mpaa}</span>
             )}
           </div>
-          
+
           {/* Жанры */}
           {film.genres && film.genres.length > 0 && (
-            <div className="film-genres">
-              {film.genres.map(genre => (
-                <span key={genre.id} className="genre-tag">
-                  {genre.name}
-                </span>
-              ))}
+            <div className="film-genres-section">
+              <span className="genres-label">Жанр:</span>
+              <div className="film-genres">
+                {film.genres.map((genre, index) => (
+                  <span key={genre.id}>
+                    <span className="genre-text">{genre.name}</span>
+                    {index < film.genres.length - 1 && (
+                      <span className="genre-separator">, </span>
+                    )}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
-          
+
           {/* Страны */}
           {film.countries && film.countries.length > 0 && (
-            <div className="film-countries">
-              {film.countries.map(country => (
-                <span key={country.id} className="country-item">
-                  {country.name}
-                </span>
-              ))}
+            <div className="film-countries-section">
+              <span className="countries-label">Страна:</span>
+              <div className="film-countries">
+                {film.countries.map((country, index) => (
+                  <span key={country.id}>
+                    <span className="country-text">{country.name}</span>
+                    {index < film.countries.length - 1 && (
+                      <span className="country-separator">, </span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Краткое описание */}
+          {film.short_description && (
+            <div className="film-short-description">
+              {film.short_description}
             </div>
           )}
           

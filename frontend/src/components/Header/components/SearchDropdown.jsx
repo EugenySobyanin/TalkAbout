@@ -47,9 +47,9 @@ const SearchDropdown = ({ results, onSelect, searchTerm, isSearching }) => {
             }}
           >
             <div className="search-item-poster">
-              {film.poster ? (
+              {film.poster_url ? (
                 <img 
-                  src={film.poster} 
+                  src={film.poster_url} 
                   alt={film.name || 'Постер фильма'}
                   loading="lazy"
                   onError={(e) => {

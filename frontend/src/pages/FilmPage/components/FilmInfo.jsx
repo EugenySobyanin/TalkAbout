@@ -11,11 +11,11 @@ function FilmInfo({ film }) {
         <div className="film-slogan">"{film.slogan}"</div>
       )}
       
-      {film.short_description && (
+      {/* {film.short_description && (
         <div className="film-short-description">
           {film.short_description}
         </div>
-      )}
+      )} */}
       
       {film.description && (
         <div className="film-description">

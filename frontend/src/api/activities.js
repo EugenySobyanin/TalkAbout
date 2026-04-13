@@ -82,7 +82,7 @@ export const removeFromPlanned = async (activityId) => {
 // Установка оценки
 export const rateFilm = async (filmId, rating, activity) => {
   return await createOrUpdateActivity({
-    film: filmId,
+    film_id: filmId,
     rating: rating
   }, activity)
 }

@@ -2,9 +2,9 @@
 
 :root {
   --pulp-primary: #FFD700;
-  --pulp-dark: #0D1117;
-  --pulp-darker: #0A0E13;
-  --pulp-paper: #161B22;
+  --pulp-dark: --color-tired-black;
+  --pulp-darker: --color-tired-black;
+  --pulp-paper: --color-tired-black;
   --pulp-text: #E6EDF3;
   --pulp-text-secondary: #8B949E;
   --pulp-border: #30363D;

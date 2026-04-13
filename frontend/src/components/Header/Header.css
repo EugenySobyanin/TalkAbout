@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 4rem;
-  background: linear-gradient(180deg, #0a0a0a 0%, #151515 100%);
+  background: --color-tired-black;
   color: #ffffff;
   position: fixed;
   top: 0;

@@ -2,7 +2,8 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 
-from api.serializers.compilations import CompilationSerializer
+from api.serializers.compilations import (CompilationSerializer,
+                                          CompilationReadSerializer)
 from api.permissions import IsOwnerOrPublicReadOnly
 from compilations.models import Compilation
 
@@ -26,6 +27,11 @@ class CompilationViewSet(viewsets.ModelViewSet):
             return Compilation.objects.filter(user=user, is_public=True)
 
         return Compilation.objects.filter(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return CompilationSerializer
+        return CompilationReadSerializer
 
     def get_object(self):
         """Переопределяем получение объекта для проверки доступа"""

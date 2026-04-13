@@ -5,6 +5,7 @@ import AuthPage from './components/Auth/AuthPage';
 import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
 import FilmPage from './pages/FilmPage/FilmPage';
+import CompilationsPage from './pages/CompilationsPage/CompilationsPage';
 import DiaryPageComponent from './pages/DiaryPage/DiaryPage'; // ← Переименовываем импорт
 import './App.css';
 
@@ -51,13 +52,13 @@ const FeedPage = () => {
     )
 }
 
-const CompilationsPage = () => {
-    return (
-        <div className="page-container">
-            <h1>Подборки</h1>
-        </div>
-    )
-}
+// const CompilationsPage = () => {
+//     return (
+//         <div className="page-container">
+//             <h1>Подборки</h1>
+//         </div>
+//     )
+// }
 
 const RecommendationsPage = () => {
     return (

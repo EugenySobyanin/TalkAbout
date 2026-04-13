@@ -1,0 +1,10 @@
+:root {
+    /*Цвета*/
+    --color-tired-black: #14120F;
+    --color-tired-yellow: #B8860B;
+
+    /*Шрифты*/
+    --font-main: 'Impact', sans-serif;
+    --font-headeing: 'Arial Narrow', cursive;
+    --font-text: 'Anton', sans-serif;
+}

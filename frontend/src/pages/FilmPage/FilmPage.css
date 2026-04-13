@@ -1,42 +1,77 @@
 /* src/pages/FilmPage/FilmPage.css - Сдержанный Тарантино */
 
+/* ========================================
+   ИМПОРТ ШРИФТОВ
+   ======================================== */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&display=swap');
 
-/* ========== ОСНОВНОЙ КОНТЕЙНЕР ========== */
+/* ========================================
+   ПЕРЕМЕННЫЕ
+   ======================================== */
+:root {
+  /* Цвета */
+  --color-bg-primary: #14120F;
+  --color-bg-secondary: #14120F;
+  --color-bg-tertiary: #1a1a1a;
+  --color-bg-hover: #2a2a2a;
+  
+  --color-text-primary: #cccccc;
+  --color-text-secondary: #aaaaaa;
+  --color-text-muted: #888888;
+  --color-text-light: #ffffff;
+  
+  --color-accent: #B8860B;        /* Красный Тарантино */
+  --color-accent-dark: #8b0000;
+  --color-accent-gold: #e3b23c;
+  
+  --color-rating-kp: #ff6600;
+  --color-rating-imdb: #e3b23c;
+  --color-rating-user: #4caf50;
+  
+  --color-border: #333333;
+  --color-border-light: #444444;
+  
+  /* Шрифты */
+  --font-title: 'Impact', sans-serif;
+  --font-heading: 'Arial Narrow', cursive;
+  --font-body: 'Anton', sans-serif;
+  
+  /* Размеры */
+  --sidebar-width: 320px;
+  --poster-width: 320px;
+  --poster-width-tablet: 260px;
+  --poster-width-mobile: 220px;
+  --poster-width-small: 180px;
+  
+  /* Отступы */
+  --spacing-xs: 5px;
+  --spacing-sm: 10px;
+  --spacing-md: 15px;
+  --spacing-lg: 20px;
+  --spacing-xl: 25px;
+  --spacing-xxl: 30px;
+  
+  /* Анимации */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+}
+
+/* ========================================
+   СБРОС СТИЛЕЙ ДЛЯ СТРАНИЦЫ
+   ======================================== */
 .film-page {
   min-height: 100vh;
-  color: #ffffff;
-  font-family: 'Oswald', sans-serif;
+  color: var(--color-text-light);
+  font-family: var(--font-body);
   position: relative;
-  background-color: #0f0f0f;
+  background-color: var(--color-bg-primary);
 }
 
-/* ========== КНОПКА НАЗАД ========== */
-.back-button {
-  background: transparent;
-  border: 2px solid #C8102E;
-  color: #F5E100;
-  font-family: 'Bebas Neue', cursive;
-  font-size: 1.2rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  padding: 10px 25px;
-  margin-bottom: 25px;
-  transition: all 0.3s ease;
-  display: inline-block;
-  font-weight: 400;
-}
+/* ========================================
+   СОСТОЯНИЯ СТРАНИЦЫ (ЗАГРУЗКА / ОШИБКА)
+   ======================================== */
 
-.back-button:hover {
-  background: #C8102E;
-  color: #ffffff;
-  border-color: #F5E100;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 0 #F5E100;
-}
-
-/* ========== ЗАГРУЗКА ========== */
+/* --- Загрузка --- */
 .film-page.loading {
   display: flex;
   align-items: center;
@@ -52,17 +87,17 @@
   width: 60px;
   height: 60px;
   border: 3px solid rgba(200, 16, 46, 0.2);
-  border-top-color: #F5E100;
-  border-right-color: #C8102E;
+  border-top-color: var(--color-accent);
+  border-right-color: var(--color-accent-dark);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 25px;
+  margin: 0 auto var(--spacing-xl);
 }
 
 .spinner + p {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-heading);
   font-size: 1.3rem;
-  color: #F5E100;
+  color: var(--color-text-primary);
   letter-spacing: 3px;
   text-transform: uppercase;
 }
@@ -71,7 +106,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* ========== ОШИБКА ========== */
+/* --- Ошибка --- */
 .film-page.error {
   display: flex;
   align-items: center;
@@ -82,45 +117,74 @@
 .error-container {
   text-align: center;
   padding: 50px;
-  background: #141414;
-  border: 2px solid #C8102E;
+  background: var(--color-bg-secondary);
+  border: 2px solid var(--color-accent);
   max-width: 500px;
 }
 
 .error-container h2 {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-heading);
   font-size: 2rem;
-  margin-bottom: 25px;
-  color: #F5E100;
+  margin-bottom: var(--spacing-xl);
+  color: var(--color-text-primary);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
 .error-container .back-btn {
-  background: #C8102E;
+  background: var(--color-accent);
   border: none;
-  color: #ffffff;
-  font-family: 'Bebas Neue', cursive;
+  color: var(--color-text-light);
+  font-family: var(--font-heading);
   font-size: 1.2rem;
-  padding: 12px 30px;
+  padding: 12px var(--spacing-xxl);
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 2px;
-  transition: all 0.3s ease;
+  transition: all var(--transition-base);
 }
 
 .error-container .back-btn:hover {
-  background: #F5E100;
-  color: #0f0f0f;
+  background: var(--color-accent-dark);
+  color: var(--color-text-light);
   transform: translateY(-2px);
-  box-shadow: 0 4px 0 #C8102E;
+  box-shadow: 0 4px 0 var(--color-accent);
 }
 
-/* ========== КОНТЕНТ ФИЛЬМА ========== */
+/* ========================================
+   КНОПКА НАЗАД
+   ======================================== */
+.back-button {
+  background: transparent;
+  border: none;
+  border-radius: 20px;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: var(--spacing-sm) var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  transition: all var(--transition-base);
+  display: inline-block;
+  font-weight: 400;
+}
+
+.back-button:hover {
+  background: var(--color-accent);
+  color: var(--color-text-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 var(--color-accent-dark);
+}
+
+/* ========================================
+   ОСНОВНОЙ КОНТЕНТ
+   ======================================== */
 .film-content {
   display: flex;
-  gap: 30px;
-  margin-top: 30px;
+  gap: var(--spacing-xxl);
+  margin-top: var(--spacing-xxl);
 }
 
 .film-main {
@@ -129,16 +193,19 @@
 }
 
 .film-sidebar {
-  width: 320px;
+  width: var(--sidebar-width);
   flex-shrink: 0;
 }
 
-/* ========== FILM HEADER ========== */
+/* ========================================
+   HEADER ФИЛЬМА (ПОСТЕР + ЗАГОЛОВОК)
+   ======================================== */
 .film-header {
   position: relative;
-  margin-bottom: 30px;
+  margin-bottom: var(--spacing-xxl);
 }
 
+/* --- Задник --- */
 .film-backdrop {
   position: absolute;
   top: 0;
@@ -159,82 +226,85 @@
     to bottom,
     rgba(15, 15, 15, 0.5) 0%,
     rgba(15, 15, 15, 0.85) 50%,
-    #0f0f0f 100%
+    var(--color-bg-primary) 100%
   );
 }
 
+/* --- Контент хедера --- */
 .film-header-content {
   position: relative;
   display: flex;
   gap: 35px;
-  padding: 30px;
+  padding: var(--spacing-xxl);
   min-height: 450px;
 }
 
+/* --- Постер --- */
 .film-poster-wrapper {
   flex-shrink: 0;
-  width: 320px;
+  width: var(--poster-width);
 }
 
 .film-poster {
   width: 100%;
-  border: 3px solid #C8102E;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-  transition: all 0.3s ease;
+  transition: all var(--transition-base);
   display: block;
 }
 
 .film-poster:hover {
-  box-shadow: 0 0 40px rgba(245, 225, 0, 0.2);
+  box-shadow: 0 0 40px rgba(200, 16, 46, 0.2);
 }
 
 .film-poster-placeholder {
   width: 100%;
   aspect-ratio: 2/3;
-  background: #1a1a1a;
-  border: 3px solid #C8102E;
+  background: var(--color-bg-tertiary);
+  border: 3px solid var(--color-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 60px;
-  color: #F5E100;
+  color: var(--color-text-primary);
 }
 
+/* --- Секция с названием --- */
 .film-title-section {
   flex: 1;
-  padding-top: 30px;
+  padding-top: var(--spacing-xxl);
 }
 
 .film-title {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-title);
   font-size: 3rem;
-  margin: 0 0 10px;
-  color: #F5E100;
-  text-transform: uppercase;
-  letter-spacing: 3px;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--color-text-primary);
+  /* text-transform: uppercase; */
+  letter-spacing: 1px;
   line-height: 1.1;
-  text-shadow: 2px 2px 0 #0f0f0f;
+  text-shadow: 2px 2px 0 var(--color-accent);
 }
 
 .film-year {
   font-size: 2rem;
-  color: #C8102E;
+  color: var(--color-text-primary);
   font-weight: normal;
 }
 
 .film-alternative-name,
 .film-en-name {
-  font-size: 1.1rem;
-  color: #cccccc;
-  margin-bottom: 5px;
-  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+  /* font-style: italic; */
 }
 
+/* --- Мета-информация --- */
 .film-meta {
   display: flex;
-  gap: 25px;
-  margin: 20px 0;
-  color: #ffffff;
+  gap: var(--spacing-xl);
+  margin: var(--spacing-lg) 0;
+  color: var(--color-text-light);
 }
 
 .meta-item {
@@ -243,53 +313,69 @@
   gap: 8px;
   font-size: 1rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  /* letter-spacing: 1px; */
+  color: var(--color-text-primary);
 }
 
 .age-rating {
-  background: #C8102E;
-  color: #ffffff;
-  padding: 3px 10px;
+  background: var(--color-accent);
+  color: var(--color-text-light);
+  padding: 3px var(--spacing-sm);
   font-weight: bold;
 }
 
-.film-genres {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 20px 0;
+/* ========================================
+   ЖАНРЫ И СТРАНЫ (ТЕКСТ В СТРОКУ)
+   ======================================== */
+
+/* --- Общие стили для мета-строк --- */
+.film-genres-section,
+.film-countries-section {
+  margin: var(--spacing-md) 0;
 }
 
-.genre-tag {
-  background: rgba(200, 16, 46, 0.15);
-  border: 1px solid #C8102E;
-  color: #F5E100;
-  padding: 6px 16px;
-  font-family: 'Bebas Neue', cursive;
+.genres-label,
+.countries-label {
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
   font-size: 1rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  transition: all 0.2s ease;
+  margin-right: var(--spacing-sm);
 }
 
-.genre-tag:hover {
-  background: #C8102E;
-  color: #ffffff;
-}
-
+.film-genres,
 .film-countries {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  color: #aaaaaa;
-  margin: 15px 0;
+  display: inline;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
   font-style: italic;
 }
 
+.genre-text,
+.country-text {
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.genre-text:hover,
+.country-text:hover {
+  color: var(--color-accent);
+}
+
+.genre-separator,
+.country-separator {
+  color: #666666;
+  margin: 0 4px;
+}
+
+/* ========================================
+   РЕЙТИНГИ
+   ======================================== */
 .film-ratings {
   display: flex;
   gap: 35px;
-  margin-top: 25px;
+  margin-top: var(--spacing-xl);
 }
 
 .rating-item {
@@ -299,59 +385,63 @@
 
 .rating-label {
   display: block;
-  font-family: 'Bebas Neue', cursive;
-  font-size: 0.9rem;
-  color: #888888;
-  margin-bottom: 5px;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 
 .rating-value {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-heading);
   font-size: 2.5rem;
   font-weight: bold;
 }
 
 .rating-votes {
   font-size: 0.8rem;
-  color: #888888;
-  margin-left: 5px;
+  color: var(--color-text-muted);
+  margin-left: var(--spacing-xs);
 }
 
 .rating-item.kp .rating-value {
-  color: #ff6600;
+  color: var(--color-rating-kp);
 }
 
 .rating-item.imdb .rating-value {
-  color: #F5E100;
+  color: var(--color-rating-imdb);
 }
 
 .rating-item.user .rating-value {
-  color: #4caf50;
+  color: var(--color-rating-user);
 }
 
-/* ========== FILM ACTIONS ========== */
+/* ========================================
+   БЛОК ДЕЙСТВИЙ (ОЦЕНКА / ИЗБРАННОЕ)
+   ======================================== */
 .film-actions {
-  background: #141414;
-  border: 1px solid #333333;
-  padding: 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 0 #C8102E;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border: ;
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xxl);
+  box-shadow: 0 2px 0 var(--color-accent);
 }
 
+/* --- Секция оценки --- */
 .rating-section {
   display: flex;
   align-items: center;
-  gap: 25px;
-  margin-bottom: 25px;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
   flex-wrap: wrap;
 }
 
 .rating-section .rating-label {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-heading);
   font-size: 1.2rem;
-  color: #F5E100;
+  color: var(--color-text-primary);
   letter-spacing: 2px;
   margin-bottom: 0;
 }
@@ -367,21 +457,21 @@
   font-size: 32px;
   color: #444444;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
   padding: 0;
 }
 
 .star-btn:hover {
   transform: scale(1.2);
-  color: #F5E100;
+  color: var(--color-accent-gold);
 }
 
 .star-btn.active {
-  color: #F5E100;
+  color: var(--color-accent-gold);
 }
 
 .star-btn.hover {
-  color: #C8102E;
+  color: var(--color-accent-dark);
 }
 
 .star-btn:disabled {
@@ -390,45 +480,47 @@
 }
 
 .current-rating {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-heading);
   font-size: 1.4rem;
-  color: #F5E100;
+  color: var(--color-text-primary);
 }
 
+/* --- Кнопки действий --- */
 .action-buttons {
   display: flex;
-  gap: 20px;
+  gap: var(--spacing-lg);
 }
 
 .action-btn {
   background: transparent;
-  border: 2px solid #C8102E;
-  color: #F5E100;
-  font-family: 'Bebas Neue', cursive;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
   padding: 12px 24px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-sm);
   font-size: 1.1rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
+  /* letter-spacing: 2px; */
+  /* text-transform: uppercase; */
+  transition: all var(--transition-base);
   flex: 1;
   justify-content: center;
 }
 
 .action-btn:hover {
-  background: #C8102E;
-  color: #ffffff;
+  background: var(--color-accent);
+  color: var(--color-text-light);
   transform: translateY(-2px);
-  box-shadow: 0 4px 0 #F5E100;
+  box-shadow: 0 4px 0 var(--color-accent-dark);
 }
 
 .action-btn.active {
-  background: #F5E100;
-  border-color: #F5E100;
-  color: #0f0f0f;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-text-light);
 }
 
 .action-btn:disabled {
@@ -440,40 +532,69 @@
   font-size: 1.3rem;
 }
 
-/* ========== FILM INFO ========== */
-.film-info-section {
-  background: #141414;
-  border: 1px solid #333333;
-  padding: 25px;
-  margin-bottom: 30px;
+/* ========================================
+   СЕКЦИИ С ИНФОРМАЦИЕЙ (ОБЩИЕ СТИЛИ)
+   ======================================== */
+.film-info-section,
+.film-persons-section,
+.film-videos-section,
+.film-facts-section,
+.similar-films-section {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xxl);
 }
 
+.film-persons-section h2,
+.film-videos-section h2,
+.film-facts-section h2,
+.similar-films-section h2 {
+  font-family: var(--font-heading);
+  margin: 0 0 var(--spacing-xl);
+  font-size: 1.8rem;
+  color: var(--color-text-primary);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.similar-films-section h2 {
+  font-size: 1.5rem;
+}
+
+/* ========================================
+   СЕКЦИЯ: ОПИСАНИЕ И ДЕТАЛИ
+   ======================================== */
+
+/* --- Слоган --- */
 .film-slogan {
-  font-family: 'Oswald', sans-serif;
+  font-family: var(--font-body);
   font-size: 1.3rem;
   font-style: italic;
-  color: #F5E100;
-  margin-bottom: 20px;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-lg);
   text-align: center;
-  padding: 15px;
-  border-left: 4px solid #C8102E;
-  border-right: 4px solid #C8102E;
+  padding: var(--spacing-md);
+  border-left: 4px solid var(--color-accent);
+  border-right: 4px solid var(--color-accent);
   background: rgba(200, 16, 46, 0.05);
 }
 
+/* --- Краткое описание --- */
 .film-short-description {
-  color: #dddddd;
+  color: var(--color-text-primary);
   line-height: 1.7;
-  margin-bottom: 25px;
+  margin-bottom: var(--spacing-xl);
   font-size: 1rem;
 }
 
+/* --- Заголовки секций --- */
 .film-description h3,
 .film-details h3 {
-  font-family: 'Bebas Neue', cursive;
-  margin: 0 0 20px;
+  font-family: var(--font-heading);
+  margin: 0 0 var(--spacing-lg);
   font-size: 1.8rem;
-  color: #F5E100;
+  color: var(--color-text-primary);
   letter-spacing: 2px;
   text-transform: uppercase;
   position: relative;
@@ -488,12 +609,13 @@
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, #C8102E 0%, #F5E100 50%, transparent 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-dark) 50%, transparent 100%);
 }
 
+/* --- Текст описания --- */
 .description-text {
   line-height: 1.7;
-  color: #dddddd;
+  color: var(--color-text-primary);
 }
 
 .description-text.collapsed {
@@ -509,66 +631,53 @@
   left: 0;
   right: 0;
   height: 60px;
-  background: linear-gradient(to bottom, transparent, #141414);
+  background: linear-gradient(to bottom, transparent, var(--color-bg-secondary));
 }
 
 .show-more-btn {
   background: none;
-  border: 1px solid #C8102E;
-  color: #F5E100;
-  font-family: 'Bebas Neue', cursive;
+  border: 1px solid var(--color-accent);
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
   cursor: pointer;
-  margin-top: 15px;
-  padding: 8px 20px;
+  margin-top: var(--spacing-md);
+  padding: 8px var(--spacing-lg);
   font-size: 1rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .show-more-btn:hover {
-  background: #C8102E;
-  color: #ffffff;
+  background: var(--color-accent);
+  color: var(--color-text-light);
 }
 
+/* --- Сетка деталей --- */
 .details-grid {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 15px 25px;
-  margin-top: 20px;
+  gap: var(--spacing-md) var(--spacing-xl);
+  margin-top: var(--spacing-lg);
 }
 
 .detail-label {
-  font-family: 'Bebas Neue', cursive;
-  color: #C8102E;
+  font-family: var(--font-heading);
+  color: var(--color-text-primary);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .detail-value {
-  color: #ffffff;
+  color: var(--color-text-primary);
   font-style: italic;
 }
 
-/* ========== FILM PERSONS ========== */
-.film-persons-section {
-  background: #141414;
-  border: 1px solid #333333;
-  padding: 25px;
-  margin-bottom: 30px;
-}
-
-.film-persons-section h2 {
-  font-family: 'Bebas Neue', cursive;
-  margin: 0 0 25px;
-  font-size: 1.8rem;
-  color: #F5E100;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
+/* ========================================
+   СЕКЦИЯ: УЧАСТНИКИ (АКТЁРЫ / РЕЖИССЁРЫ)
+   ======================================== */
 .profession-group {
-  margin-bottom: 30px;
+  margin-bottom: var(--spacing-xxl);
 }
 
 .profession-group:last-child {
@@ -576,12 +685,12 @@
 }
 
 .profession-title {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-heading);
   font-size: 1.3rem;
-  color: #C8102E;
-  margin: 0 0 15px;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-md);
   padding-bottom: 8px;
-  border-bottom: 2px solid #C8102E;
+  border-bottom: 2px solid var(--color-accent);
   text-transform: uppercase;
   letter-spacing: 2px;
   display: flex;
@@ -590,30 +699,30 @@
 
 .person-count {
   font-size: 1rem;
-  color: #888888;
+  color: var(--color-text-muted);
   font-weight: normal;
-  margin-left: 10px;
+  margin-left: var(--spacing-sm);
 }
 
 .persons-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
+  gap: var(--spacing-md);
 }
 
 .person-card {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--spacing-md);
   background: #1e1e1e;
-  border: 1px solid #444444;
+  border: 1px solid var(--color-border-light);
   padding: 12px;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .person-card:hover {
-  border-color: #C8102E;
-  background: #2a2a2a;
+  border-color: var(--color-accent);
+  background: var(--color-bg-hover);
   transform: translateX(3px);
 }
 
@@ -621,9 +730,9 @@
   width: 55px;
   height: 55px;
   overflow: hidden;
-  background: #1a1a1a;
+  background: var(--color-bg-tertiary);
   flex-shrink: 0;
-  border: 2px solid #C8102E;
+  border: 2px solid var(--color-accent);
   border-radius: 50%;
 }
 
@@ -639,9 +748,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #2a2a2a;
-  color: #F5E100;
-  font-family: 'Bebas Neue', cursive;
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
   font-size: 1.5rem;
 }
 
@@ -653,7 +762,7 @@
 .person-name {
   font-weight: 600;
   margin-bottom: 3px;
-  color: #F5E100;
+  color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -661,7 +770,7 @@
 
 .person-en-name {
   font-size: 11px;
-  color: #888888;
+  color: var(--color-text-muted);
   margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
@@ -670,7 +779,7 @@
 
 .person-role {
   font-size: 11px;
-  color: #C8102E;
+  color: var(--color-accent);
   font-style: italic;
   white-space: nowrap;
   overflow: hidden;
@@ -679,42 +788,28 @@
 
 .show-more-persons-btn {
   background: none;
-  border: 1px solid #C8102E;
-  color: #F5E100;
-  font-family: 'Bebas Neue', cursive;
-  padding: 10px 20px;
+  border: 1px solid var(--color-accent);
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  padding: var(--spacing-sm) var(--spacing-lg);
   cursor: pointer;
-  margin-top: 15px;
+  margin-top: var(--spacing-md);
   font-size: 1rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .show-more-persons-btn:hover {
-  background: #C8102E;
-  color: #ffffff;
+  background: var(--color-accent);
+  color: var(--color-text-light);
 }
 
-/* ========== FILM VIDEOS ========== */
-.film-videos-section {
-  background: #141414;
-  border: 1px solid #333333;
-  padding: 25px;
-  margin-bottom: 30px;
-}
-
-.film-videos-section h2 {
-  font-family: 'Bebas Neue', cursive;
-  margin: 0 0 25px;
-  font-size: 1.8rem;
-  color: #F5E100;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
+/* ========================================
+   СЕКЦИЯ: ВИДЕО (ТРЕЙЛЕРЫ)
+   ======================================== */
 .video-category {
-  margin-bottom: 30px;
+  margin-bottom: var(--spacing-xxl);
 }
 
 .video-category:last-child {
@@ -722,12 +817,12 @@
 }
 
 .category-title {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-heading);
   font-size: 1.3rem;
-  color: #C8102E;
-  margin: 0 0 15px;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-md);
   padding-bottom: 8px;
-  border-bottom: 2px solid #C8102E;
+  border-bottom: 2px solid var(--color-accent);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
@@ -735,18 +830,18 @@
 .videos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  gap: var(--spacing-lg);
 }
 
 .video-card {
-  background: #1a1a1a;
-  border: 1px solid #444444;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-light);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all var(--transition-base);
 }
 
 .video-card:hover {
-  border-color: #C8102E;
+  border-color: var(--color-accent);
   transform: translateY(-3px);
   box-shadow: 0 8px 0 rgba(200, 16, 46, 0.2);
 }
@@ -754,7 +849,7 @@
 .video-thumbnail {
   position: relative;
   aspect-ratio: 16/9;
-  background: #0f0f0f;
+  background: var(--color-bg-primary);
   cursor: pointer;
 }
 
@@ -775,7 +870,7 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--transition-base);
 }
 
 .video-thumbnail:hover .play-overlay {
@@ -791,8 +886,8 @@
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  color: #ffffff;
-  border: 2px solid #F5E100;
+  color: var(--color-text-light);
+  border: 2px solid var(--color-accent-dark);
 }
 
 .external-link {
@@ -804,18 +899,18 @@
 }
 
 .external-link-btn {
-  color: #C8102E;
+  color: var(--color-accent);
   text-decoration: none;
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-heading);
   font-size: 1rem;
-  padding: 15px;
+  padding: var(--spacing-md);
   text-align: center;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
 .external-link-btn:hover {
-  color: #F5E100;
+  color: var(--color-accent-dark);
 }
 
 .video-info {
@@ -824,24 +919,24 @@
 
 .video-name {
   font-weight: 500;
-  margin-bottom: 5px;
+  margin-bottom: var(--spacing-xs);
   line-height: 1.3;
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 .video-meta {
   display: flex;
   gap: 12px;
   font-size: 11px;
-  color: #888888;
+  color: var(--color-text-muted);
   text-transform: uppercase;
 }
 
 .video-type {
-  color: #C8102E;
+  color: var(--color-accent);
 }
 
-/* Модальное окно видео */
+/* --- Модальное окно видео --- */
 .video-modal-overlay {
   position: fixed;
   top: 0;
@@ -862,31 +957,31 @@
   max-width: 1000px;
   aspect-ratio: 16/9;
   background: #000000;
-  border: 3px solid #C8102E;
+  border: 3px solid var(--color-accent);
   overflow: hidden;
 }
 
 .modal-close-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
   width: 45px;
   height: 45px;
-  background: #C8102E;
-  border: 2px solid #F5E100;
-  color: #ffffff;
+  background: var(--color-accent);
+  border: 2px solid var(--color-accent-dark);
+  color: var(--color-text-light);
   font-size: 24px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .modal-close-btn:hover {
-  background: #F5E100;
-  color: #0f0f0f;
+  background: var(--color-accent-dark);
+  color: var(--color-text-light);
 }
 
 .modal-video-player {
@@ -894,23 +989,9 @@
   height: 100%;
 }
 
-/* ========== FILM FACTS ========== */
-.film-facts-section {
-  background: #141414;
-  border: 1px solid #333333;
-  padding: 25px;
-  margin-bottom: 30px;
-}
-
-.film-facts-section h2 {
-  font-family: 'Bebas Neue', cursive;
-  margin: 0 0 25px;
-  font-size: 1.8rem;
-  color: #F5E100;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
+/* ========================================
+   СЕКЦИЯ: ФАКТЫ
+   ======================================== */
 .facts-list {
   display: flex;
   flex-direction: column;
@@ -920,20 +1001,20 @@
 .fact-item {
   padding: 18px;
   background: #1e1e1e;
-  border-left: 4px solid #C8102E;
+  border-left: 4px solid var(--color-accent);
   line-height: 1.6;
 }
 
 .fact-item.spoiler {
-  border-left-color: #F5E100;
+  border-left-color: var(--color-accent-dark);
   background: #1a1515;
 }
 
 .spoiler-badge {
   display: inline-block;
-  background: #C8102E;
-  color: #ffffff;
-  font-family: 'Bebas Neue', cursive;
+  background: var(--color-accent);
+  color: var(--color-text-light);
+  font-family: var(--font-heading);
   font-size: 11px;
   padding: 3px 12px;
   margin-right: 12px;
@@ -943,66 +1024,56 @@
 
 .fact-item p {
   margin: 12px 0 0;
-  color: #dddddd;
+  color: var(--color-text-primary);
 }
 
 .toggle-spoilers-btn {
   background: none;
-  border: 1px solid #C8102E;
-  color: #F5E100;
-  font-family: 'Bebas Neue', cursive;
-  padding: 10px 20px;
+  border: 1px solid var(--color-accent);
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  padding: var(--spacing-sm) var(--spacing-lg);
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: var(--spacing-lg);
   font-size: 1rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .toggle-spoilers-btn:hover {
-  background: #C8102E;
-  color: #ffffff;
+  background: var(--color-accent);
+  color: var(--color-text-light);
 }
 
-/* ========== SIMILAR FILMS ========== */
+/* ========================================
+   СЕКЦИЯ: ПОХОЖИЕ ФИЛЬМЫ (САЙДБАР)
+   ======================================== */
 .similar-films-section {
-  background: #141414;
-  border: 1px solid #333333;
-  padding: 25px;
   position: sticky;
   top: 110px;
-}
-
-.similar-films-section h2 {
-  font-family: 'Bebas Neue', cursive;
-  margin: 0 0 25px;
-  font-size: 1.5rem;
-  color: #F5E100;
-  letter-spacing: 2px;
-  text-transform: uppercase;
 }
 
 .similar-films-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--spacing-md);
 }
 
 .similar-film-card {
   display: flex;
-  gap: 15px;
+  gap: var(--spacing-md);
   text-decoration: none;
   color: inherit;
   padding: 12px;
-  border: 1px solid #333333;
-  background: #1a1a1a;
-  transition: all 0.2s ease;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-tertiary);
+  transition: all var(--transition-fast);
 }
 
 .similar-film-card:hover {
-  border-color: #C8102E;
-  background: #2a2a2a;
+  border-color: var(--color-accent);
+  background: var(--color-bg-hover);
   transform: translateX(5px);
 }
 
@@ -1011,8 +1082,8 @@
   height: 80px;
   flex-shrink: 0;
   overflow: hidden;
-  background: #0f0f0f;
-  border: 1px solid #C8102E;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-accent);
 }
 
 .similar-film-poster img {
@@ -1028,7 +1099,7 @@
   align-items: center;
   justify-content: center;
   font-size: 22px;
-  color: #C8102E;
+  color: var(--color-accent);
 }
 
 .similar-film-info {
@@ -1038,8 +1109,8 @@
 
 .similar-film-name {
   font-weight: 600;
-  margin-bottom: 5px;
-  color: #F5E100;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1047,50 +1118,54 @@
 
 .similar-film-meta {
   display: flex;
-  gap: 10px;
+  gap: var(--spacing-sm);
   font-size: 11px;
-  color: #888888;
-  margin-bottom: 5px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
 }
 
 .similar-film-year {
-  color: #C8102E;
+  color: var(--color-accent);
 }
 
 .similar-film-ratings {
   display: flex;
-  gap: 10px;
-  margin-top: 5px;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
 }
 
 .similar-film-ratings .rating {
   font-size: 11px;
   padding: 2px 8px;
   background: rgba(200, 16, 46, 0.15);
-  color: #F5E100;
+  color: var(--color-text-primary);
 }
 
 .show-more-films-btn {
   width: 100%;
   background: none;
-  border: 1px solid #C8102E;
-  color: #F5E100;
-  font-family: 'Bebas Neue', cursive;
+  border: 1px solid var(--color-accent);
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
   padding: 12px;
   cursor: pointer;
-  margin-top: 15px;
+  margin-top: var(--spacing-md);
   font-size: 1rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .show-more-films-btn:hover {
-  background: #C8102E;
-  color: #ffffff;
+  background: var(--color-accent);
+  color: var(--color-text-light);
 }
 
-/* ========== АДАПТИВНОСТЬ ========== */
+/* ========================================
+   АДАПТИВНОСТЬ
+   ======================================== */
+
+/* --- Планшеты (1024px) --- */
 @media (max-width: 1024px) {
   .film-content {
     flex-direction: column;
@@ -1105,28 +1180,30 @@
   }
 }
 
+/* --- Маленькие ноутбуки (900px) --- */
 @media (max-width: 900px) {
   .film-title {
     font-size: 2.5rem;
   }
   
   .film-poster-wrapper {
-    width: 260px;
+    width: var(--poster-width-tablet);
   }
   
   .film-header-content {
-    gap: 25px;
+    gap: var(--spacing-xl);
   }
 }
 
+/* --- Планшеты (768px) --- */
 @media (max-width: 768px) {
   .film-header-content {
     flex-direction: column;
-    padding: 20px;
+    padding: var(--spacing-lg);
   }
   
   .film-poster-wrapper {
-    width: 220px;
+    width: var(--poster-width-mobile);
     margin: 0 auto;
   }
   
@@ -1136,7 +1213,7 @@
   }
   
   .film-title-section {
-    padding-top: 10px;
+    padding-top: var(--spacing-sm);
     text-align: center;
   }
   
@@ -1144,12 +1221,9 @@
     justify-content: center;
   }
   
-  .film-genres {
-    justify-content: center;
-  }
-  
-  .film-countries {
-    justify-content: center;
+  .film-genres-section,
+  .film-countries-section {
+    text-align: center;
   }
   
   .film-ratings {
@@ -1183,13 +1257,14 @@
   }
 }
 
+/* --- Мобильные (480px) --- */
 @media (max-width: 480px) {
   .film-title {
     font-size: 1.6rem;
   }
   
   .film-poster-wrapper {
-    width: 180px;
+    width: var(--poster-width-small);
   }
   
   .rating-value {
@@ -1197,7 +1272,7 @@
   }
   
   .film-ratings {
-    gap: 20px;
+    gap: var(--spacing-lg);
   }
   
   .back-button {
@@ -1214,7 +1289,7 @@
   }
   
   .person-card {
-    padding: 10px;
+    padding: var(--spacing-sm);
   }
   
   .video-modal {

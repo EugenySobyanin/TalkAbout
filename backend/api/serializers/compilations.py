@@ -1,7 +1,35 @@
 from rest_framework import serializers
-
 from compilations.models import Compilation, CompilationsFilms
 from gallery.models import Film
+from django.conf import settings
+
+
+class FilmSerializer(serializers.ModelSerializer):
+    """Сериализатор для фильмов внутри подборок."""
+    
+    poster = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Film
+        fields = [
+            'id',
+            'name',
+            'year',
+            'poster',
+            'kinopoisk_rating',
+            'imdb_rating',
+        ]
+    
+    def get_poster(self, obj):
+        """Возвращает полный URL до постера."""
+        if obj.poster:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.poster.url)
+            else:
+                base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
+                return f"{base_url}{obj.poster.url}"
+        return None
 
 
 class CompilationSerializer(serializers.ModelSerializer):
@@ -15,19 +43,26 @@ class CompilationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Compilation
-        fields = ['id', 'user', 'title', 'description', 'is_public', 'films']
-        read_only_fields = ['user']  # чтобы user автоматически устанавливался из запроса
+        fields = [
+            'id',
+            'user',
+            'title',
+            'description',
+            'is_public',
+            'films'
+        ]
+        read_only_fields = ['user']
 
     def create(self, validated_data):
         films_data = validated_data.pop('films', [])
         compilation = Compilation.objects.create(**validated_data)
 
         # Создаем связи через промежуточную модель
-        for film in films_data:
-            CompilationsFilms.objects.create(
-                collection=compilation,
-                film=film
-            )
+        if films_data:
+            CompilationsFilms.objects.bulk_create([
+                CompilationsFilms(collection=compilation, film=film)
+                for film in films_data
+            ])
 
         return compilation
 
@@ -41,25 +76,50 @@ class CompilationSerializer(serializers.ModelSerializer):
 
         # Обновляем связи с фильмами, если они были переданы
         if films_data is not None:
-            # Получаем существующие ID фильмов
-            existing_film_ids = set(
-                CompilationsFilms.objects.filter(collection=instance)
-                .values_list('film_id', flat=True)
-            )
-
-            # Создаем список для новых связей
-            new_relations = []
-            for film in films_data:
-                if film.id not in existing_film_ids:
-                    new_relations.append(
-                        CompilationsFilms(
-                            collection=instance,
-                            film=film
-                        )
-                    )
-
-            # Массовое создание новых связей
-            if new_relations:
-                CompilationsFilms.objects.bulk_create(new_relations)
+            # Удаляем старые связи
+            CompilationsFilms.objects.filter(collection=instance).delete()
+            # Создаем новые
+            if films_data:
+                CompilationsFilms.objects.bulk_create([
+                    CompilationsFilms(collection=instance, film=film)
+                    for film in films_data
+                ])
 
         return instance
+
+
+class CompilationReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для чтения подборок с детальной информацией о фильмах."""
+    
+    films = serializers.SerializerMethodField()
+    films_count = serializers.SerializerMethodField()
+    created_at = serializers.DateTimeField(format="%d.%m.%Y", read_only=True)
+    updated_at = serializers.DateTimeField(format="%d.%m.%Y", read_only=True)
+
+    class Meta:
+        model = Compilation
+        fields = [
+            'id',
+            'user',
+            'title',
+            'description',
+            'is_public',
+            'films',
+            'films_count',
+            'created_at',
+            'updated_at'
+        ]
+
+    def get_films(self, obj):
+        # Получаем фильмы через промежуточную модель
+        films = Film.objects.filter(
+            compilationsfilms__collection=obj
+        ).distinct()
+        return FilmSerializer(
+            films, 
+            many=True, 
+            context={'request': self.context.get('request')}
+        ).data
+    
+    def get_films_count(self, obj):
+        return obj.films.count()

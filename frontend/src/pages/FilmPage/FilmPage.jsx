@@ -71,9 +71,9 @@ function FilmPage() {
 
   return (
     <div className="film-page">
-      <button onClick={handleBack} className="back-button">
+      {/* <button onClick={handleBack} className="back-button">
         ← Назад
-      </button>
+      </button> */}
       
       <FilmHeader film={film} />
       
