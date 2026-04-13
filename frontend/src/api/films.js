@@ -26,3 +26,8 @@ export const getFilmDetails = async (id) => {
         ...data,
     }
 }
+
+export const getRandomTopFilms = async (params = {}) => {
+  const response = await api.get('/films/discover/', { params })
+  return response.data
+}

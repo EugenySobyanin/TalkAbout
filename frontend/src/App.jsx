@@ -4,20 +4,21 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthPage from './components/Auth/AuthPage';
 import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
+import HomePage from './pages/HomePage/HomePage';
 import FilmPage from './pages/FilmPage/FilmPage';
 import CompilationsPage from './pages/CompilationsPage/CompilationsPage';
 import DiaryPageComponent from './pages/DiaryPage/DiaryPage'; // ← Переименовываем импорт
 import './App.css';
 
 // Страницы
-const HomePage = () => {
-    return (
-        <div className="page-container">
-            <h1>Главная страница</h1>
-            <p>Добро пожаловать в TalkAbout</p>
-        </div>
-    )
-}
+// const HomePage = () => {
+//     return (
+//         <div className="page-container">
+//             <h1>Главная страница</h1>
+//             <p>Добро пожаловать в TalkAbout</p>
+//         </div>
+//     )
+// }
 
 const ProfilePage = () => {
     return (

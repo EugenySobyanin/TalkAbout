@@ -4,7 +4,6 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from api.serializers.activities import ActivitySerializer, AddActivitySerializer
-from api.filters import ActivityFilter
 from activities.models import UserFilmActivity
 
 
@@ -51,24 +50,3 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-# class ActivityViewSet(viewsets.ModelViewSet):
-#     serializer_class = ActivitySerializer
-#     filterset_class = ActivityFilter  # Используем django-filter
-
-#     def get_serializer_class(self):
-#         if self.action == 'create':
-#             return AddActivitySerializer
-#         return super().get_serializer_class()
-
-#     def get_queryset(self):
-#         queryset = UserFilmActivity.objects.all()
-
-#         # Автоматическая фильтрация по пользователю если не указан user_id
-#         if not self.request.GET.get('user_id'):
-#             queryset = queryset.filter(user=self.request.user)
-
-#         return queryset
-
-#     def perform_create(self, serializer):
-#         serializer.save(user=self.request.user)
