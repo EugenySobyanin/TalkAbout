@@ -12,8 +12,7 @@ from gallery.models import (Film,
                             FilmPersonProfession,
                             SequelsAndPrequels,
                             SimilarFilms,
-                            Type,
-                            Network)
+                            Type)
 from activities.models import UserFilmActivity
 
 
@@ -30,14 +29,6 @@ class CountrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Country
-        fields = ['id', 'name', 'slug']
-
-
-class NetworkSerializer(serializers.ModelSerializer):
-    """Сериализатор для стриминговых сервисов."""
-
-    class Meta:
-        model = Network
         fields = ['id', 'name', 'slug']
 
 
@@ -174,7 +165,6 @@ class FilmDetailSerializer(serializers.ModelSerializer):
     type = TypeSerializer(read_only=True)
     genres = serializers.SerializerMethodField()
     countries = serializers.SerializerMethodField()
-    networks = serializers.SerializerMethodField()
 
     # Медиа
     poster_url = serializers.SerializerMethodField()
@@ -297,15 +287,6 @@ class FilmDetailSerializer(serializers.ModelSerializer):
         film_countries = obj.film_countries.select_related('country').all()
         countries = [fc.country for fc in film_countries]
         return CountrySerializer(countries, many=True).data
-
-    def get_networks(self, obj):
-        """
-        Получаем стриминговые сервисы через правильную связь.
-        related_name='film_networks' из модели FilmNetwork
-        """
-        film_networks = obj.film_networks.select_related('network').all()
-        networks = [fn.network for fn in film_networks]
-        return NetworkSerializer(networks, many=True).data
 
     def get_persons_by_profession(self, obj):
         """

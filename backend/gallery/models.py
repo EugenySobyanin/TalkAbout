@@ -237,24 +237,39 @@ class Film(models.Model):
         null=True,
         blank=True
     )
-    poster = models.ImageField(
-        'Постер',
-        # media/films/film_<ID>/<имя_файла>/
-        upload_to=films_photos_path,
+    poster_url = models.URLField(
+        'Ссылка на постер',
+        max_length=500,
         null=True,
         blank=True,
     )
-    logo = models.ImageField(
-        'Лого',
-        # media/films/film_<ID>/<имя_файла>/
-        upload_to=films_photos_path,
+    poster_preview_url = models.URLField(
+        'Ссылка на маленький постер',
+        max_length=500,
+        blank=True,
+        null=True,
+    )
+    logo_url = models.URLField(
+        'Ссылка на Лого',
+        max_length=500,
         null=True,
         blank=True,
     )
-    backdrop = models.ImageField(
-        'Обои',
-        # media/films/film_<ID>/<имя_файла>/
-        upload_to=films_photos_path,
+    logo_preview_url = models.URLField(
+        'Ссылка на маленькое Лого',
+        max_length=500,
+        null=True,
+        blank=True,
+    )
+    backdrop_url = models.URLField(
+        'Ссылка на Обои',
+        max_length=500,
+        null=True,
+        blank=True,
+    )
+    backdrop_preview_url = models.URLField(
+        'Ссылка на маленькие Обои',
+        max_length=500,
         null=True,
         blank=True,
     )
@@ -276,11 +291,6 @@ class Film(models.Model):
         through='FilmCountry',
         verbose_name='Страны'
     )
-    networks = models.ManyToManyField(
-        'Network',
-        through='FilmNetwork',
-        verbose_name='Стриминговые сервисы'
-    )
     persons = models.ManyToManyField(
         'Person',
         through='FilmPerson',
@@ -295,71 +305,76 @@ class Film(models.Model):
     def __str__(self):
         return f'{self.name} {self.year if self.year else ""}'
 
-    def save(self, *args, **kwargs):
-        # Запоминаем старые пути файлов, если объект уже существует
-        old_files = {}
-        if self.pk:
-            old_instance = Film.objects.get(pk=self.pk)
-            for field_name in ['poster', 'logo', 'backdrop']:
-                old_file = getattr(old_instance, field_name)
-                if old_file:
-                    old_files[field_name] = old_file.name
+    """
+    По сути, надобность в переопределении методов save и delete отпала
+    при изменении данных картинок:
+    теперь они хранятся ссылками, а не физически на сервере.
+    """
+    # def save(self, *args, **kwargs):
+    #     # Запоминаем старые пути файлов, если объект уже существует
+    #     old_files = {}
+    #     if self.pk:
+    #         old_instance = Film.objects.get(pk=self.pk)
+    #         for field_name in ['poster', 'logo', 'backdrop']:
+    #             old_file = getattr(old_instance, field_name)
+    #             if old_file:
+    #                 old_files[field_name] = old_file.name
 
-        # Первое сохранение объекта (получаем ID)
-        super().save(*args, **kwargs)
+    #     # Первое сохранение объекта (получаем ID)
+    #     super().save(*args, **kwargs)
 
-        # Обрабатываем каждое поле с изображением
-        for field_name in ['poster', 'logo', 'backdrop']:
-            current_file = getattr(self, field_name)
+    #     # Обрабатываем каждое поле с изображением
+    #     for field_name in ['poster', 'logo', 'backdrop']:
+    #         current_file = getattr(self, field_name)
 
-            if current_file and 'temp' in current_file.name:
-                # Формируем новый путь
-                old_path = current_file.name
-                new_path = old_path.replace('temp', f'film_{self.pk}')
+    #         if current_file and 'temp' in current_file.name:
+    #             # Формируем новый путь
+    #             old_path = current_file.name
+    #             new_path = old_path.replace('temp', f'film_{self.pk}')
 
-                # Перемещаем файл, если он существует
-                if default_storage.exists(old_path):
-                    # Копируем файл в новое место
-                    with default_storage.open(old_path, 'rb') as old_file:
-                        default_storage.save(new_path, old_file)
+    #             # Перемещаем файл, если он существует
+    #             if default_storage.exists(old_path):
+    #                 # Копируем файл в новое место
+    #                 with default_storage.open(old_path, 'rb') as old_file:
+    #                     default_storage.save(new_path, old_file)
 
-                    # Удаляем временный файл
-                    default_storage.delete(old_path)
+    #                 # Удаляем временный файл
+    #                 default_storage.delete(old_path)
 
-                    # Обновляем путь в модели
-                    getattr(self, field_name).name = new_path
+    #                 # Обновляем путь в модели
+    #                 getattr(self, field_name).name = new_path
 
-        # Сохраняем модель с обновленными путями (без рекурсии)
-        super().save(update_fields=['poster', 'logo', 'backdrop'])
+    #     # Сохраняем модель с обновленными путями (без рекурсии)
+    #     super().save(update_fields=['poster', 'logo', 'backdrop'])
 
-        # Удаляем старые файлы, которые были заменены
-        for field_name, old_path in old_files.items():
-            current_file = getattr(self, field_name)
-            if (current_file and old_path != current_file.name and
-               default_storage.exists(old_path)):
-                default_storage.delete(old_path)
+    #     # Удаляем старые файлы, которые были заменены
+    #     for field_name, old_path in old_files.items():
+    #         current_file = getattr(self, field_name)
+    #         if (current_file and old_path != current_file.name and
+    #            default_storage.exists(old_path)):
+    #             default_storage.delete(old_path)
 
-    def delete(self, *args, **kwargs):
-        """
-        Удаляет модель и папку фильма с постером, лого и обоями.
+    # def delete(self, *args, **kwargs):
+    #     """
+    #     Удаляет модель и папку фильма с постером, лого и обоями.
 
-        При удалении фильма удаляется вся папка с ее фотографиями:
-        media/films/film_<ID>/
-        """
-        # Запоминаем путь к папке персоны перед удалением
-        film_folder_path = f'films/film_{self.pk}'
+    #     При удалении фильма удаляется вся папка с ее фотографиями:
+    #     media/films/film_<ID>/
+    #     """
+    #     # Запоминаем путь к папке персоны перед удалением
+    #     film_folder_path = f'films/film_{self.pk}'
 
-        # Удаляем саму модель из базы данных
-        super().delete(*args, **kwargs)
+    #     # Удаляем саму модель из базы данных
+    #     super().delete(*args, **kwargs)
 
-        # Удаляем папку со всеми файлами фотографий
-        try:
-            if default_storage.exists(film_folder_path):
-                # Удаляем всю папку рекурсивно
-                delete_folder_with_all_files(film_folder_path)
-        except Exception as e:
-            # Логируем ошибку, но не прерываем выполнение
-            print(f"Error deleting film folder: {e}")  # Добавить логирование ===============================================================
+    #     # Удаляем папку со всеми файлами фотографий
+    #     try:
+    #         if default_storage.exists(film_folder_path):
+    #             # Удаляем всю папку рекурсивно
+    #             delete_folder_with_all_files(film_folder_path)
+    #     except Exception as e:
+    #         # Логируем ошибку, но не прерываем выполнение
+    #         print(f"Error deleting film folder: {e}")  # Добавить логирование ===============================================================
 
 
 class Type(BaseWithSlug):
@@ -471,52 +486,6 @@ class FilmCountry(models.Model):
     def __str__(self) -> str:
         return (f'{cut_str(self.film.name, CUT_FILM_NAME)} '
                 f'- {self.country.name}')
-
-
-class Network(BaseWithSlug):
-    """Стриминговый сервис.
-
-    Netfilx, HBO и тд.
-    """
-
-    name = models.CharField(
-        'Стриминговый сервис',
-        max_length=NAME_MAX_LENGTH,
-        unique=True,
-        help_text="Например: Netfilx, HBO, Apple TV",
-    )
-
-    class Meta:
-        verbose_name = 'Стриминговый сервис'
-        verbose_name_plural = 'Стриминговые сервисы'
-        ordering = ['name']
-
-
-class FilmNetwork(models.Model):
-    """Промежуточная модель.
-
-    Связь Фильма и Стримингового сервиса (Many To Many).
-    """
-
-    # При обратной связи получаем все объекты FilmNetwork, где film == Film.id
-    # Потом можно получить все стриминговые сервисы фильма (это не нужно)
-    film = models.ForeignKey(
-        Film,
-        on_delete=models.CASCADE,
-        related_name='film_networks'
-    )
-    # При обратной свзи получаем все объекты FilmNetwork,
-    # где network == Network.id
-    # Потом можно получить все фильмы, выпущенные этим сервисом
-    network = models.ForeignKey(
-        Network,
-        on_delete=models.CASCADE,
-        related_name='films'
-    )
-
-    def __str__(self) -> str:
-        return (f'{cut_str(self.film.name, CUT_FILM_NAME)} '
-                f'- {self.network.name}')
 
 
 class Person(models.Model):
@@ -874,7 +843,7 @@ class Fees(models.Model):
         related_name='fees'
     )
     place = models.CharField(
-        'Тип сброров',
+        'Место сборов (США, Мир, Россия)',
         max_length=NAME_MAX_LENGTH,
     )
     value = models.PositiveIntegerField('Сумма', null=True, blank=True)
@@ -895,42 +864,42 @@ class Fees(models.Model):
                 f'собрал {self.value} {self.currency} в {self.place}')
 
 
-class AgregatorInfo(models.Model):
-    """Данные агрегаторов.
+# class AgregatorInfo(models.Model):
+#     """Данные агрегаторов.
 
-    Агрегаторы: кинопоиск, imdb, критики.
-    Связь One To Many
-    Одна записись из AgregatorIngo может быть связан с одним Film
-    Один Film может быть связан со многими AgregatorInfo.
-    """
+#     Агрегаторы: кинопоиск, imdb, критики.
+#     Связь One To Many
+#     Одна записись из AgregatorIngo может быть связан с одним Film
+#     Один Film может быть связан со многими AgregatorInfo.
+#     """
 
-    film = models.ForeignKey(
-        Film,
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Фильм',
-        related_name='agregators'
-    )
-    rating = models.FloatField(
-        'Значение',
-        null=True,
-        blank=True,
-        validators=[
-            MinValueValidator(0),
-            MaxValueValidator(10)
-        ]
-    )
-    votes = models.PositiveIntegerField('Количество оценок')
-    source = models.CharField('Ресурс', max_length=NAME_MAX_LENGTH)
+#     film = models.ForeignKey(
+#         Film,
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         verbose_name='Фильм',
+#         related_name='agregators'
+#     )
+#     rating = models.FloatField(
+#         'Значение',
+#         null=True,
+#         blank=True,
+#         validators=[
+#             MinValueValidator(0),
+#             MaxValueValidator(10)
+#         ]
+#     )
+#     votes = models.PositiveIntegerField('Количество оценок')
+#     source = models.CharField('Ресурс', max_length=NAME_MAX_LENGTH)
 
-    class Meta:
-        verbose_name = 'Данные агрегатора'
-        verbose_name_plural = 'Данные агрегаторов'
-        ordering = ['film', 'source', 'pk']
+#     class Meta:
+#         verbose_name = 'Данные агрегатора'
+#         verbose_name_plural = 'Данные агрегаторов'
+#         ordering = ['film', 'source', 'pk']
 
-    def __str__(self) -> str:
-        return (f'{self.pk} - {self.source} - '
-                f'{cut_str(self.film.name, CUT_FILM_NAME)}')
+#     def __str__(self) -> str:
+#         return (f'{self.pk} - {self.source} - '
+#                 f'{cut_str(self.film.name, CUT_FILM_NAME)}')
 
 
 class SequelsAndPrequels(models.Model):

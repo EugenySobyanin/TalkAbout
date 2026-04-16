@@ -5,7 +5,6 @@ from gallery.models import (
     Film,
     Type,
     Genre,
-    Network,
     Person,
     Country
 )
@@ -56,14 +55,6 @@ class FilmFilter(filters.FilterSet):
         label='Страна (ID)'
     )
 
-    # Сеть (можно несколько)
-    networks = filters.ModelMultipleChoiceFilter(
-        field_name='networks__id',
-        to_field_name='id',
-        queryset=Network.objects.all(),
-        label='Сеть (ID)'
-    )
-
     # Персоны (можно несколько)
     persons = filters.ModelMultipleChoiceFilter(
         field_name='persons__id',
@@ -75,4 +66,3 @@ class FilmFilter(filters.FilterSet):
     class Meta:
         model = Film
         fields = []
-    
