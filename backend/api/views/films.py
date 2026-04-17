@@ -14,7 +14,7 @@ class FilmViewSet(viewsets.ModelViewSet):
     """Вьюсет для фильмов."""
 
     queryset = Film.objects.all().select_related('type').prefetch_related(
-        'genres', 'countries', 'networks', 'persons'
+        'genres', 'countries', 'persons'
     )
     serializer_class = FilmDetailSerializer
     permission_classes = []  # Настройте по необходимости
@@ -67,7 +67,7 @@ class FilmViewSet(viewsets.ModelViewSet):
         queryset = Film.objects.filter(
             kinopoisk_rating__gte=min_rating
         ).exclude(
-            poster__isnull=True
+            poster_url__isnull=True
         ).exclude(
             poster_url=''
         ).select_related('type').prefetch_related(
@@ -127,7 +127,7 @@ class FilmViewSet(viewsets.ModelViewSet):
         queryset = Film.objects.filter(
             kinopoisk_rating__gte=7.0
         ).exclude(
-            Q(poster__isnull=True) | Q(poster='')
+            Q(poster_url__isnull=True) | Q(poster_url='')
         )
         
         # Применяем фильтры из запроса

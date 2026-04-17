@@ -438,6 +438,14 @@ class FilmGenre(models.Model):
         related_name='films'
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['film', 'genre'],
+                name='unique_film_genre'
+            )
+        ]
+
     def __str__(self) -> str:
         return f'{cut_str(self.film.name, CUT_FILM_NAME)} - {self.genre.name}'
 
@@ -482,6 +490,14 @@ class FilmCountry(models.Model):
         on_delete=models.CASCADE,
         related_name='films'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['film', 'country'],
+                name='unique_film_country'
+            )
+        ]
 
     def __str__(self) -> str:
         return (f'{cut_str(self.film.name, CUT_FILM_NAME)} '
@@ -530,10 +546,11 @@ class Person(models.Model):
         null=True,
         blank=True,
     )
-    photo = models.ImageField(
-        'Фото',
-        # media/persons/person_<ID>/<имя_файла>/
-        upload_to=persons_photos_path,
+    photo_url = models.URLField(
+        'Ссылка на фото',
+        max_length=500,
+        null=True,
+        blank=True,
         default=DEFAULT_AVATAR_PATH,
     )
 
@@ -545,78 +562,78 @@ class Person(models.Model):
     def __str__(self):
         return f'{cut_str(self.name, CUT_PERSON_NAME)}'
 
-    def save(self, *args, **kwargs):
-        # Запоминаем старый файл, если объект уже существует и фото изменяется
-        old_photo_path = None
-        if self.pk:
-            try:
-                old_instance = Person.objects.get(pk=self.pk)
-                if (old_instance.photo and
-                    (not self.photo or
-                     old_instance.photo.name != self.photo.name)):
-                    old_photo_path = old_instance.photo.name
-            except Person.DoesNotExist:
-                pass
+    # def save(self, *args, **kwargs):
+    #     # Запоминаем старый файл, если объект уже существует и фото изменяется
+    #     old_photo_path = None
+    #     if self.pk:
+    #         try:
+    #             old_instance = Person.objects.get(pk=self.pk)
+    #             if (old_instance.photo and
+    #                 (not self.photo or
+    #                  old_instance.photo.name != self.photo.name)):
+    #                 old_photo_path = old_instance.photo.name
+    #         except Person.DoesNotExist:
+    #             pass
 
-        # Сохраняем объект чтобы получить ID
-        super().save(*args, **kwargs)
+    #     # Сохраняем объект чтобы получить ID
+    #     super().save(*args, **kwargs)
 
-        # Обрабатываем перемещение нового файла из temp
-        if self.photo and 'temp' in self.photo.name:
-            # Запоминаем старый путь
-            old_path = self.photo.name
+    #     # Обрабатываем перемещение нового файла из temp
+    #     if self.photo and 'temp' in self.photo.name:
+    #         # Запоминаем старый путь
+    #         old_path = self.photo.name
 
-            # Копируем файл с использованием менеджера контекста
-            try:
-                with default_storage.open(old_path, 'rb') as source_file:
-                    # Перемещаем файл в постоянную папку
-                    new_name = old_path.replace('temp', f'person_{self.pk}')
-                    default_storage.save(new_name, source_file)
+    #         # Копируем файл с использованием менеджера контекста
+    #         try:
+    #             with default_storage.open(old_path, 'rb') as source_file:
+    #                 # Перемещаем файл в постоянную папку
+    #                 new_name = old_path.replace('temp', f'person_{self.pk}')
+    #                 default_storage.save(new_name, source_file)
 
-                # Обновляем путь в модели
-                self.photo.name = new_name
-                super().save(update_fields=['photo'])
+    #             # Обновляем путь в модели
+    #             self.photo.name = new_name
+    #             super().save(update_fields=['photo'])
 
-                # Пытаемся удалить временный файл
-                if default_storage.exists(old_path):
-                    default_storage.delete(old_path)
+    #             # Пытаемся удалить временный файл
+    #             if default_storage.exists(old_path):
+    #                 default_storage.delete(old_path)
 
-            except Exception as e:
-                # Логируем ошибку, но не прерываем выполнение
-                print(f"Error moving file: {e}")  # Добавить логирование =====================================================================
+    #         except Exception as e:
+    #             # Логируем ошибку, но не прерываем выполнение
+    #             print(f"Error moving file: {e}")  # Добавить логирование =====================================================================
 
-        # Удаляем старый файл, если он был заменен новым
-        if old_photo_path and default_storage.exists(old_photo_path):
-            try:
-                # Не удаляем если старый файл тот же,
-                # что и новый (при обновлении других полей)
-                if not self.photo or old_photo_path != self.photo.name:
-                    default_storage.delete(old_photo_path)
-            except Exception as e:
-                # Логируем ошибку удаления старого файла  # Добавляем логирование ============================================================
-                print(f"Error deleting old file: {e}")
+    #     # Удаляем старый файл, если он был заменен новым
+    #     if old_photo_path and default_storage.exists(old_photo_path):
+    #         try:
+    #             # Не удаляем если старый файл тот же,
+    #             # что и новый (при обновлении других полей)
+    #             if not self.photo or old_photo_path != self.photo.name:
+    #                 default_storage.delete(old_photo_path)
+    #         except Exception as e:
+    #             # Логируем ошибку удаления старого файла  # Добавляем логирование ============================================================
+    #             print(f"Error deleting old file: {e}")
 
-    def delete(self, *args, **kwargs):
-        """
-        Удаляет модель и связанные с ней файлы фотографий.
+    # def delete(self, *args, **kwargs):
+    #     """
+    #     Удаляет модель и связанные с ней файлы фотографий.
 
-        При удалении персоны удаляется вся папка с ее фотографиями:
-        media/persons/person_<ID>/
-        """
-        # Запоминаем путь к папке персоны перед удалением
-        person_folder_path = f'persons/person_{self.pk}'
+    #     При удалении персоны удаляется вся папка с ее фотографиями:
+    #     media/persons/person_<ID>/
+    #     """
+    #     # Запоминаем путь к папке персоны перед удалением
+    #     person_folder_path = f'persons/person_{self.pk}'
 
-        # Удаляем саму модель из базы данных
-        super().delete(*args, **kwargs)
+    #     # Удаляем саму модель из базы данных
+    #     super().delete(*args, **kwargs)
 
-        # Удаляем папку со всеми файлами фотографий
-        try:
-            if default_storage.exists(person_folder_path):
-                # Удаляем всю папку рекурсивно
-                delete_folder_with_all_files(person_folder_path)
-        except Exception as e:
-            # Логируем ошибку, но не прерываем выполнение
-            print(f"Error deleting person folder: {e}")  # Добавить логирование ===============================================================
+    #     # Удаляем папку со всеми файлами фотографий
+    #     try:
+    #         if default_storage.exists(person_folder_path):
+    #             # Удаляем всю папку рекурсивно
+    #             delete_folder_with_all_files(person_folder_path)
+    #     except Exception as e:
+    #         # Логируем ошибку, но не прерываем выполнение
+    #         print(f"Error deleting person folder: {e}")  # Добавить логирование ===============================================================
 
     @property
     def age(self):
@@ -731,6 +748,14 @@ class FilmPersonProfession(models.Model):
         on_delete=models.CASCADE,
         related_name='film_person_professions'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['film_person', 'profession'],
+                name='uniq_film_person_profession'
+            )
+        ]
 
     def __str__(self) -> str:
         return (f'{self.pk} - '
@@ -924,6 +949,12 @@ class SequelsAndPrequels(models.Model):
     class Meta:
         verbose_name = 'Сиквелы, приквелы и тд.'
         verbose_name_plural = 'Сиквелы, приквелы и тд.'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['film', 'related_film'],
+                name='uniq_sequel_prequel'
+            )
+        ]
 
     def __str__(self) -> str:
         return (f'{self.pk} - {cut_str(self.film.name, CUT_FILM_NAME)} '
@@ -952,7 +983,71 @@ class SimilarFilms(models.Model):
     class Meta:
         verbose_name = 'Похожий фильм'
         verbose_name_plural = 'Похожие фильмы'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['film', 'similar_film'],
+                name='uniq_similar_film'
+            )
+        ]
 
     def __str__(self) -> str:
         return (f'{self.pk} - {cut_str(self.film.name, CUT_FILM_NAME)} '
                 f'связан с - {cut_str(self.similar_film.name, CUT_FILM_NAME)}')
+
+
+class ImportState(models.Model):
+    """Состояние импорта из внешнего API."""
+
+    source = models.CharField(
+        'Источник',
+        max_length=100,
+        unique=True,
+        help_text='Например: kinopoisk_movies'
+    )
+    next_cursor = models.TextField(
+        'Курсор следующей страницы',
+        null=True,
+        blank=True,
+    )
+    last_successful_run_at = models.DateTimeField(
+        'Последний успешный запуск',
+        null=True,
+        blank=True,
+    )
+    last_completed_sync_at = models.DateTimeField(
+        'Когда полностью закончили проход',
+        null=True,
+        blank=True,
+        help_text='Заполняется, когда дошли до конца выборки'
+    )
+    pages_processed = models.PositiveIntegerField(
+        'Обработано страниц',
+        default=0,
+    )
+    movies_processed = models.PositiveIntegerField(
+        'Обработано фильмов',
+        default=0,
+    )
+    movies_saved = models.PositiveIntegerField(
+        'Сохранено/обновлено фильмов',
+        default=0,
+    )
+    last_error = models.TextField(
+        'Последняя ошибка',
+        null=True,
+        blank=True,
+    )
+    is_running = models.BooleanField(
+        'Импорт сейчас выполняется',
+        default=False,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Состояние импорта'
+        verbose_name_plural = 'Состояния импорта'
+        ordering = ['source']
+
+    def __str__(self):
+        return self.source

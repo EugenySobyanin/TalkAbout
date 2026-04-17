@@ -67,21 +67,14 @@ class ProfessionSerializer(serializers.ModelSerializer):
 class PersonSerializer(serializers.ModelSerializer):
     """Сериализатор для персоны."""
 
-    photo_url = serializers.SerializerMethodField()
     age = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Person
         fields = [
-            'id', 'kinopoisk_id', 'name', 'en_name', 
+            'id', 'kinopoisk_id', 'name', 'en_name',
             'photo_url', 'growth', 'birthday', 'death', 'age'
         ]
-
-    def get_photo_url(self, obj):
-        """Возвращает URL фото или заглушку."""
-        if obj.photo:
-            return obj.photo.url
-        return '/media/default-avatar.png'
 
 
 class FilmPersonSerializer(serializers.ModelSerializer):
@@ -104,19 +97,12 @@ class FilmPersonSerializer(serializers.ModelSerializer):
 class SimilarFilmSerializer(serializers.ModelSerializer):
     """Сериализатор для похожих фильмов (упрощенный)."""
 
-    poster_url = serializers.SerializerMethodField()
-
     class Meta:
         model = Film
         fields = [
-            'id', 'name', 'alternative_name', 'year', 
+            'id', 'name', 'alternative_name', 'year',
             'poster_url', 'kinopoisk_rating', 'imdb_rating', 'movie_length'
         ]
-
-    def get_poster_url(self, obj):
-        if obj.poster:
-            return obj.poster.url
-        return None
 
 
 class SequelsAndPrequelsSerializer(serializers.ModelSerializer):
@@ -167,9 +153,9 @@ class FilmDetailSerializer(serializers.ModelSerializer):
     countries = serializers.SerializerMethodField()
 
     # Медиа
-    poster_url = serializers.SerializerMethodField()
-    logo_url = serializers.SerializerMethodField()
-    backdrop_url = serializers.SerializerMethodField()
+    # poster_url = serializers.SerializerMethodField()
+    # logo_url = serializers.SerializerMethodField()
+    # backdrop_url = serializers.SerializerMethodField()
 
     # Видео и факты
     videos = VideoSerializer(many=True, read_only=True)
@@ -230,7 +216,7 @@ class FilmDetailSerializer(serializers.ModelSerializer):
             'type',
             'genres',
             'countries',
-            'networks',
+            # 'networks',
 
             # Видео и факты
             'videos',
@@ -252,23 +238,23 @@ class FilmDetailSerializer(serializers.ModelSerializer):
             'activity',
         ]
 
-    def get_poster_url(self, obj):
-        if obj.poster:
-            request = self.context.get('request')
-            return request.build_absolute_uri(obj.poster.url)
-        return None
+    # def get_poster_url(self, obj):
+    #     if obj.poster:
+    #         request = self.context.get('request')
+    #         return request.build_absolute_uri(obj.poster.url)
+    #     return None
 
-    def get_logo_url(self, obj):
-        if obj.logo:
-            request = self.context.get('request')
-            return request.build_absolute_uri(obj.logo.url)
-        return None
+    # def get_logo_url(self, obj):
+    #     if obj.logo:
+    #         request = self.context.get('request')
+    #         return request.build_absolute_uri(obj.logo.url)
+    #     return None
 
-    def get_backdrop_url(self, obj):
-        if obj.backdrop:
-            request = self.context.get('request')
-            return request.build_absolute_uri(obj.backdrop.url)
-        return None
+    # def get_backdrop_url(self, obj):
+    #     if obj.backdrop:
+    #         request = self.context.get('request')
+    #         return request.build_absolute_uri(obj.backdrop.url)
+    #     return None
 
     def get_genres(self, obj):
         """
@@ -399,7 +385,7 @@ class SearchListFilmSerilizer(serializers.ModelSerializer):
     Упрощенная версия для оптимизации.
     """
 
-    poster_url = serializers.SerializerMethodField()
+    # poster_url = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
 
     class Meta:
@@ -410,11 +396,11 @@ class SearchListFilmSerilizer(serializers.ModelSerializer):
             'short_description', 'rating'
         ]
 
-    def get_poster_url(self, obj):
-        if obj.poster:
-            request = self.context.get('request')
-            return request.build_absolute_uri(obj.poster.url)
-        return None
+    # def get_poster_url(self, obj):
+    #     if obj.poster:
+    #         request = self.context.get('request')
+    #         return request.build_absolute_uri(obj.poster.url)
+    #     return None
 
     def get_rating(self, obj):
         """Вычисляет средний рейтинг фильма из активностей пользователей."""
