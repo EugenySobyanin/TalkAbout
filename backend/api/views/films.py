@@ -5,9 +5,14 @@ import random
 from django.conf import settings
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
+
 from gallery.models import Film
 from api.filters import FilmFilter
 from api.serializers.films import FilmDetailSerializer, SearchListFilmSerilizer
+from talk_about.constants import MIN_RATING, EXCLUDED_GENRES
+
+
+
 
 
 class FilmViewSet(viewsets.ModelViewSet):
@@ -17,7 +22,7 @@ class FilmViewSet(viewsets.ModelViewSet):
         'genres', 'countries', 'persons'
     )
     serializer_class = FilmDetailSerializer
-    permission_classes = []  # Настройте по необходимости
+    permission_classes = []
     filter_backends = [
         DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
     ]
@@ -37,9 +42,35 @@ class FilmViewSet(viewsets.ModelViewSet):
     ordering = ['-kinopoisk_rating', '-year']
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action in ['list', 'random_top_films', 'discover']:
             return SearchListFilmSerilizer
         return super().get_serializer_class()
+
+    def get_random_films_base_queryset(self, min_rating=MIN_RATING):
+        """
+        Базовый queryset для случайных подборок:
+        - рейтинг >= min_rating
+        - есть постер
+        - есть хотя бы один жанр
+        - исключены нежелательные жанры
+        """
+        queryset = (
+            Film.objects.filter(
+                kinopoisk_rating__gte=min_rating,
+                genres__isnull=False,  # 👈 есть хотя бы один жанр
+            )
+            .exclude(
+                Q(poster_url__isnull=True) | Q(poster_url='')
+            )
+            .exclude(
+                genres__name__in=EXCLUDED_GENRES
+            )
+            .select_related('type')
+            .prefetch_related('genres', 'persons')
+            .distinct()
+        )
+
+        return queryset
 
     @action(
         detail=False,
@@ -50,62 +81,41 @@ class FilmViewSet(viewsets.ModelViewSet):
     )
     def random_top_films(self, request):
         """
-        Возвращает 250 случайных фильмов с рейтингом Кинопоиска > 7.
-
-        Query параметры:
-        - count: количество фильмов (по умолчанию 250, максимум 500)
-        - min_rating: минимальный рейтинг (по умолчанию 7.0)
+        Возвращает случайные фильмы с рейтингом выше min_rating,
+        исключая короткометражки, концерты и документальные.
         """
-        # Получаем параметры из запроса
         count = int(request.query_params.get('count', 250))
-        min_rating = float(request.query_params.get('min_rating', 7.0))
-
-        # Ограничиваем максимальное количество
+        # min_rating = float(request.query_params.get('min_rating', MIN_RATING))
         count = min(count, 500)
 
-        # Базовый queryset
-        queryset = Film.objects.filter(
-            kinopoisk_rating__gte=min_rating
-        ).exclude(
-            poster_url__isnull=True
-        ).exclude(
-            poster_url=''
-        ).select_related('type').prefetch_related(
-            'genres', 'persons',
-        )
-
-        # Получаем общее количество подходящих фильмов
+        queryset = self.get_random_films_base_queryset(min_rating=MIN_RATING)
         total_count = queryset.count()
 
         if total_count == 0:
             return Response({
                 'count': 0,
-                'message': f'Нет фильмов с рейтингом >= {min_rating}',
+                'message': 'Нет фильмов с рейтингом >= {0}'.format(min_rating),
                 'results': []
             })
 
-        # Если запрошено больше, чем есть - вернём все
         if count >= total_count:
             films = list(queryset)
             random.shuffle(films)
         else:
-            # Эффективный способ получить случайные записи
-            # Вариант 1: Для PostgreSQL (самый быстрый)
             if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql':
                 films = queryset.order_by('?')[:count]
             else:
-                # Вариант 2: Для SQLite/MySQL (более медленный, но надёжный)
                 pks = list(queryset.values_list('id', flat=True))
                 random_pks = random.sample(pks, count)
-                films = queryset.filter(id__in=random_pks)
+                films = list(queryset.filter(id__in=random_pks))
 
-        # Сериализуем результат
         serializer = self.get_serializer(films, many=True)
 
         return Response({
             'count': len(films),
             'total_available': total_count,
             'min_rating_filter': min_rating,
+            'excluded_genres': EXCLUDED_GENRES,
             'results': serializer.data
         })
 
@@ -117,56 +127,46 @@ class FilmViewSet(viewsets.ModelViewSet):
     )
     def discover(self, request):
         """
-        Умная рекомендация: случайные фильмы с высоким рейтингом и постерами.
-        
-        Можно комбинировать с фильтрами:
-        - genres: ID жанров через запятую
-        - year_min, year_max
-        - exclude_watched: исключить просмотренные (если пользователь авторизован)
+        Умная рекомендация: случайные фильмы с высоким рейтингом и постерами,
+        без короткометражек, концертов и документальных.
         """
-        queryset = Film.objects.filter(
-            kinopoisk_rating__gte=7.0
-        ).exclude(
-            Q(poster_url__isnull=True) | Q(poster_url='')
-        )
-        
-        # Применяем фильтры из запроса
+        # min_rating = float(request.query_params.get('min_rating', MIN_RATING))
+        queryset = self.get_random_films_base_queryset(min_rating=MIN_RATING)
+
         genres = request.query_params.get('genres')
         if genres:
             genre_ids = [int(g) for g in genres.split(',') if g.isdigit()]
             queryset = queryset.filter(genres__id__in=genre_ids).distinct()
-        
+
         year_min = request.query_params.get('year_min')
         if year_min and year_min.isdigit():
             queryset = queryset.filter(year__gte=int(year_min))
-            
+
         year_max = request.query_params.get('year_max')
         if year_max and year_max.isdigit():
             queryset = queryset.filter(year__lte=int(year_max))
-        
-        # Оптимизация запроса
-        queryset = queryset.select_related('type').prefetch_related(
-            'genres', 'persons'
-        )
-        
+
         total = queryset.count()
-        
-        # Берём случайные
         count = min(int(request.query_params.get('count', 50)), 200)
-        
+
         if total == 0:
             films = []
         elif total <= count:
             films = list(queryset)
             random.shuffle(films)
         else:
-            # Для PostgreSQL используем order_by('?')
-            films = queryset.order_by('?')[:count]
-        
+            if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql':
+                films = queryset.order_by('?')[:count]
+            else:
+                pks = list(queryset.values_list('id', flat=True))
+                random_pks = random.sample(pks, count)
+                films = list(queryset.filter(id__in=random_pks))
+
         serializer = self.get_serializer(films, many=True)
-        
+
         return Response({
             'count': len(films),
             'total_matching': total,
+            'excluded_genres': EXCLUDED_GENRES,
             'results': serializer.data
         })

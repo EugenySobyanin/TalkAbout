@@ -1,10 +1,45 @@
 :root {
-    /*Цвета*/
-    --color-tired-black: #14120F;
-    --color-tired-yellow: #B8860B;
+  /* Цвета */
+  --color-bg: #14120f;
+  --color-bg-soft: #1c1915;
+  --color-surface: #221e19;
+  --color-surface-2: #2a241d;
 
-    /*Шрифты*/
-    --font-main: 'Impact', sans-serif;
-    --font-headeing: 'Arial Narrow', cursive;
-    --font-text: 'Anton', sans-serif;
+  --color-accent: #ffd700;
+  --color-accent-tired: #b8860b;
+  --color-accent-soft: rgba(184, 134, 11, 0.14);
+  --color-accent-strong: #d4a017;
+
+  --color-red-bright: #cc0000;
+  --color-red-dark: #8b0000;
+
+  --color-text: #f3eee6;
+  --color-text-soft: #c8bba8;
+  --color-text-muted: #8f8477;
+  --color-border: rgba(184, 134, 11, 0.18);
+
+  /* Шрифты */
+  --font-ui: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-text: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+  --font-accent: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
+  --font-impact: 'Impact';
+
+  /* Размеры */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2.25rem;
+  --text-3xl: 3.5rem;
+
+  /* Ритм */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
 }

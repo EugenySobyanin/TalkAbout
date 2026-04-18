@@ -1,171 +1,79 @@
 .filmstrip-logo-link {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
   text-decoration: none;
-  display: flex;
-  align-items: center;
-}
-
-.filmstrip-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.filmstrip-body {
-  position: relative;
-  width: 55px;
-  height: 55px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-  /* border: 2px solid #ff8c00; */
-  border-radius: 4px;
-  box-shadow: 
-    0 0 15px rgba(255, 140, 0, 0.3),
-    inset 0 0 10px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.3s ease;
-}
-
-.filmstrip-logo-link:hover .filmstrip-body {
-  border-color: #ffd700;
-  box-shadow: 
-    0 0 20px rgba(255, 215, 0, 0.4),
-    inset 0 0 12px rgba(0, 0, 0, 0.6);
-  transform: translateY(-2px);
-}
-
-.filmstrip-perforation {
-  display: flex;
-  justify-content: space-around;
-  padding: 0 4px;
-}
-
-.filmstrip-perforation span {
-  width: 8px;
-  height: 5px;
-  background: #0a0a0a;
-  border-radius: 2px;
-  box-shadow: 
-    inset 0 1px 3px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(255, 140, 0, 0.3);
-}
-
-.filmstrip-perforation.top {
-  margin-top: 6px;
-}
-
-.filmstrip-perforation.bottom {
-  margin-bottom: 6px;
-}
-
-.filmstrip-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-}
-
-.filmstrip-icon {
-  font-size: 26px;
-  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
-  animation: filmstripPulse 2s ease-in-out infinite;
-  display: block;
-}
-
-@keyframes filmstripPulse {
-  0%, 100% { 
-    transform: scale(1);
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
-  }
-  50% { 
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
-  }
-}
-
-.filmstrip-logo-link:hover .filmstrip-icon {
-  animation: none;
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+  white-space: nowrap;
 }
 
 .filmstrip-text {
-  font-family: 'Bebas Neue', cursive;
-  font-size: 2.2rem;
-  font-weight: bold;
-  letter-spacing: 5px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+
+  font-family: var(--font-impact);
+  font-size: calc(var(--text-2xl) * 1.12);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #ffd700;
-  text-shadow: 
-    3px 3px 0 #8b0000, 
-    5px 5px 0 rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(255, 215, 0, 0.3);
-  transition: all 0.3s ease;
+
+  transition: transform var(--transition-fast);
 }
 
-.filmstrip-logo-link:hover .filmstrip-text {
-  text-shadow: 
-    4px 4px 0 #cc0000, 
-    6px 6px 0 rgba(0, 0, 0, 0.5),
-    0 0 25px rgba(255, 215, 0, 0.5);
-  transform: scale(1.02);
+.filmstrip-word {
+  color: var(--color-accent);
+  text-shadow:
+    2px 2px 0 var(--color-red-dark),
+    4px 4px 0 rgba(0, 0, 0, 0.35);
 }
 
-.filmstrip-text .letter {
-  display: inline-block;
-  transition: all 0.2s ease;
+.filmstrip-number {
+  color: var(--color-text-soft);
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
-.filmstrip-logo-link:hover .filmstrip-text .letter {
-  animation: letterBounce 0.5s ease;
+/*Текст увеличивается и поднимается вверх*/
+.filmstrip-logo-link:hover .filmstrip-text,
+.filmstrip-logo-link:focus-visible .filmstrip-text {
+  transform: translateY(-1px) scale(1.01);
 }
 
-.filmstrip-logo-link:hover .filmstrip-text .letter:nth-child(1) { animation-delay: 0s; }
-.filmstrip-logo-link:hover .filmstrip-text .letter:nth-child(2) { animation-delay: 0.05s; }
-.filmstrip-logo-link:hover .filmstrip-text .letter:nth-child(3) { animation-delay: 0.1s; }
-.filmstrip-logo-link:hover .filmstrip-text .letter:nth-child(4) { animation-delay: 0.15s; }
-.filmstrip-logo-link:hover .filmstrip-text .letter:nth-child(5) { animation-delay: 0.2s; }
-.filmstrip-logo-link:hover .filmstrip-text .letter:nth-child(6) { animation-delay: 0.25s; }
-.filmstrip-logo-link:hover .filmstrip-text .letter:nth-child(7) { animation-delay: 0.3s; }
-
-@keyframes letterBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+/*Усиливаются тени при наведении на Frame*/
+.filmstrip-logo-link:hover .filmstrip-word,
+.filmstrip-logo-link:focus-visible .filmstrip-word {
+  text-shadow:
+    3px 3px 0 var(--color-red-bright),
+    5px 5px 0 rgba(0, 0, 0, 0.42),
+    0 0 14px rgba(255, 215, 0, 0.18);
 }
 
+/*Усиливаются тени при наведении на 25*/
+.filmstrip-logo-link:hover .filmstrip-number,
+.filmstrip-logo-link:focus-visible .filmstrip-number {
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.36),
+    0 0 10px rgba(200, 187, 168, 0.14);
+}
+
+.filmstrip-logo-link:focus-visible {
+  outline: none;
+}
+
+/*Адаптивность для планшета*/
 @media (max-width: 768px) {
-  .filmstrip-body {
-    width: 45px;
-    height: 45px;
-  }
-  
-  .filmstrip-icon {
-    font-size: 22px;
-  }
-  
   .filmstrip-text {
-    font-size: 1.5rem;
-    letter-spacing: 3px;
+    font-size: 2.1rem;
+    letter-spacing: 0.03em;
+    gap: 2px;
   }
 }
 
+/*Адаптивность для телефона*/
 @media (max-width: 480px) {
-  .filmstrip-body {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .filmstrip-icon {
-    font-size: 20px;
-  }
-  
   .filmstrip-text {
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-  }
-  
-  .filmstrip-logo {
-    gap: 8px;
+    font-size: 1.75rem;
+    letter-spacing: 0.025em;
   }
 }

@@ -385,7 +385,6 @@ class SearchListFilmSerilizer(serializers.ModelSerializer):
     Упрощенная версия для оптимизации.
     """
 
-    # poster_url = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
 
     class Meta:

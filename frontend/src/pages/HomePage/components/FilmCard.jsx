@@ -29,7 +29,7 @@ function FilmCard({ film }) {
     >
       <div className="film-poster">
         <img 
-          src={film.poster || DEFAULT_POSTER}
+          src={film.poster_url || DEFAULT_POSTER}
           alt={film.name || 'Постер'}
           loading="lazy"
           onError={(e) => {

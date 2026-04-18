@@ -1,15 +1,50 @@
 .home-page {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 20px;
-  background-color: var(--color-tired-black, #14120F);
+  background-color: var(--color-bg);
   min-height: 100vh;
+}
+
+.home-section {
+  padding: 32px 20px 48px;
+}
+
+.home-section__head {
+  margin-bottom: 28px;
+}
+
+.home-section__eyebrow {
+  margin: 0 0 10px;
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-family: var(--font-accent);
+}
+
+.home-section__title {
+  margin: 0 0 10px;
+  color: var(--color-text);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1.05;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.home-section__subtitle {
+  margin: 0;
+  max-width: 700px;
+  color: var(--color-text-soft);
+  font-size: var(--text-md);
+  line-height: 1.6;
+  font-family: var(--font-text);
 }
 
 .films-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
+  gap: 24px;
 }
 
 .loading {
@@ -17,27 +52,32 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  color: var(--color-tired-yellow, #B8860B);
-  font-size: 1.2rem;
-  background-color: var(--color-tired-black, #14120F);
+  color: var(--color-accent);
+  font-size: 1.1rem;
+  background-color: var(--color-bg);
+  font-family: var(--font-ui);
 }
 
 .load-more {
   display: block;
-  margin: 40px auto 0;
-  padding: 12px 32px;
+  margin: 42px auto 0;
+  padding: 14px 34px;
   background: transparent;
-  color: var(--color-tired-yellow, #B8860B);
-  border: 1px solid var(--color-tired-yellow, #B8860B);
-  font-size: 1rem;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  font-size: var(--text-sm);
+  font-family: var(--font-accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 4px;
+  transition: all var(--transition-fast);
+  border-radius: 999px;
 }
 
 .load-more:hover:not(:disabled) {
-  background: var(--color-tired-yellow, #B8860B);
-  color: var(--color-tired-black, #14120F);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  transform: translateY(-1px);
 }
 
 .load-more:disabled {
@@ -46,12 +86,12 @@
 }
 
 @media (max-width: 768px) {
-  .home-page {
-    padding: 16px;
+  .home-section {
+    padding: 24px 16px 40px;
   }
-  
+
   .films-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 12px;
+    gap: 14px;
   }
 }
