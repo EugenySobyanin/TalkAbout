@@ -1,18 +1,19 @@
-from rest_framework import filters, viewsets, permissions
+from rest_framework import filters, generics, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 import random
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Case, When, IntegerField, Value, Q
 from django_filters.rest_framework import DjangoFilterBackend
 
-from gallery.models import Film
+from gallery.models import (Film, Genre, Country, Type)
 from api.filters import FilmFilter
-from api.serializers.films import FilmDetailSerializer, SearchListFilmSerilizer
-from talk_about.constants import MIN_RATING, EXCLUDED_GENRES
-
-
-
+from api.serializers.films import FilmDetailSerializer, SearchListFilmSerilizer, GenreSerializer, CountrySerializer, TypeSerializer
+from api.pagination import FilmSearchPagination
+from talk_about.constants import (MIN_RATING,
+                                  EXCLUDED_GENRES,
+                                  MIN_SEARCH_VOTES,
+                                  SEARCH_SUGGESTIONS_LIMIT)
 
 
 class FilmViewSet(viewsets.ModelViewSet):
@@ -20,13 +21,14 @@ class FilmViewSet(viewsets.ModelViewSet):
 
     queryset = Film.objects.all().select_related('type').prefetch_related(
         'genres', 'countries', 'persons'
-    )
+    ).distinct()
     serializer_class = FilmDetailSerializer
     permission_classes = []
     filter_backends = [
         DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
     ]
     filterset_class = FilmFilter
+    pagination_class = FilmSearchPagination
 
     search_fields = [
         'name',
@@ -42,7 +44,11 @@ class FilmViewSet(viewsets.ModelViewSet):
     ordering = ['-kinopoisk_rating', '-year']
 
     def get_serializer_class(self):
-        if self.action in ['list', 'random_top_films', 'discover']:
+        if self.action in ['list',
+                           'random_top_films',
+                           'discover',
+                           'search_suggestions',
+                           'search']:
             return SearchListFilmSerilizer
         return super().get_serializer_class()
 
@@ -94,7 +100,7 @@ class FilmViewSet(viewsets.ModelViewSet):
         if total_count == 0:
             return Response({
                 'count': 0,
-                'message': 'Нет фильмов с рейтингом >= {0}'.format(min_rating),
+                'message': 'Нет фильмов с рейтингом >= {0}'.format(MIN_RATING),
                 'results': []
             })
 
@@ -114,7 +120,7 @@ class FilmViewSet(viewsets.ModelViewSet):
         return Response({
             'count': len(films),
             'total_available': total_count,
-            'min_rating_filter': min_rating,
+            'min_rating_filter': MIN_RATING,
             'excluded_genres': EXCLUDED_GENRES,
             'results': serializer.data
         })
@@ -170,3 +176,112 @@ class FilmViewSet(viewsets.ModelViewSet):
             'excluded_genres': EXCLUDED_GENRES,
             'results': serializer.data
         })
+
+    @action(
+        detail=False,
+        methods=['get'],
+        url_path='search-suggestions',
+        url_name='search-suggestions',
+        permission_classes=[permissions.AllowAny],
+    )
+    def search_suggestions(self, request):
+        query = request.query_params.get('q', '').strip()
+
+        # Не обрабатываем запрос с 1 буквой
+        if len(query) < 2:
+            return Response({
+                'total': 0,
+                'results': []
+            })
+
+        queryset = Film.objects.filter(
+            Q(name__icontains=query) |
+            Q(alternative_name__icontains=query) |
+            Q(en_name__icontains=query),
+        ).exclude(
+            Q(name__isnull=True) &
+            Q(alternative_name__isnull=True) &
+            Q(en_name__isnull=True)
+        ).select_related(
+            'type'
+        ).prefetch_related(
+            'genres'
+        ).annotate(
+            # 🔥 приоритет популярным фильмам
+            popularity_priority=Case(
+                When(kinopoisk_votes__gte=MIN_SEARCH_VOTES, then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            )
+        ).order_by(
+            '-popularity_priority',   # сначала популярные
+            '-kinopoisk_rating',      # потом рейтинг
+            '-kinopoisk_votes',       # потом голоса
+            '-year'
+        ).distinct()
+
+        total = queryset.count()
+        films = queryset[:SEARCH_SUGGESTIONS_LIMIT]
+
+        serializer = SearchListFilmSerilizer(films, many=True)
+
+        return Response({
+            'total': total,
+            'results': serializer.data
+        })
+
+    @action(
+        detail=False,
+        methods=['get'],
+        url_path='search',
+        url_name='search',
+        permission_classes=[permissions.AllowAny],
+    )
+    def search(self, request):
+        query = request.query_params.get('q', '').strip()
+
+        if len(query) < 2:
+            return Response({
+                'count': 0,
+                'next': None,
+                'previous': None,
+                'results': []
+            })
+
+        queryset = Film.objects.filter(
+            Q(name__icontains=query) |
+            Q(alternative_name__icontains=query) |
+            Q(en_name__icontains=query)
+        ).select_related(
+            'type'
+        ).prefetch_related(
+            'genres'
+        ).order_by(
+            '-kinopoisk_rating',
+            '-kinopoisk_votes',
+            '-year'
+        ).distinct()
+
+        paginator = FilmSearchPagination()
+        page = paginator.paginate_queryset(queryset, request)
+        serializer = SearchListFilmSerilizer(page, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
+
+
+class TypeList(generics.ListCreateAPIView):
+    queryset = Type.objects.all()
+    serializer_class = TypeSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class GenreList(generics.ListCreateAPIView):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class CountryList(generics.ListCreateAPIView):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    permission_classes = [permissions.AllowAny]

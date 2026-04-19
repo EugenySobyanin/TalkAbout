@@ -3,14 +3,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework import routers
 
-
-from api.router import router as api_router
-
-
-router = routers.DefaultRouter()
-router.registry.extend(api_router.registry)
+from api.router import router as api_router, urlpatterns as api_extra_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,7 +17,9 @@ urlpatterns = [
     path('api/v1/compilations/', include('compilations.urls')),
     path('api/v1/', include('djoser.urls')),
     path('api/v1/auth/', include('djoser.urls.authtoken')),
-    path('api/v1/', include(router.urls)),
+
+    path('api/v1/', include(api_router.urls)),
+    path('api/v1/', include((api_extra_urls, 'api'))),
 ]
 
 if settings.DEBUG:

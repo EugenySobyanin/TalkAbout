@@ -1,12 +1,11 @@
 import { useEffect, useState, useCallback } from 'react'
 import { getRandomTopFilms } from '../../api/films'
-import FilmCard from './components/FilmCard'
+import FilmsGridSection from '../../components/FilmsGridSection/FilmsGridSection'
 import Hero from './components/Hero'
 import './HomePage.css'
 
 const FILMS_PER_PAGE = 12
 
-// Кэш живёт, пока живо приложение в браузере
 let homePageCache = {
   films: [],
   hasMore: true,
@@ -71,7 +70,6 @@ function HomePage() {
   }, [])
 
   useEffect(() => {
-    // Если уже загружали ранее — не дёргаем API повторно
     if (homePageCache.isLoaded) {
       setFilms(homePageCache.films)
       setHasMore(homePageCache.hasMore)
@@ -89,39 +87,23 @@ function HomePage() {
     await loadFilms(true)
   }
 
-  if (loading) {
-    return <div className="loading">Загрузка...</div>
-  }
-
   return (
     <div className="home-page">
       {/* <Hero /> */}
 
-      <section className="home-section">
-        <div className="home-section__head">
-          <p className="home-section__eyebrow">Подборка вечера</p>
-          <h2 className="home-section__title">Фильмы с высоким рейтингом</h2>
-          <p className="home-section__subtitle">
-            Выбирайте из сильных работ, о которых хочется говорить после титров.
-          </p>
-        </div>
-
-        <div className="films-grid">
-          {films.map((film) => (
-            <FilmCard key={film.id} film={film} />
-          ))}
-        </div>
-
-        {hasMore && (
-          <button
-            className="load-more"
-            onClick={handleLoadMore}
-            disabled={loadingMore}
-          >
-            {loadingMore ? 'Загрузка...' : 'Показать ещё'}
-          </button>
-        )}
-      </section>
+      <div className="home-page__content">
+        <FilmsGridSection
+          eyebrow="Подборка вечера"
+          title="Фильмы с высоким рейтингом"
+          subtitle="Выбирайте из сильных работ, о которых хочется говорить после титров."
+          films={films}
+          loading={loading}
+          hasMore={hasMore}
+          loadingMore={loadingMore}
+          onLoadMore={handleLoadMore}
+          emptyText="Фильмы пока не найдены"
+        />
+      </div>
     </div>
   )
 }

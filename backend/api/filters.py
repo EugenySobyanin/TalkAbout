@@ -3,64 +3,56 @@ from django_filters import rest_framework as filters
 
 from gallery.models import (
     Film,
-    Type,
     Genre,
     Person,
-    Country
+    Country,
 )
 
 
 class FilmFilter(filters.FilterSet):
-    """Лаконичный фильтр только по нужным полям."""
+    """Фильтр фильмов с явными min/max параметрами для фронтенда."""
 
-    # Год (диапазон)
-    year = filters.RangeFilter()
+    # Год выпуска
+    year_min = filters.NumberFilter(field_name='year', lookup_expr='gte')
+    year_max = filters.NumberFilter(field_name='year', lookup_expr='lte')
 
-    # Длительность (диапазон)
-    movie_length = filters.RangeFilter()
+    # Длительность
+    movie_length_min = filters.NumberFilter(field_name='movie_length', lookup_expr='gte')
+    movie_length_max = filters.NumberFilter(field_name='movie_length', lookup_expr='lte')
 
-    # Рейтинг Кинопоиска (от и до)
-    kinopoisk_rating = filters.RangeFilter()
+    # Рейтинг Кинопоиска
+    kinopoisk_rating_min = filters.NumberFilter(field_name='kinopoisk_rating', lookup_expr='gte')
+    kinopoisk_rating_max = filters.NumberFilter(field_name='kinopoisk_rating', lookup_expr='lte')
 
-    # Рейтинг IMDb (от и до)
-    imdb_rating = filters.RangeFilter()
+    # Рейтинг IMDb
+    imdb_rating_min = filters.NumberFilter(field_name='imdb_rating', lookup_expr='gte')
+    imdb_rating_max = filters.NumberFilter(field_name='imdb_rating', lookup_expr='lte')
 
-    # Возрастной рейтинг (точное совпадение)
-    age_rating = filters.NumberFilter()
+    # Возрастной рейтинг
+    age_rating = filters.NumberFilter(field_name='age_rating')
 
-    # Бюджет (диапазон)
-    budget_value = filters.RangeFilter()
-
-    # Тип (можно несколько)
-    type = filters.ModelMultipleChoiceFilter(
-        field_name='type__id',
-        to_field_name='id',
-        queryset=Type.objects.all(),
-        label='Тип (ID)'
-    )
-
-    # Жанр (можно несколько)
+    # Жанры
     genres = filters.ModelMultipleChoiceFilter(
         field_name='genres__id',
         to_field_name='id',
         queryset=Genre.objects.all(),
-        label='Жанр (ID)'
+        label='Жанры (ID)',
     )
 
-    # Страна (можно несколько)
+    # Страны
     countries = filters.ModelMultipleChoiceFilter(
         field_name='countries__id',
         to_field_name='id',
         queryset=Country.objects.all(),
-        label='Страна (ID)'
+        label='Страны (ID)',
     )
 
-    # Персоны (можно несколько)
+    # Персоны
     persons = filters.ModelMultipleChoiceFilter(
         field_name='persons__id',
         to_field_name='id',
         queryset=Person.objects.all(),
-        label='Персона (ID)'
+        label='Персоны (ID)',
     )
 
     class Meta:

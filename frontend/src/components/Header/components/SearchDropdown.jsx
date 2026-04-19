@@ -1,7 +1,15 @@
 import React from 'react';
 import './SearchDropdown.css';
 
-const SearchDropdown = ({ results, onSelect, searchTerm, isSearching }) => {
+const SearchDropdown = ({ 
+  results,
+  total,
+  onSelect,
+  onShowAll,
+  searchTerm,
+  isSearching 
+}) => {
+
   const formatDuration = (minutes) => {
     if (!minutes) return null;
     const hours = Math.floor(minutes / 60);
@@ -29,7 +37,16 @@ const SearchDropdown = ({ results, onSelect, searchTerm, isSearching }) => {
   return (
     <div className="search-dropdown">
       <div className="search-results-header">
-        <span>Найдено: {results.length}</span>
+        <span>Найдено: {total}</span>
+
+        <button
+          className="show-all-btn"
+          onMouseDown={(e) => e.preventDefault()} // ❗ важно!
+          onClick={onShowAll}
+        >
+          Показать все
+        </button>
+  
       </div>
       <div className="search-results-list">
         {results.map((film) => (

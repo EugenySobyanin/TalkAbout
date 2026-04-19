@@ -8,17 +8,11 @@ import HomePage from './pages/HomePage/HomePage';
 import FilmPage from './pages/FilmPage/FilmPage';
 import CompilationsPage from './pages/CompilationsPage/CompilationsPage';
 import DiaryPageComponent from './pages/DiaryPage/DiaryPage'; // ← Переименовываем импорт
+import SearchResultsPage from './pages/SearchResultsPage/SearchResultsPage';
+import FilmPickerPage from './pages/FilmPickerPage/FilmPickerPage';
+import PickerResultsPage from './pages/PickerResultsPage/PickerResultsPage';
 import './App.css';
 
-// Страницы
-// const HomePage = () => {
-//     return (
-//         <div className="page-container">
-//             <h1>Главная страница</h1>
-//             <p>Добро пожаловать в TalkAbout</p>
-//         </div>
-//     )
-// }
 
 const ProfilePage = () => {
     return (
@@ -28,14 +22,6 @@ const ProfilePage = () => {
     )
 }
 
-// ← Удаляем этот компонент или переименовываем
-// const DiaryPage = () => {
-//     return (
-//         <div className="page-container">
-//             <DiaryPage />
-//         </div>
-//     )
-// }
 
 const SubscriptionsPage = () => {
     return (
@@ -53,13 +39,6 @@ const FeedPage = () => {
     )
 }
 
-// const CompilationsPage = () => {
-//     return (
-//         <div className="page-container">
-//             <h1>Подборки</h1>
-//         </div>
-//     )
-// }
 
 const RecommendationsPage = () => {
     return (
@@ -191,6 +170,29 @@ const AppContent = () => {
                 
                 {/* Редирект для неизвестных маршрутов */}
                 <Route path="*" element={<Navigate to="/" replace />} />
+
+                {/* Все результаты поиска фильма */}
+                <Route path="/films/search" element={
+                    <MainLayout>
+                        <SearchResultsPage />
+                    </MainLayout>
+                } />
+
+                {/*Страница с формой подбора фильмов*/}
+                <Route path="/films/picker" element={
+                    <MainLayout>
+                        <FilmPickerPage />
+                    </MainLayout>
+                    
+                } />
+
+                {/*Страница с результатами подбора*/}
+                <Route path="/films/picker/results" element={
+                    <MainLayout>
+                        <PickerResultsPage />
+                    </MainLayout>
+                } />
+
             </Routes>
         </Router>
     )

@@ -230,3 +230,27 @@
 .search-dropdown::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 140, 0, 0.6);
 }
+
+.search-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.show-all-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-accent);
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.show-all-btn:hover {
+  color: var(--color-accent-strong);
+}

@@ -6,6 +6,7 @@ function Sidebar() {
     { path: '/', label: 'Главная', icon: '🏠' },
     { path: '/profile', label: 'Профиль', icon: '👤' },
     { path: '/diary', label: 'Дневник', icon: '📓' },
+    { path: '/films/picker', label: 'Подбор' },
     { path: '/subscriptions', label: 'Подписки', icon: '🔔' },
     { path: '/feed', label: 'Лента', icon: '📰' },
     { path: '/compilations', label: 'Подборки', icon: '📚' },

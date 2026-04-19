@@ -6,6 +6,7 @@
   justify-content: space-between;
   padding: 0 6rem;
   color: var(--color-text-soft);
+  background-color: var(--color-bg);
   position: fixed;
   top: 0;
   left: 0;
