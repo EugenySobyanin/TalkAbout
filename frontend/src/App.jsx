@@ -11,16 +11,9 @@ import DiaryPageComponent from './pages/DiaryPage/DiaryPage'; // ← Переи�
 import SearchResultsPage from './pages/SearchResultsPage/SearchResultsPage';
 import FilmPickerPage from './pages/FilmPickerPage/FilmPickerPage';
 import PickerResultsPage from './pages/PickerResultsPage/PickerResultsPage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
+import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
 import './App.css';
-
-
-const ProfilePage = () => {
-    return (
-        <div className="page-container">
-            <h1>Профиль</h1>
-        </div>
-    )
-}
 
 
 const SubscriptionsPage = () => {
@@ -191,6 +184,22 @@ const AppContent = () => {
                     <MainLayout>
                         <PickerResultsPage />
                     </MainLayout>
+                } />
+
+                {/*Профиль текущего пользователя*/}
+                <Route path="/profile" element={
+                    <MainLayout>
+                        <ProfilePage />
+                    </MainLayout>
+                    
+                } />
+
+                {/*Профиль другого пользователя*/}
+                <Route path="/users/:id" element={
+                    <MainLayout>
+                        <UserProfilePage />
+                    </MainLayout>
+                    
                 } />
 
             </Routes>

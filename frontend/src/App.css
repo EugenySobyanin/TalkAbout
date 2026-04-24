@@ -653,3 +653,12 @@ a:hover::after {
   cursor: pointer;
   clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 20% 100%);
 }
+
+.profile-loading {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-soft);
+  font-size: var(--text-lg);
+}
