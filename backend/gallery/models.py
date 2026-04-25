@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib.auth import get_user_model
 from django.core.files.storage import default_storage
 from django.core.validators import (MinValueValidator,
                                     MaxValueValidator,
@@ -38,6 +39,9 @@ from gallery.validators import validate_max_future_year
 from gallery.utils import cut_str
 from talk_about.constants import DEFAULT_AVATAR_PATH
 from talk_about.utils import delete_folder_with_all_files
+
+
+User = get_user_model()
 
 
 def films_photos_path(instance, filename) -> str:
@@ -1051,3 +1055,44 @@ class ImportState(models.Model):
 
     def __str__(self):
         return self.source
+
+
+class UserTopFilm(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='top_films',
+        on_delete=models.CASCADE
+    )
+    film = models.ForeignKey(
+        Film,
+        related_name='user_top_entries',
+        on_delete=models.CASCADE
+    )
+    position = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(10),
+        ]
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['position']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'position'],
+                name='unique_user_top_position'
+            ),
+            models.UniqueConstraint(
+                fields=['user', 'film'],
+                name='unique_user_top_film'
+            ),
+            models.CheckConstraint(
+                check=models.Q(position__gte=1) & models.Q(position__lte=10),
+                name='user_top_film_position_1_10',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.user} — #{self.position} — {self.film}'

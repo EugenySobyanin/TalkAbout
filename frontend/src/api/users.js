@@ -27,9 +27,43 @@ export const updateMyAvatar = async (formData) => {
         'Content-Type': 'multipart/form-data',
       },
     })
+
     return response.data
   } catch (error) {
     console.error('Avatar update error:', error)
     throw error
+  }
+}
+
+export const getMyTopFilms = async () => {
+  try {
+    const response = await api.get('/users/me/top-films/')
+    return response.data
+  } catch (error) {
+    console.error('My top films fetch error:', error)
+    return []
+  }
+}
+
+export const updateMyTopFilms = async (filmIds) => {
+  try {
+    const response = await api.put('/users/me/top-films/', {
+      film_ids: filmIds,
+    })
+
+    return response.data
+  } catch (error) {
+    console.error('My top films update error:', error)
+    throw error
+  }
+}
+
+export const getUserTopFilms = async (userId) => {
+  try {
+    const response = await api.get(`/users/${userId}/top-films/`)
+    return response.data
+  } catch (error) {
+    console.error('User top films fetch error:', error)
+    return []
   }
 }

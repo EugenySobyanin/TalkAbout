@@ -7,30 +7,19 @@ from django.conf import settings
 class FilmSerializer(serializers.ModelSerializer):
     """Сериализатор для фильмов внутри подборок."""
     
-    poster = serializers.SerializerMethodField()
-
+ 
     class Meta:
         model = Film
         fields = [
             'id',
             'name',
             'year',
-            'poster',
+            'poster_url',
+            'poster_preview_url',
             'kinopoisk_rating',
             'imdb_rating',
         ]
     
-    def get_poster(self, obj):
-        """Возвращает полный URL до постера."""
-        if obj.poster:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.poster.url)
-            else:
-                base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
-                return f"{base_url}{obj.poster.url}"
-        return None
-
 
 class CompilationSerializer(serializers.ModelSerializer):
     """Сериализатор для подборок (компиляций)."""

@@ -1,6 +1,16 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+const getFilmPoster = (film) => {
+  return (
+    film?.poster_preview_url ||
+    film?.poster_url ||
+    film?.poster ||
+    film?.logo_preview_url ||
+    '/placeholder-poster.jpg'
+  )
+}
+
 function ProfileFilmsTable({
   title,
   items = [],
@@ -19,24 +29,24 @@ function ProfileFilmsTable({
 
   const getStatusLabel = (item) => {
     if (mode === 'watched') {
-      return item.rating ?? '—'
+      return item.rating ? `${item.rating}/10` : '—'
     }
 
-    return item.rating ?? '—'
+    return item.rating ? `${item.rating}/10` : '—'
   }
 
   return (
     <section className="profile-table-block">
-      <div className="profile-table-block__head">
+      <div className="profile-block__head">
         <div>
-          <h2 className="profile-table-block__title">{title}</h2>
-          <p className="profile-table-block__count">Всего: {items.length}</p>
+          <h2 className="profile-block__title">{title}</h2>
+          <p className="profile-block__count">Всего: {items.length}</p>
         </div>
 
         {canShowMore && (
           <button
             type="button"
-            className="profile-table-block__btn"
+            className="profile-block__btn"
             onClick={() => setVisibleCount((prev) => prev + 7)}
           >
             Показать ещё
@@ -58,25 +68,21 @@ function ProfileFilmsTable({
                 key={item.id}
                 type="button"
                 className="profile-table__row profile-table__row--clickable"
-                onClick={() => navigate(`/films/${item.film.id}`)}
+                onClick={() => navigate(`/film/${item.film.id}`)}
               >
                 <div className="profile-table__film">
-                  <div className="profile-table__film-logo-wrap">
-                    {item.film.logo_preview_url ? (
-                      <img
-                        src={item.film.logo_preview_url}
-                        alt={item.film.name}
-                        className="profile-table__film-logo"
-                      />
-                    ) : (
-                      <div className="profile-table__film-logo-placeholder">
-                        {item.film.name?.slice(0, 1) || 'F'}
-                      </div>
-                    )}
-                  </div>
+                  <img
+                    src={getFilmPoster(item.film)}
+                    alt={item.film.name}
+                    className="profile-table__poster"
+                    onError={(event) => {
+                      event.target.onerror = null
+                      event.target.src = '/placeholder-poster.jpg'
+                    }}
+                  />
 
                   <span className="profile-table__film-name">
-                    {item.film.name}
+                    {item.film.name || item.film.alternative_name || 'Без названия'}
                   </span>
                 </div>
 

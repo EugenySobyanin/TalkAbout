@@ -1,264 +1,205 @@
-// src/pages/CompilationsPage/components/CompilationDialog.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
+  Alert,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  TextField,
+  DialogContent,
+  DialogTitle,
   FormControlLabel,
   Switch,
-  Box,
+  TextField,
   Typography,
-  Alert
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+} from '@mui/material'
+import CompilationFilmSelector from './CompilationFilmSelector'
 
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialog-paper': {
-    backgroundColor: '#1C2128',
-    border: '2px solid #FFD700',
-    borderRadius: 8,
-    minWidth: 500,
-  },
-  '& .MuiDialogTitle-root': {
-    fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-    fontSize: '1.5rem',
-    fontWeight: 700,
-    color: '#E6EDF3',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    borderBottom: '1px solid #30363D',
-  },
-  '& .MuiInputLabel-root': {
-    color: '#8B949E',
-  },
-  '& .MuiOutlinedInput-root': {
-    color: '#E6EDF3',
-    '& fieldset': {
-      borderColor: '#30363D',
-    },
-    '&:hover fieldset': {
-      borderColor: '#FFD700',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#FFD700',
-    },
-  },
-  '& .MuiFormControlLabel-label': {
-    color: '#E6EDF3',
-  },
-}));
-
-const CompilationDialog = ({ 
-  open, 
-  onClose, 
-  onSubmit, 
-  compilation = null 
+const CompilationDialog = ({
+  open,
+  onClose,
+  onSubmit,
+  compilation = null,
 }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     is_public: false,
-    films: []
-  });
-  const [errors, setErrors] = useState({});
+    films: [],
+  })
+
+  const [errors, setErrors] = useState({})
 
   useEffect(() => {
     if (compilation) {
       setFormData({
         title: compilation.title || '',
         description: compilation.description || '',
-        is_public: compilation.is_public || false,
-        films: compilation.films || []
-      });
+        is_public: Boolean(compilation.is_public),
+        films: compilation.films || [],
+      })
     } else {
       setFormData({
         title: '',
         description: '',
         is_public: false,
-        films: []
-      });
+        films: [],
+      })
     }
-  }, [compilation, open]);
 
-  const handleChange = (e) => {
-    const { name, value, checked } = e.target;
-    setFormData(prev => ({
+    setErrors({})
+  }, [compilation, open])
+
+  const handleChange = (event) => {
+    const { name, value, checked } = event.target
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'is_public' ? checked : value
-    }));
-    
-    // Очищаем ошибку поля при изменении
+      [name]: name === 'is_public' ? checked : value,
+    }))
+
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
+      setErrors((prev) => ({ ...prev, [name]: null }))
     }
-  };
+  }
+
+  const handleFilmsChange = (films) => {
+    setFormData((prev) => ({
+      ...prev,
+      films,
+    }))
+  }
 
   const validateForm = () => {
-    const newErrors = {};
-    
+    const newErrors = {}
+
     if (!formData.title.trim()) {
-      newErrors.title = 'Название обязательно';
+      newErrors.title = 'Название обязательно'
     }
-    
+
     if (formData.title.length > 255) {
-      newErrors.title = 'Название не может быть длиннее 255 символов';
+      newErrors.title = 'Название не может быть длиннее 255 символов'
     }
-    
+
     if (formData.description && formData.description.length > 500) {
-      newErrors.description = 'Описание не может быть длиннее 500 символов';
+      newErrors.description = 'Описание не может быть длиннее 500 символов'
     }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+
+    setErrors(newErrors)
+
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = () => {
-    if (!validateForm()) return;
-    
-    const submitData = {
-      ...formData,
-      films: formData.films.map(f => f.id)
-    };
-    
-    onSubmit(submitData);
-  };
+    if (!validateForm()) return
+
+    onSubmit({
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      is_public: formData.is_public,
+      films: formData.films.map((film) => film.id),
+    })
+  }
 
   return (
-    <StyledDialog open={open} onClose={onClose}>
-      <DialogTitle>
-        {compilation ? 'РЕДАКТИРОВАТЬ ПОДБОРКУ' : 'НОВАЯ ПОДБОРКА'}
+    <Dialog
+      open={open}
+      onClose={onClose}
+      className="compilations-dialog"
+      maxWidth="md"
+      fullWidth
+    >
+      <DialogTitle className="compilations-dialog__title">
+        {compilation ? 'Редактировать подборку' : 'Новая подборка'}
       </DialogTitle>
-      
-      <DialogContent>
-        <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+
+      <DialogContent className="compilations-dialog__content">
+        <div className="compilations-dialog__form">
           <TextField
             fullWidth
             label="Название подборки"
             name="title"
             value={formData.title}
             onChange={handleChange}
-            error={!!errors.title}
+            error={Boolean(errors.title)}
             helperText={errors.title}
             required
             placeholder="Мои любимые фильмы"
+            className="compilations-dialog__field"
           />
-          
+
           <TextField
             fullWidth
             label="Описание"
             name="description"
             value={formData.description}
             onChange={handleChange}
-            error={!!errors.description}
+            error={Boolean(errors.description)}
             helperText={errors.description || `${formData.description.length}/500`}
             multiline
             rows={3}
             placeholder="Опишите вашу подборку..."
+            className="compilations-dialog__field"
           />
-          
+
           <FormControlLabel
+            className="compilations-dialog__switch-row"
             control={
               <Switch
                 checked={formData.is_public}
                 onChange={handleChange}
                 name="is_public"
-                sx={{
-                  '& .MuiSwitch-switchBase.Mui-checked': {
-                    color: '#FFD700',
-                  },
-                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                    backgroundColor: '#FFD700',
-                  },
-                }}
+                className="compilations-switch"
               />
             }
             label={
-              <Box>
-                <Typography variant="body2">
-                  {formData.is_public ? '🌍 Публичная подборка' : '🔒 Приватная подборка'}
+              <div className="compilations-dialog__switch-label">
+                <Typography className="compilations-dialog__switch-title">
+                  {formData.is_public ? 'Публичная подборка' : 'Приватная подборка'}
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#8B949E', display: 'block' }}>
-                  {formData.is_public 
+
+                <Typography className="compilations-dialog__switch-hint">
+                  {formData.is_public
                     ? 'Все пользователи смогут видеть эту подборку'
-                    : 'Только вы сможете видеть эту подборку'
-                  }
+                    : 'Только вы сможете видеть эту подборку'}
                 </Typography>
-              </Box>
+              </div>
             }
           />
-          
-          <Alert 
-            severity="info" 
-            sx={{ 
-              backgroundColor: '#21262D',
-              color: '#E6EDF3',
-              border: '1px solid #30363D',
-              '& .MuiAlert-icon': {
-                color: '#FFD700'
-              }
-            }}
-          >
-            <Typography variant="body2">
-              💡 Фильмы можно будет добавить позже из карточки фильма или при редактировании подборки.
+
+          <div className="compilations-dialog__films-block">
+            <Typography className="compilations-dialog__section-title">
+              Фильмы в подборке
             </Typography>
+
+            <CompilationFilmSelector
+              selectedFilms={formData.films}
+              onChange={handleFilmsChange}
+            />
+          </div>
+
+          <Alert className="compilations-dialog__alert" severity="info">
+            Фильмы можно добавить сейчас или позже внутри раскрытой подборки.
           </Alert>
-        </Box>
+        </div>
       </DialogContent>
-      
-      <DialogActions sx={{ p: 2, gap: 1 }}>
-        <button 
+
+      <DialogActions className="compilations-dialog__actions">
+        <button
+          type="button"
           onClick={onClose}
-          className="compilations-dialog-button cancel"
+          className="compilations-dialog-button compilations-dialog-button--cancel"
         >
-          ОТМЕНА
+          Отмена
         </button>
-        <button 
+
+        <button
+          type="button"
           onClick={handleSubmit}
-          className="compilations-dialog-button submit"
+          className="compilations-dialog-button compilations-dialog-button--submit"
         >
-          {compilation ? 'СОХРАНИТЬ' : 'СОЗДАТЬ'}
+          {compilation ? 'Сохранить' : 'Создать'}
         </button>
       </DialogActions>
-      
-      <style jsx>{`
-        .compilations-dialog-button {
-          padding: 10px 20px;
-          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-          font-weight: 600;
-          font-size: 0.95rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        
-        .compilations-dialog-button.cancel {
-          background-color: transparent;
-          color: #8B949E;
-          border: 1px solid #30363D;
-        }
-        
-        .compilations-dialog-button.cancel:hover {
-          background-color: #21262D;
-          color: #E6EDF3;
-        }
-        
-        .compilations-dialog-button.submit {
-          background-color: #FFD700;
-          color: #0D1117;
-        }
-        
-        .compilations-dialog-button.submit:hover {
-          background-color: #FFC700;
-          transform: translateY(-1px);
-        }
-      `}</style>
-    </StyledDialog>
-  );
-};
+    </Dialog>
+  )
+}
 
-export default CompilationDialog;
+export default CompilationDialog

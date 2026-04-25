@@ -1,66 +1,68 @@
-// src/pages/CompilationsPage/components/CompilationsTable.jsx
-import React from 'react';
+import React from 'react'
 import {
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Typography
-} from '@mui/material';
-import CompilationsTableRow from './CompilationsTableRow';
+  Typography,
+} from '@mui/material'
+import CompilationsTableRow from './CompilationsTableRow'
 
-const CompilationsTable = ({ 
-  compilations, 
-  loading,
-  expandedRow,
+const CompilationsTable = ({
+  compilations = [],
+  loading = false,
+  expandedRow = null,
   onToggleExpand,
+  onToggleVisibility,
   onDelete,
-  onNavigateToFilm
+  onEdit,
+  onNavigateToFilm,
+  onUpdateFilms,
 }) => {
-  const columns = [
-    { id: 'number', label: '№', width: '50px' },
-    { id: 'name', label: 'Название', width: 'auto' },
-    { id: 'count', label: 'Фильмов', width: '100px' },
-    { id: 'visibility', label: 'Приватность', width: '120px' },
-    { id: 'actions', label: '', width: '100px' },
-  ];
+  const safeCompilations = Array.isArray(compilations) ? compilations : []
 
   return (
     <TableContainer component={Paper} className="compilations-table-container">
-      <Table>
+      <Table className="compilations-table">
         <TableHead className="compilations-table-head">
           <TableRow>
-            {columns.map(column => (
-              <TableCell 
-                key={column.id}
-                sx={{ width: column.width }}
-              >
-                {column.label}
-              </TableCell>
-            ))}
+            <TableCell className="compilations-cell-number">№</TableCell>
+            <TableCell className="compilations-cell-name">Название</TableCell>
+            <TableCell className="compilations-cell-posters">Фильмы</TableCell>
+            <TableCell className="compilations-cell-count">Всего</TableCell>
+            <TableCell className="compilations-cell-visibility">Приватность</TableCell>
+            <TableCell className="compilations-cell-actions" />
           </TableRow>
         </TableHead>
+
         <TableBody>
-          {compilations.map((compilation, index) => (
+          {safeCompilations.map((compilation, index) => (
             <CompilationsTableRow
               key={compilation.id}
               compilation={compilation}
               index={index}
               expanded={expandedRow === compilation.id}
               onToggleExpand={onToggleExpand}
+              onToggleVisibility={onToggleVisibility}
               onDelete={onDelete}
+              onEdit={onEdit}
               onNavigateToFilm={onNavigateToFilm}
+              onUpdateFilms={onUpdateFilms}
             />
           ))}
-          
-          {compilations.length === 0 && !loading && (
+
+          {safeCompilations.length === 0 && !loading && (
             <TableRow>
-              <TableCell colSpan={columns.length} align="center" sx={{ py: 6 }}>
+              <TableCell
+                colSpan={6}
+                align="center"
+                className="compilations-empty-cell"
+              >
                 <Typography className="compilations-empty-message">
-                  🚫 У ТЕБЯ НЕТ ПОДБОРОК. СОЗДАЙ ПЕРВУЮ!
+                  У тебя пока нет подборок. Создай первую.
                 </Typography>
               </TableCell>
             </TableRow>
@@ -68,7 +70,7 @@ const CompilationsTable = ({
         </TableBody>
       </Table>
     </TableContainer>
-  );
-};
+  )
+}
 
-export default CompilationsTable;
+export default CompilationsTable

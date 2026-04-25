@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+const getFilmPoster = (film) => {
+  return (
+    film?.poster_preview_url ||
+    film?.poster_url ||
+    film?.poster ||
+    film?.logo_preview_url ||
+    '/placeholder-poster.jpg'
+  )
+}
+
 function ProfileCompilationsTable({
   items = [],
   emptyText = 'Подборок пока нет',
@@ -22,16 +32,16 @@ function ProfileCompilationsTable({
 
   return (
     <section className="profile-table-block">
-      <div className="profile-table-block__head">
+      <div className="profile-block__head">
         <div>
-          <h2 className="profile-table-block__title">Подборки</h2>
-          <p className="profile-table-block__count">Всего: {items.length}</p>
+          <h2 className="profile-block__title">Подборки</h2>
+          <p className="profile-block__count">Всего: {items.length}</p>
         </div>
 
         {canShowMore && (
           <button
             type="button"
-            className="profile-table-block__btn"
+            className="profile-block__btn"
             onClick={() => setVisibleCount((prev) => prev + 7)}
           >
             Показать ещё
@@ -88,25 +98,21 @@ function ProfileCompilationsTable({
                             key={film.id}
                             type="button"
                             className="profile-compilation__film-row"
-                            onClick={() => navigate(`/films/${film.id}`)}
+                            onClick={() => navigate(`/film/${film.id}`)}
                           >
                             <div className="profile-compilation__film-main">
-                              <div className="profile-compilation__film-logo-wrap">
-                                {film.logo_preview_url ? (
-                                  <img
-                                    src={film.logo_preview_url}
-                                    alt={film.name}
-                                    className="profile-compilation__film-logo"
-                                  />
-                                ) : (
-                                  <div className="profile-compilation__film-logo-placeholder">
-                                    {film.name?.slice(0, 1) || 'F'}
-                                  </div>
-                                )}
-                              </div>
+                              <img
+                                src={getFilmPoster(film)}
+                                alt={film.name}
+                                className="profile-compilation__poster"
+                                onError={(event) => {
+                                  event.target.onerror = null
+                                  event.target.src = '/placeholder-poster.jpg'
+                                }}
+                              />
 
                               <span className="profile-compilation__film-name">
-                                {film.name}
+                                {film.name || film.alternative_name || 'Без названия'}
                               </span>
                             </div>
 

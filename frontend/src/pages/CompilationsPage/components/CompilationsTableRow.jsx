@@ -1,199 +1,326 @@
-// src/pages/CompilationsPage/components/CompilationsTableRow.jsx
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react'
 import {
-  TableRow,
-  TableCell,
-  Box,
-  Typography,
-  IconButton,
   Collapse,
-  Chip
-} from '@mui/material';
+  IconButton,
+  TableCell,
+  TableRow,
+  Typography,
+} from '@mui/material'
 import {
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+  Star as StarIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
-  Delete as DeleteIcon,
-  Star as StarIcon,
-  CalendarToday as CalendarIcon
-} from '@mui/icons-material';
+} from '@mui/icons-material'
+import CompilationFilmSelector from './CompilationFilmSelector'
 
-const CompilationsTableRow = ({ 
-  compilation, 
-  index, 
+const getFilmPoster = (film) => {
+  return (
+    film.poster_preview_url ||
+    film.poster_url ||
+    film.poster ||
+    '/placeholder-poster.jpg'
+  )
+}
+
+const getFilmTitle = (film) => {
+  return film.name || film.alternative_name || film.en_name || 'Без названия'
+}
+
+const formatRating = (rating) => {
+  if (rating === null || rating === undefined || rating === '') {
+    return null
+  }
+
+  const numericRating = Number(rating)
+
+  if (Number.isNaN(numericRating)) {
+    return null
+  }
+
+  return numericRating.toFixed(1)
+}
+
+const getIdsSignature = (films) => {
+  return films
+    .map((film) => film.id)
+    .sort((a, b) => a - b)
+    .join(',')
+}
+
+const CompilationsTableRow = ({
+  compilation,
+  index,
   expanded,
   onToggleExpand,
+  onToggleVisibility,
   onDelete,
-  onNavigateToFilm
+  onEdit,
+  onNavigateToFilm,
+  onUpdateFilms,
 }) => {
-  const formatDate = (date) => {
-    if (!date) return '—';
-    return new Date(date).toLocaleDateString('ru-RU');
-  };
+  const [draftFilms, setDraftFilms] = useState(compilation.films || [])
+  const [savingFilms, setSavingFilms] = useState(false)
+
+  useEffect(() => {
+    setDraftFilms(compilation.films || [])
+  }, [compilation.id, compilation.films])
+
+  const filmsChanged = useMemo(() => {
+    return getIdsSignature(draftFilms) !== getIdsSignature(compilation.films || [])
+  }, [draftFilms, compilation.films])
+
+  const previewFilms = (compilation.films || []).slice(0, 5)
+  const hiddenFilmsCount = Math.max((compilation.films_count || 0) - previewFilms.length, 0)
+
+  const handleRowClick = () => {
+    onToggleExpand(compilation.id)
+  }
+
+  const handleActionClick = (event, callback) => {
+    event.stopPropagation()
+    callback()
+  }
+
+  const handleFilmClick = (event, filmId) => {
+    event.stopPropagation()
+    onNavigateToFilm(filmId)
+  }
+
+  const handleVisibilityClick = (event) => {
+    event.stopPropagation()
+    onToggleVisibility(compilation)
+  }
+
+  const handleSaveFilms = async () => {
+    setSavingFilms(true)
+
+    try {
+      await onUpdateFilms(compilation, draftFilms)
+    } catch (error) {
+      console.error('Ошибка сохранения фильмов подборки:', error)
+    } finally {
+      setSavingFilms(false)
+    }
+  }
 
   return (
     <>
-      <TableRow className="compilations-table-row">
-        <TableCell onClick={() => onToggleExpand(compilation.id)}>
+      <TableRow
+        className={`compilations-table-row ${expanded ? 'compilations-table-row--expanded' : ''}`}
+        onClick={handleRowClick}
+      >
+        <TableCell className="compilations-cell-number">
           <Typography className="compilations-number">
             #{index + 1}
           </Typography>
         </TableCell>
-        
-        <TableCell onClick={() => onToggleExpand(compilation.id)}>
+
+        <TableCell className="compilations-cell-name">
           <Typography className="compilations-name">
             {compilation.title || 'Без названия'}
           </Typography>
+
           {compilation.description && (
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                color: 'var(--comp-text-secondary)',
-                display: 'block',
-                fontSize: '0.8rem',
-                mt: 0.5
-              }}
-            >
-              {compilation.description.length > 50 
-                ? compilation.description.substring(0, 50) + '...'
-                : compilation.description
-              }
+            <Typography className="compilations-description-preview">
+              {compilation.description.length > 70
+                ? `${compilation.description.substring(0, 70)}...`
+                : compilation.description}
             </Typography>
           )}
         </TableCell>
-        
-        <TableCell onClick={() => onToggleExpand(compilation.id)}>
+
+        <TableCell className="compilations-cell-posters">
+          <div className="compilations-preview-posters">
+            {previewFilms.length > 0 ? (
+              <>
+                {previewFilms.map((film) => (
+                  <img
+                    key={film.id}
+                    src={getFilmPoster(film)}
+                    alt={getFilmTitle(film)}
+                    className="compilations-preview-poster"
+                    onError={(event) => {
+                      event.target.onerror = null
+                      event.target.src = '/placeholder-poster.jpg'
+                    }}
+                  />
+                ))}
+
+                {hiddenFilmsCount > 0 && (
+                  <span className="compilations-preview-more">
+                    +{hiddenFilmsCount}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="compilations-preview-empty">
+                —
+              </span>
+            )}
+          </div>
+        </TableCell>
+
+        <TableCell className="compilations-cell-count">
           <Typography className="compilations-count">
             {compilation.films_count || 0}
           </Typography>
         </TableCell>
-        
-        <TableCell onClick={() => onToggleExpand(compilation.id)}>
-          <Box className="compilations-visibility">
-            {compilation.is_public ? (
-              <VisibilityIcon sx={{ fontSize: 20, color: 'var(--comp-success)' }} />
-            ) : (
-              <VisibilityOffIcon sx={{ fontSize: 20, color: 'var(--comp-text-secondary)' }} />
-            )}
+
+        <TableCell className="compilations-cell-visibility">
+          <div
+            className={`compilations-visibility ${
+              compilation.is_public
+                ? 'compilations-visibility--public'
+                : 'compilations-visibility--private'
+            }`}
+          >
+            <IconButton
+              className="compilations-icon-button compilations-visibility-button"
+              onClick={handleVisibilityClick}
+              title={compilation.is_public ? 'Сделать приватной' : 'Сделать публичной'}
+            >
+              {compilation.is_public ? <VisibilityIcon /> : <VisibilityOffIcon />}
+            </IconButton>
+
             <Typography className="compilations-visibility-status">
-              {compilation.is_public ? 'ПУБЛИЧНЫЙ' : 'ПРИВАТНЫЙ'}
+              {compilation.is_public ? 'Публичная' : 'Приватная'}
             </Typography>
-          </Box>
+          </div>
         </TableCell>
-        
-        <TableCell>
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <IconButton 
+
+        <TableCell className="compilations-cell-actions">
+          <div className="compilations-actions">
+            <IconButton
               className="compilations-icon-button"
-              onClick={() => onToggleExpand(compilation.id)}
+              onClick={(event) =>
+                handleActionClick(event, () => onToggleExpand(compilation.id))
+              }
+              title={expanded ? 'Свернуть' : 'Подробнее'}
             >
               {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </IconButton>
-            
-            <IconButton 
+
+            <IconButton
+              className="compilations-icon-button"
+              onClick={(event) =>
+                handleActionClick(event, () => onEdit(compilation))
+              }
+              title="Редактировать подборку"
+            >
+              <EditIcon />
+            </IconButton>
+
+            <IconButton
               className="compilations-icon-button delete"
-              onClick={() => onDelete(compilation.id)}
-              title="УДАЛИТЬ ПОДБОРКУ"
+              onClick={(event) =>
+                handleActionClick(event, () => onDelete(compilation.id))
+              }
+              title="Удалить подборку"
             >
               <DeleteIcon />
             </IconButton>
-          </Box>
+          </div>
         </TableCell>
       </TableRow>
-      
-      <TableRow>
-        <TableCell colSpan={5} sx={{ p: 0 }}>
-          <Collapse in={expanded}>
-            <Box className="compilations-collapse-box">
-              <Typography className="compilations-collapse-title">
-                📋 ИНФОРМАЦИЯ О ПОДБОРКЕ
-              </Typography>
-              
-              <Typography className="compilations-description">
-                {compilation.description || 'Описание отсутствует. Здесь могло быть ваше описание.'}
-              </Typography>
-              
-              <Box className="compilations-info-chips">
-                <Chip 
-                  icon={<CalendarIcon />}
-                  label={`Создана: ${compilation.created_at || '—'}`}
-                  size="small"
-                  className="compilations-chip"
-                />
+
+      <TableRow className="compilations-collapse-row">
+        <TableCell colSpan={6} className="compilations-collapse-cell">
+          <Collapse in={expanded} timeout="auto" unmountOnExit>
+            <div className="compilations-collapse-box">
+              <div className="compilations-collapse-meta">
+                <span>
+                  Создана: <strong>{compilation.created_at || '—'}</strong>
+                </span>
+
                 {compilation.updated_at && (
-                  <Chip 
-                    icon={<CalendarIcon />}
-                    label={`Обновлена: ${compilation.updated_at}`}
-                    size="small"
-                    className="compilations-chip"
-                  />
+                  <span>
+                    Обновлена: <strong>{compilation.updated_at}</strong>
+                  </span>
                 )}
-                <Chip 
-                  label={`Фильмов: ${compilation.films_count || 0}`}
-                  size="small"
-                  className="compilations-chip"
-                />
-              </Box>
-              
+
+                <span>
+                  Фильмов: <strong>{compilation.films_count || 0}</strong>
+                </span>
+              </div>
+
+              <Typography className="compilations-description">
+                {compilation.description || 'Описание отсутствует.'}
+              </Typography>
+
               {compilation.films && compilation.films.length > 0 && (
-                <>
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-                      fontSize: '1.1rem',
-                      fontWeight: 600,
-                      color: 'var(--comp-text)',
-                      mt: 3,
-                      mb: 2
-                    }}
-                  >
-                    🎬 ФИЛЬМЫ В ПОДБОРКЕ
-                  </Typography>
-                  
-                  <Box className="compilations-films-grid">
-                    {compilation.films.map(film => (
-                      <Box 
-                        key={film.id} 
-                        className="compilations-film-card"
-                        onClick={() => onNavigateToFilm(film.id)}
-                      >
-                        <img 
-                          src={film.poster} 
-                          alt={film.name}
-                          className="compilations-film-poster"
-                        />
-                        <Box className="compilations-film-info">
-                          <Typography className="compilations-film-title">
-                            {film.name}
-                          </Typography>
-                          <Typography className="compilations-film-year">
-                            {film.year || '—'}
-                          </Typography>
-                          <Box className="compilations-film-rating">
-                            <StarIcon sx={{ fontSize: 16 }} />
-                            <span>
-                              {film.kinopoisk_rating 
-                                ? `KP: ${film.kinopoisk_rating}`
-                                : film.imdb_rating 
-                                  ? `IMDb: ${film.imdb_rating}`
-                                  : 'Нет рейтинга'
-                              }
-                            </span>
-                          </Box>
-                        </Box>
-                      </Box>
-                    ))}
-                  </Box>
-                </>
+                <div className="compilations-films-grid">
+                  {compilation.films.map((film) => (
+                    <button
+                      type="button"
+                      key={film.id}
+                      className="compilations-film-card"
+                      onClick={(event) => handleFilmClick(event, film.id)}
+                    >
+                      <img
+                        src={getFilmPoster(film)}
+                        alt={getFilmTitle(film)}
+                        className="compilations-film-poster"
+                        onError={(event) => {
+                          event.target.onerror = null
+                          event.target.src = '/placeholder-poster.jpg'
+                        }}
+                      />
+
+                      <span className="compilations-film-info">
+                        <span className="compilations-film-title">
+                          {getFilmTitle(film)}
+                        </span>
+
+                        <span className="compilations-film-year">
+                          {film.year || '—'}
+                        </span>
+
+                        <span className="compilations-film-rating">
+                          <StarIcon />
+                          {formatRating(film.kinopoisk_rating)
+                            ? `KP ${formatRating(film.kinopoisk_rating)}`
+                            : formatRating(film.imdb_rating)
+                              ? `IMDb ${formatRating(film.imdb_rating)}`
+                              : 'Нет рейтинга'}
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
               )}
-            </Box>
+
+              <div className="compilations-films-editor">
+                <div className="compilations-films-editor__head">
+                  <Typography className="compilations-collapse-title">
+                    Управление фильмами
+                  </Typography>
+
+                  <button
+                    type="button"
+                    className="compilations-save-films-button"
+                    onClick={handleSaveFilms}
+                    disabled={!filmsChanged || savingFilms}
+                  >
+                    {savingFilms ? 'Сохранение...' : 'Сохранить фильмы'}
+                  </button>
+                </div>
+
+                <CompilationFilmSelector
+                  selectedFilms={draftFilms}
+                  onChange={setDraftFilms}
+                  compact
+                />
+              </div>
+            </div>
           </Collapse>
         </TableCell>
       </TableRow>
     </>
-  );
-};
+  )
+}
 
-export default CompilationsTableRow;
+export default CompilationsTableRow

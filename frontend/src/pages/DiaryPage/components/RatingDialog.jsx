@@ -57,7 +57,7 @@ const RatingDialog = ({
   return (
     <StyledDialog open={open} onClose={onClose}>
       <DialogTitle>
-        ОЦЕНИ ЭТО ДЕРЬМО
+        ОЦЕНИ ЭТОТ ФИЛЬМ
       </DialogTitle>
       <DialogContent>
         <Box sx={{ py: 3, textAlign: 'center' }}>

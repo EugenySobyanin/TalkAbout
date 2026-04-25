@@ -1,133 +1,188 @@
-// src/pages/CompilationsPage/CompilationsPage.jsx
-import React, { useState, useEffect } from 'react';
-import { Box, CircularProgress, Fab } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { getMyCompilations, createCompilation, deleteCompilation } from '../../api/compilations';
-import CompilationsTabs from './components/CompilationsTabs';
-import CompilationsTable from './components/CompilationsTable';
-import CompilationDialog from './components/CompilationDialog';
-import './CompilationsPage.css';
+import React, { useEffect, useState } from 'react'
+import { CircularProgress } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+import {
+  createCompilation,
+  deleteCompilation,
+  getMyCompilations,
+  patchCompilation,
+  updateCompilation,
+} from '../../api/compilations'
+import CompilationsTabs from './components/CompilationsTabs'
+import CompilationsTable from './components/CompilationsTable'
+import CompilationDialog from './components/CompilationDialog'
+import './CompilationsPage.css'
 
 const CompilationsPage = () => {
-  const navigate = useNavigate();
-  const [currentTab, setCurrentTab] = useState(0);
-  const [compilations, setCompilations] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [expandedRow, setExpandedRow] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingCompilation, setEditingCompilation] = useState(null);
+  const navigate = useNavigate()
+
+  const [currentTab, setCurrentTab] = useState(0)
+  const [compilations, setCompilations] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [expandedRow, setExpandedRow] = useState(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingCompilation, setEditingCompilation] = useState(null)
 
   useEffect(() => {
-    fetchCompilations();
-  }, []);
+    fetchCompilations()
+  }, [])
 
   const fetchCompilations = async () => {
-    setLoading(true);
+    setLoading(true)
+
     try {
-      const data = await getMyCompilations();
-      setCompilations(data);
+      const data = await getMyCompilations()
+      setCompilations(data)
     } catch (error) {
-      console.error('Ошибка загрузки подборок:', error);
+      console.error('Ошибка загрузки подборок:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleTabChange = (event, newValue) => {
-    setCurrentTab(newValue);
-  };
+    setCurrentTab(newValue)
+  }
 
-  const handleCreateCompilation = async (formData) => {
+  const handleSubmitCompilation = async (formData) => {
     try {
-      const newCompilation = await createCompilation(formData);
-      setCompilations(prev => [...prev, newCompilation]);
-      setDialogOpen(false);
+      if (editingCompilation) {
+        await updateCompilation(editingCompilation.id, formData)
+      } else {
+        await createCompilation(formData)
+      }
+
+      await fetchCompilations()
+      setDialogOpen(false)
+      setEditingCompilation(null)
     } catch (error) {
-      console.error('Ошибка создания подборки:', error);
+      console.error('Ошибка сохранения подборки:', error)
     }
-  };
+  }
+
+  const handleToggleVisibility = async (compilation) => {
+    try {
+      const newValue = !compilation.is_public
+
+      await patchCompilation(compilation.id, {
+        is_public: newValue,
+      })
+
+      setCompilations((prev) =>
+        prev.map((item) =>
+          item.id === compilation.id
+            ? { ...item, is_public: newValue }
+            : item
+        )
+      )
+    } catch (error) {
+      console.error('Ошибка изменения приватности подборки:', error)
+    }
+  }
+
+  const handleUpdateCompilationFilms = async (compilation, films) => {
+    try {
+      await patchCompilation(compilation.id, {
+        films: films.map((film) => film.id),
+      })
+
+      await fetchCompilations()
+    } catch (error) {
+      console.error('Ошибка обновления фильмов подборки:', error)
+      throw error
+    }
+  }
 
   const handleDeleteCompilation = async (compilationId) => {
-    if (!window.confirm('Точно удалить эту подборку?')) return;
-    
+    if (!window.confirm('Точно удалить эту подборку?')) return
+
     try {
-      await deleteCompilation(compilationId);
-      setCompilations(prev => prev.filter(item => item.id !== compilationId));
+      await deleteCompilation(compilationId)
+
+      setCompilations((prev) =>
+        prev.filter((item) => item.id !== compilationId)
+      )
+
       if (expandedRow === compilationId) {
-        setExpandedRow(null);
+        setExpandedRow(null)
       }
     } catch (error) {
-      console.error('Ошибка удаления подборки:', error);
+      console.error('Ошибка удаления подборки:', error)
     }
-  };
+  }
 
   const handleToggleExpand = (compilationId) => {
-    setExpandedRow(expandedRow === compilationId ? null : compilationId);
-  };
+    setExpandedRow((prev) => (prev === compilationId ? null : compilationId))
+  }
 
   const handleNavigateToFilm = (filmId) => {
-    navigate(`/films/${filmId}`);
-  };
+    navigate(`/film/${filmId}`)
+  }
 
   const handleOpenCreateDialog = () => {
-    setEditingCompilation(null);
-    setDialogOpen(true);
-  };
+    setEditingCompilation(null)
+    setDialogOpen(true)
+  }
+
+  const handleOpenEditDialog = (compilation) => {
+    setEditingCompilation(compilation)
+    setDialogOpen(true)
+  }
 
   const handleCloseDialog = () => {
-    setDialogOpen(false);
-    setEditingCompilation(null);
-  };
+    setDialogOpen(false)
+    setEditingCompilation(null)
+  }
 
   if (loading) {
     return (
-      <Box className="compilations-container">
-        <Box className="compilations-loading">
+      <div className="compilations-container">
+        <div className="compilations-loading">
           <CircularProgress className="compilations-loading-spinner" />
-        </Box>
-      </Box>
-    );
+        </div>
+      </div>
+    )
   }
 
   return (
-    <Box className="compilations-container">
-      <Box sx={{ position: 'relative', zIndex: 2 }}>
-        <Box className="compilations-title-wrapper">
-          <h1 className="compilations-title">МОИ ПОДБОРКИ</h1>
-        </Box>
+    <div className="compilations-container">
+      <div className="compilations-page-inner">
+        <div className="compilations-title-wrapper">
+          <button
+            type="button"
+            className="compilations-create-button"
+            onClick={handleOpenCreateDialog}
+          >
+            Добавить подборку
+          </button>
+        </div>
 
-        <CompilationsTabs 
+        <CompilationsTabs
           currentTab={currentTab}
           onTabChange={handleTabChange}
         />
 
-        <CompilationsTable 
+        <CompilationsTable
           compilations={compilations}
           loading={loading}
           expandedRow={expandedRow}
           onToggleExpand={handleToggleExpand}
+          onToggleVisibility={handleToggleVisibility}
           onDelete={handleDeleteCompilation}
+          onEdit={handleOpenEditDialog}
           onNavigateToFilm={handleNavigateToFilm}
+          onUpdateFilms={handleUpdateCompilationFilms}
         />
+      </div>
 
-        <Fab 
-          color="primary" 
-          className="compilations-fab"
-          onClick={handleOpenCreateDialog}
-        >
-          <AddIcon />
-        </Fab>
-      </Box>
-
-      <CompilationDialog 
+      <CompilationDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
-        onSubmit={handleCreateCompilation}
+        onSubmit={handleSubmitCompilation}
         compilation={editingCompilation}
       />
-    </Box>
-  );
-};
+    </div>
+  )
+}
 
-export default CompilationsPage;
+export default CompilationsPage

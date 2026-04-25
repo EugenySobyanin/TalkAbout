@@ -13,7 +13,8 @@ from gallery.models import (Film,
                             FilmPersonProfession,
                             SequelsAndPrequels,
                             SimilarFilms,
-                            Type)
+                            Type,
+                            UserTopFilm)
 from activities.models import UserFilmActivity
 
 
@@ -375,3 +376,31 @@ class SearchListFilmSerilizer(serializers.ModelSerializer):
         ).aggregate(avg=Avg('rating'))['avg']
 
         return round(result, 1) if result else None
+
+
+class TopFilmSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Film
+        fields = [
+            'id',
+            'name',
+            'alternative_name',
+            'en_name',
+            'year',
+            'poster_url',
+            'poster_preview_url',
+            'kinopoisk_rating',
+            'imdb_rating',
+        ]
+
+
+class UserTopFilmSerializer(serializers.ModelSerializer):
+    film = TopFilmSerializer(read_only=True)
+
+    class Meta:
+        model = UserTopFilm
+        fields = [
+            'id',
+            'position',
+            'film',
+        ]

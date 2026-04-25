@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   getFilmGenres,
@@ -22,13 +22,46 @@ const initialFormData = {
   countries: [],
 }
 
+const quickPresets = [
+  {
+    label: 'Высокий рейтинг',
+    hint: 'КП и IMDb от 7',
+    values: {
+      kinopoisk_rating_min: '7',
+      imdb_rating_min: '7',
+    },
+  },
+  {
+    label: 'Короткий фильм',
+    hint: 'До 100 минут',
+    values: {
+      movie_length_max: '100',
+    },
+  },
+  {
+    label: 'Классика',
+    hint: '1970–1999, КП от 7',
+    values: {
+      year_min: '1970',
+      year_max: '1999',
+      kinopoisk_rating_min: '7',
+    },
+  },
+  {
+    label: 'Новое',
+    hint: 'После 2015',
+    values: {
+      year_min: '2015',
+    },
+  },
+]
+
 function FilmPickerPage() {
   const navigate = useNavigate()
 
   const [genres, setGenres] = useState([])
   const [countries, setCountries] = useState([])
   const [loading, setLoading] = useState(true)
-
   const [formData, setFormData] = useState(initialFormData)
 
   useEffect(() => {
@@ -51,8 +84,18 @@ function FilmPickerPage() {
     loadFiltersData()
   }, [])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
+  const activeFiltersCount = useMemo(() => {
+    return Object.values(formData).reduce((count, value) => {
+      if (Array.isArray(value)) {
+        return value.length > 0 ? count + 1 : count
+      }
+
+      return value ? count + 1 : count
+    }, 0)
+  }, [formData])
+
+  const handleChange = (event) => {
+    const { name, value } = event.target
 
     setFormData((prev) => ({
       ...prev,
@@ -67,12 +110,19 @@ function FilmPickerPage() {
     }))
   }
 
+  const handlePresetClick = (preset) => {
+    setFormData((prev) => ({
+      ...prev,
+      ...preset.values,
+    }))
+  }
+
   const handleReset = () => {
     setFormData(initialFormData)
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = (event) => {
+    event.preventDefault()
 
     const params = new URLSearchParams()
 
@@ -90,25 +140,64 @@ function FilmPickerPage() {
   }
 
   if (loading) {
-    return <div className="picker-loading">Загрузка фильтров...</div>
+    return (
+      <div className="movie-picker-page">
+        <div className="picker-loading">
+          <div className="picker-loading-spinner" />
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="movie-picker-page">
-      <div className="movie-picker-hero">
-        <p className="movie-picker-hero__eyebrow">Frame25</p>
-        <h1 className="movie-picker-hero__title">Подбор фильма</h1>
-        <p className="movie-picker-hero__subtitle">
-          Настрой параметры под свое настроение: жанр, страну, рейтинг, длительность и период выхода.
-        </p>
+      <div className="movie-picker-toolbar">
+        <div>
+          <p className="movie-picker-eyebrow">Frame25</p>
+          <h1 className="movie-picker-title">Подбор фильма</h1>
+        </div>
+
+        <div className="movie-picker-summary">
+          <span className="movie-picker-summary__label">Активных фильтров</span>
+          <span className="movie-picker-summary__value">{activeFiltersCount}</span>
+        </div>
       </div>
 
       <form className="movie-picker-form" onSubmit={handleSubmit}>
+        <section className="picker-panel picker-panel--presets">
+          <div className="picker-panel__head">
+            <div>
+              <h2 className="picker-panel__title">Быстрый старт</h2>
+              <p className="picker-panel__text">
+                Можно выбрать один из пресетов, а потом докрутить параметры вручную.
+              </p>
+            </div>
+          </div>
+
+          <div className="picker-presets">
+            {quickPresets.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                className="picker-preset"
+                onClick={() => handlePresetClick(preset)}
+              >
+                <span className="picker-preset__label">{preset.label}</span>
+                <span className="picker-preset__hint">{preset.hint}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
         <div className="movie-picker-layout">
-          <section className="picker-card">
-            <div className="picker-card__head">
-              <h2 className="picker-card__title">Основные параметры</h2>
-              <p className="picker-card__text">Укажите диапазоны, чтобы сузить подборку.</p>
+          <section className="picker-panel">
+            <div className="picker-panel__head">
+              <div>
+                <h2 className="picker-panel__title">Период и формат</h2>
+                <p className="picker-panel__text">
+                  Ограничь год выхода, длительность и возрастной рейтинг.
+                </p>
+              </div>
             </div>
 
             <div className="picker-stack">
@@ -119,8 +208,8 @@ function FilmPickerPage() {
                 minValue={formData.year_min}
                 maxValue={formData.year_max}
                 onChange={handleChange}
-                minPlaceholder="Например, 1990"
-                maxPlaceholder="Например, 2010"
+                minPlaceholder="1990"
+                maxPlaceholder="2010"
               />
 
               <RangeField
@@ -130,30 +219,13 @@ function FilmPickerPage() {
                 minValue={formData.movie_length_min}
                 maxValue={formData.movie_length_max}
                 onChange={handleChange}
-              />
-
-              <RangeField
-                label="Рейтинг Кинопоиска"
-                minName="kinopoisk_rating_min"
-                maxName="kinopoisk_rating_max"
-                minValue={formData.kinopoisk_rating_min}
-                maxValue={formData.kinopoisk_rating_max}
-                onChange={handleChange}
-                step="0.1"
-              />
-
-              <RangeField
-                label="Рейтинг IMDb"
-                minName="imdb_rating_min"
-                maxName="imdb_rating_max"
-                minValue={formData.imdb_rating_min}
-                maxValue={formData.imdb_rating_max}
-                onChange={handleChange}
-                step="0.1"
+                minPlaceholder="80"
+                maxPlaceholder="140"
               />
 
               <div className="single-field">
                 <label className="single-field__label">Возрастной рейтинг</label>
+
                 <input
                   type="number"
                   name="age_rating"
@@ -166,45 +238,82 @@ function FilmPickerPage() {
             </div>
           </section>
 
-          <section className="picker-card">
-            <div className="picker-card__head">
-              <h2 className="picker-card__title">Категории</h2>
-              <p className="picker-card__text">Выберите несколько значений. Поиск поможет быстро найти нужное.</p>
+          <section className="picker-panel">
+            <div className="picker-panel__head">
+              <div>
+                <h2 className="picker-panel__title">Рейтинги</h2>
+                <p className="picker-panel__text">
+                  Отсекай слабые фильмы по оценкам Кинопоиска и IMDb.
+                </p>
+              </div>
             </div>
 
             <div className="picker-stack">
-              <SearchableMultiSelect
-                label="Жанры"
-                options={genres}
-                selectedValues={formData.genres}
-                onChange={(values) => handleArrayChange('genres', values)}
-                placeholder="Найти жанр"
-                emptyText="Жанры не найдены"
+              <RangeField
+                label="Рейтинг Кинопоиска"
+                minName="kinopoisk_rating_min"
+                maxName="kinopoisk_rating_max"
+                minValue={formData.kinopoisk_rating_min}
+                maxValue={formData.kinopoisk_rating_max}
+                onChange={handleChange}
+                minPlaceholder="7.0"
+                maxPlaceholder="10"
+                step="0.1"
               />
 
-              <SearchableMultiSelect
-                label="Страны"
-                options={countries}
-                selectedValues={formData.countries}
-                onChange={(values) => handleArrayChange('countries', values)}
-                placeholder="Найти страну"
-                emptyText="Страны не найдены"
+              <RangeField
+                label="Рейтинг IMDb"
+                minName="imdb_rating_min"
+                maxName="imdb_rating_max"
+                minValue={formData.imdb_rating_min}
+                maxValue={formData.imdb_rating_max}
+                onChange={handleChange}
+                minPlaceholder="7.0"
+                maxPlaceholder="10"
+                step="0.1"
               />
             </div>
           </section>
         </div>
 
+        <section className="picker-panel">
+          <div className="picker-panel__head">
+            <div>
+              <h2 className="picker-panel__title">Жанры и страны</h2>
+              <p className="picker-panel__text">
+                Выбирай несколько значений. Поиск поможет быстро найти нужное.
+              </p>
+            </div>
+          </div>
+
+          <div className="movie-picker-categories">
+            <SearchableMultiSelect
+              label="Жанры"
+              options={genres}
+              selectedValues={formData.genres}
+              onChange={(values) => handleArrayChange('genres', values)}
+              placeholder="Найти жанр"
+              emptyText="Жанры не найдены"
+            />
+
+            <SearchableMultiSelect
+              label="Страны"
+              options={countries}
+              selectedValues={formData.countries}
+              onChange={(values) => handleArrayChange('countries', values)}
+              placeholder="Найти страну"
+              emptyText="Страны не найдены"
+            />
+          </div>
+        </section>
+
         <div className="picker-actions">
-          <button type="submit" className="picker-submit-btn">
-            Показать фильмы
+          <button type="button" className="picker-reset-btn" onClick={handleReset}>
+            Очистить
           </button>
 
-          <button
-            type="button"
-            className="picker-reset-btn"
-            onClick={handleReset}
-          >
-            Очистить
+          <button type="submit" className="picker-submit-btn">
+            Показать фильмы
           </button>
         </div>
       </form>

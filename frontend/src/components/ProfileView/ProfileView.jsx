@@ -1,4 +1,5 @@
 import ProfileSummaryCard from '../ProfileSummaryCard/ProfileSummaryCard'
+import ProfileTopFilms from '../ProfileTopFilms/ProfileTopFilms'
 import ProfileFilmsTable from '../ProfileFilmsTable/ProfileFilmsTable'
 import ProfileCompilationsTable from '../ProfileCompilationsTable/ProfileCompilationsTable'
 import './ProfileView.css'
@@ -11,32 +12,42 @@ function ProfileView({
 }) {
   return (
     <div className="profile-page">
-      <ProfileSummaryCard
-        profile={profile}
-        isOwner={isOwner}
-        onAvatarChange={onAvatarChange}
-        avatarUploading={avatarUploading}
-      />
+      <div className="profile-page__layout">
+        <main className="profile-page__main">
+          <ProfileSummaryCard
+            profile={profile}
+            isOwner={isOwner}
+            onAvatarChange={onAvatarChange}
+            avatarUploading={avatarUploading}
+          />
 
-      <div className="profile-page__content">
-        <ProfileFilmsTable
-          title="Просмотренные фильмы"
-          items={profile.watched_activities || []}
-          emptyText="Просмотренных фильмов пока нет"
-          mode="watched"
-        />
+          <ProfileFilmsTable
+            title="Просмотренные фильмы"
+            items={profile.watched_activities || []}
+            emptyText="Просмотренных фильмов пока нет"
+            mode="watched"
+          />
 
-        <ProfileFilmsTable
-          title="Планируемые фильмы"
-          items={profile.planned_activities || []}
-          emptyText="Планируемых фильмов пока нет"
-          mode="planned"
-        />
+          <ProfileFilmsTable
+            title="Планируемые фильмы"
+            items={profile.planned_activities || []}
+            emptyText="Планируемых фильмов пока нет"
+            mode="planned"
+          />
 
-        <ProfileCompilationsTable
-          items={profile.compilations || []}
-          emptyText="Подборок пока нет"
-        />
+          <ProfileCompilationsTable
+            items={profile.compilations || []}
+            emptyText="Подборок пока нет"
+          />
+        </main>
+
+        <aside className="profile-page__aside">
+          <ProfileTopFilms
+            isOwner={isOwner}
+            userId={profile.id || profile.user_id}
+            initialItems={profile.top_films || []}
+          />
+        </aside>
       </div>
     </div>
   )
