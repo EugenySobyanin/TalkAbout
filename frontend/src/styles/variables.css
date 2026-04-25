@@ -1,31 +1,44 @@
 :root {
-  /* Цвета */
-  --color-bg: #14120f;
-  --color-bg-soft: #1c1915;
-  --color-surface: #221e19;
-  --color-surface-2: #2a241d;
+  /* Colors */
+
+  /*Фоны*/
+  --color-bg: #0f0f10;
+  --color-bg-soft: #171719;
+  --color-surface: #1d1d20;
+  --color-surface-2: #26262a;
+  --color-surface-glass: rgba(15, 15, 16, 0.88);
 
   --color-accent: #ffd700;
-  --color-accent-tired: #b8860b;
-  --color-accent-soft: rgba(184, 134, 11, 0.14);
+  --color-accent-tired: #a88f2a;
+  --color-accent-tired-very: #70682b;
+  --color-accent-soft: rgba(255, 215, 0, 0.1);
   --color-accent-strong: #d4a017;
 
+  --color-orange: #ff8c00;
+  --color-orange-soft: rgba(255, 140, 0, 0.12);
+
   --color-red-bright: #cc0000;
-  --color-red-dark: #8b0000;
+  --color-red-dark: #8a0303;
+  --color-red-soft: rgba(204, 0, 0, 0.12);
+
+  --color-green-bright: #39ff14;
+  --color-green-soft: rgba(35, 161, 12, 0.658);
+  --color-green-border: rgba(57, 255, 20, 0.48);
 
   --color-text: #f3eee6;
-  --color-text-soft: #c8bba8;
-  --color-text-muted: #8f8477;
-  --color-border: rgba(184, 134, 11, 0.18);
+  --color-text-soft: #c7c2b8;
+  --color-text-muted: #8f8a82;
+  --color-border: rgba(255, 215, 0, 0.13);
+  --color-border-strong: rgba(255, 140, 0, 0.28);
 
-  /* Шрифты */
+  /* Fonts */
   --font-ui: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   --font-text: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   --font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
   --font-accent: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
   --font-impact: 'Impact';
 
-  /* Размеры */
+  /* Text sizes */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-md: 1rem;
@@ -34,12 +47,45 @@
   --text-2xl: 2.25rem;
   --text-3xl: 3.5rem;
 
-  /* Ритм */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  /* Layout */
+  --header-height: 80px;
+  --sidebar-width: 260px;
 
-  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.38);
+  --shadow-card-hover: 0 14px 34px rgba(0, 0, 0, 0.46);
+  --shadow-sidebar: 4px 0 15px rgba(255, 140, 0, 0.12);
+  --shadow-red-glow: 0 0 28px rgba(204, 0, 0, 0.18);
+  --shadow-gold-glow: 0 0 18px rgba(255, 215, 0, 0.14);
+  --shadow-green-glow: 0 0 18px rgba(57, 255, 20, 0.16);
+
+  /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-medium: 0.3s ease;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --sidebar-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 75px;
+    --sidebar-width: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --header-height: 70px;
+    --sidebar-width: 60px;
+  }
 }

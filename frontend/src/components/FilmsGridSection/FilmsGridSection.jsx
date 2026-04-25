@@ -1,3 +1,5 @@
+// src/components/FilmsGridSection/FilmsGridSection.jsx
+
 import FilmCard from '../FilmCard/FilmCard'
 import './FilmsGridSection.css'
 
@@ -14,7 +16,7 @@ function FilmsGridSection({
   count = null,
 }) {
   if (loading) {
-    return <div className="films-section-loading">Загрузка...</div>
+    return <div className="films-section__loading">Загрузка...</div>
   }
 
   return (
@@ -31,7 +33,7 @@ function FilmsGridSection({
 
       {films.length > 0 ? (
         <>
-          <div className="films-grid">
+          <div className="films-section__grid">
             {films.map((film) => (
               <FilmCard key={film.id} film={film} />
             ))}
@@ -39,7 +41,7 @@ function FilmsGridSection({
 
           {hasMore && onLoadMore && (
             <button
-              className="load-more"
+              className="films-section__load-more"
               onClick={onLoadMore}
               disabled={loadingMore}
               type="button"
@@ -49,7 +51,7 @@ function FilmsGridSection({
           )}
         </>
       ) : (
-        <div className="films-section-empty">{emptyText}</div>
+        <div className="films-section__empty">{emptyText}</div>
       )}
     </section>
   )

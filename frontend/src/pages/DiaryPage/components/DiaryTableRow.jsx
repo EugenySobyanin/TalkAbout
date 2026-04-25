@@ -1,43 +1,26 @@
-// src/pages/DiaryPage/components/DiaryTableRow.jsx
-import React from 'react';
+import React from 'react'
 import {
-  TableRow,
-  TableCell,
-  Box,
-  Typography,
-  Rating,
-  IconButton,
   Collapse,
-  Chip
-} from '@mui/material';
+  IconButton,
+  Rating,
+  TableCell,
+  TableRow,
+  Typography,
+} from '@mui/material'
 import {
+  CheckCircle as WatchedIcon,
+  Delete as DeleteIcon,
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+  Star as StarIcon,
+  StarBorder as StarBorderIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
-  Delete as DeleteIcon,
-  CheckCircle as WatchedIcon,
-  Star as StarIcon,
-  StarBorder as StarBorderIcon
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+} from '@mui/icons-material'
 
-const StyledRating = styled(Rating)({
-  '& .MuiRating-iconFilled': {
-    color: '#FFD700',
-    filter: 'drop-shadow(0 0 4px #FF0000)',
-  },
-  '& .MuiRating-iconEmpty': {
-    color: 'rgba(26, 26, 26, 0.3)',
-  },
-  '& .MuiRating-iconHover': {
-    color: '#FF0000',
-  },
-});
-
-const DiaryTableRow = ({ 
-  activity, 
-  index, 
+const DiaryTableRow = ({
+  activity,
+  index,
   currentTab,
   expanded,
   onToggleExpand,
@@ -45,158 +28,273 @@ const DiaryTableRow = ({
   onUpdateRating,
   onMarkAsWatched,
   onRemove,
-  onNavigateToFilm
+  onNavigateToFilm,
 }) => {
+  const film = activity.film
+  const posterSrc = film.poster_preview_url || film.poster_url
+
+  const isPublic = currentTab === 0
+    ? activity.is_public_for_planned
+    : activity.is_public_for_watched
+
   const formatDate = (date) => {
-    if (!date) return '—';
-    return new Date(date).toLocaleDateString('ru-RU');
-  };
+    if (!date) return '—'
+    return new Date(date).toLocaleDateString('ru-RU')
+  }
+
+  const formatRating = (rating) => {
+    if (rating === null || rating === undefined || rating === '') {
+      return '—'
+    }
+
+    const numericRating = Number(rating)
+
+    if (Number.isNaN(numericRating)) {
+      return '—'
+    }
+
+    return numericRating.toFixed(1)
+  }
+
+  const formatVotes = (votes) => {
+    if (votes === null || votes === undefined || votes === '') {
+      return '—'
+    }
+
+    return Number(votes).toLocaleString('ru-RU')
+  }
+
+  const formatDuration = (minutes) => {
+    if (!minutes) return '—'
+
+    const hours = Math.floor(minutes / 60)
+    const restMinutes = minutes % 60
+
+    if (hours === 0) return `${restMinutes} мин`
+    if (restMinutes === 0) return `${hours} ч`
+
+    return `${hours} ч ${restMinutes} мин`
+  }
+
+  const handleRowClick = () => {
+    onToggleExpand(activity.id)
+  }
+
+  const handlePosterClick = (event) => {
+    event.stopPropagation()
+    onNavigateToFilm(film.id)
+  }
+
+  const handleTitleClick = (event) => {
+    event.stopPropagation()
+    onNavigateToFilm(film.id)
+  }
+
+  const handleRatingClick = (event) => {
+    event.stopPropagation()
+  }
+
+  const handleVisibilityClick = (event) => {
+    event.stopPropagation()
+
+    onToggleVisibility(
+      activity,
+      currentTab === 0 ? 'planned' : 'watched'
+    )
+  }
+
+  const handleActionClick = (event, callback) => {
+    event.stopPropagation()
+    callback(activity)
+  }
 
   return (
     <>
-      <TableRow className="pulp-table-row">
-        <TableCell>
+      <TableRow
+        className={`pulp-table-row ${expanded ? 'pulp-table-row--expanded' : ''}`}
+        onClick={handleRowClick}
+      >
+        <TableCell className="pulp-cell-number">
           <Typography className="pulp-film-number">
             #{index + 1}
           </Typography>
         </TableCell>
-        
-        <TableCell onClick={() => onNavigateToFilm(activity.film.id)}>
-          <img 
-            src={activity.film.poster} 
-            alt={activity.film.name}
-            className="pulp-poster"
-          />
+
+        <TableCell className="pulp-cell-poster">
+          <button
+            type="button"
+            className="pulp-poster-button"
+            onClick={handlePosterClick}
+            aria-label={`Открыть фильм ${film.name}`}
+          >
+            <img
+              src={posterSrc}
+              alt={film.name}
+              className="pulp-poster"
+            />
+          </button>
         </TableCell>
-        
-        <TableCell onClick={() => onNavigateToFilm(activity.film.id)}>
-          <Typography className="pulp-film-name">
-            {activity.film.name}
-          </Typography>
+
+        <TableCell className="pulp-cell-name">
+          <button
+            type="button"
+            className="pulp-film-name-button"
+            onClick={handleTitleClick}
+          >
+            {film.name}
+          </button>
         </TableCell>
-        
-        <TableCell onClick={() => onNavigateToFilm(activity.film.id)}>
+
+        <TableCell className="pulp-cell-year">
           <Typography className="pulp-film-year">
-            {activity.film.year || '—'}
+            {film.year || '—'}
           </Typography>
         </TableCell>
-        
-        <TableCell>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <StyledRating
+
+        <TableCell className="pulp-cell-rating" onClick={handleRatingClick}>
+          <div className="pulp-rating-control">
+            <Rating
+              className="pulp-rating"
               value={activity.rating || 0}
               max={10}
-              onChange={(e, newValue) => onUpdateRating(activity, newValue)}
+              onChange={(event, newValue) => onUpdateRating(activity, newValue)}
               icon={<StarIcon fontSize="small" />}
               emptyIcon={<StarBorderIcon fontSize="small" />}
             />
+
             {activity.rating && (
               <Typography variant="caption" className="pulp-rating-value">
                 {activity.rating}/10
               </Typography>
             )}
-          </Box>
+          </div>
         </TableCell>
-        
-        <TableCell>
+
+        <TableCell
+          className={`pulp-cell-visibility pulp-visibility ${
+            isPublic ? 'pulp-visibility--public' : 'pulp-visibility--private'
+          }`}
+        >
           <IconButton
-            className="pulp-icon-button"
-            onClick={() => onToggleVisibility(
-              activity, 
-              currentTab === 0 ? 'planned' : 'watched'
-            )}
+            className="pulp-icon-button pulp-visibility-button"
+            onClick={handleVisibilityClick}
+            title={isPublic ? 'Сделать приватным' : 'Сделать публичным'}
           >
-            {(currentTab === 0 && activity.is_public_for_planned) ||
-             (currentTab === 1 && activity.is_public_for_watched)
-              ? <VisibilityIcon />
-              : <VisibilityOffIcon />
-            }
+            {isPublic ? <VisibilityIcon /> : <VisibilityOffIcon />}
           </IconButton>
+
           <Typography className="pulp-visibility-status">
-            {(currentTab === 0 && activity.is_public_for_planned) ||
-             (currentTab === 1 && activity.is_public_for_watched)
-              ? 'ПУБЛИЧНЫЙ'
-              : 'ПРИВАТНЫЙ'}
+            {isPublic ? 'Публичный' : 'Приватный'}
           </Typography>
         </TableCell>
-        
-        <TableCell>
+
+        <TableCell className="pulp-cell-date">
           <Typography className="pulp-film-date">
-            {currentTab === 0 
+            {currentTab === 0
               ? formatDate(activity.planned_at)
-              : formatDate(activity.watched_at)
-            }
+              : formatDate(activity.watched_at)}
           </Typography>
         </TableCell>
-        
-        <TableCell>
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <IconButton 
+
+        <TableCell className="pulp-cell-actions">
+          <div className="pulp-actions">
+            <IconButton
               className="pulp-icon-button"
-              onClick={() => onToggleExpand(activity.id)}
+              onClick={(event) => {
+                event.stopPropagation()
+                onToggleExpand(activity.id)
+              }}
+              title={expanded ? 'Свернуть' : 'Подробнее'}
             >
               {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </IconButton>
-            
+
             {currentTab === 0 && (
               <>
-                <IconButton 
+                <IconButton
                   className="pulp-icon-button watched"
-                  onClick={() => onMarkAsWatched(activity)}
-                  title="ОТМЕТИТЬ КАК ПРОСМОТРЕННОЕ"
+                  onClick={(event) => handleActionClick(event, onMarkAsWatched)}
+                  title="Отметить как просмотренное"
                 >
                   <WatchedIcon />
                 </IconButton>
-                <IconButton 
+
+                <IconButton
                   className="pulp-icon-button delete"
-                  onClick={() => onRemove(activity)}
-                  title="УДАЛИТЬ ИЗ СПИСКА"
+                  onClick={(event) => handleActionClick(event, onRemove)}
+                  title="Удалить из списка"
                 >
                   <DeleteIcon />
                 </IconButton>
               </>
             )}
-          </Box>
+          </div>
         </TableCell>
       </TableRow>
-      
-      <TableRow>
-        <TableCell colSpan={8} sx={{ p: 0 }}>
-          <Collapse in={expanded}>
-            <Box className="pulp-collapse-box">
-              <Typography className="pulp-collapse-title">
-                СЮЖЕТ
-              </Typography>
+
+      <TableRow className="pulp-collapse-row">
+        <TableCell colSpan={8} className="pulp-collapse-cell">
+          <Collapse in={expanded} timeout="auto" unmountOnExit>
+            <div className="pulp-collapse-box">
+              <div className="pulp-duration-line">
+                <span className="pulp-duration-label">Длительность</span>
+                <span className="pulp-duration-value">
+                  {formatDuration(film.movie_length)}
+                </span>
+              </div>
+
               <Typography className="pulp-collapse-description">
-                {activity.film.description || 'Описание отсутствует. Фильм настолько крутой, что не нуждается в описании.'}
+                {film.description || 'Описание отсутствует.'}
               </Typography>
-              
-              <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Chip 
-                  label={`Добавлен: ${formatDate(activity.planned_at)}`}
-                  size="small"
-                  className="pulp-chip"
-                />
+
+              <div className="pulp-entry-meta-line">
+                <div className="pulp-entry-meta-item">
+                  <span>Моя оценка</span>
+                  <strong>{activity.rating ? `${activity.rating}/10` : '—'}</strong>
+                </div>
+
+                <div className="pulp-entry-meta-item">
+                  <span>Добавлен</span>
+                  <strong>{formatDate(activity.planned_at)}</strong>
+                </div>
+
                 {activity.watched_at && (
-                  <Chip 
-                    label={`Просмотрен: ${formatDate(activity.watched_at)}`}
-                    size="small"
-                    className="pulp-chip"
-                  />
+                  <div className="pulp-entry-meta-item">
+                    <span>Просмотрен</span>
+                    <strong>{formatDate(activity.watched_at)}</strong>
+                  </div>
                 )}
-                <Chip 
-                  label={`Рейтинг: ${activity.rating || 'Нет'}/10`}
-                  size="small"
-                  className="pulp-chip"
-                  icon={<StarIcon />}
-                />
-              </Box>
-            </Box>
+              </div>
+
+              <table className="pulp-scores-table">
+                <thead>
+                  <tr>
+                    <th>Источник</th>
+                    <th>Оценка</th>
+                    <th>Количество оценок</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td>Кинопоиск</td>
+                    <td>{formatRating(film.kinopoisk_rating)}</td>
+                    <td>{formatVotes(film.kinopoisk_votes)}</td>
+                  </tr>
+
+                  <tr>
+                    <td>IMDb</td>
+                    <td>{formatRating(film.imdb_rating)}</td>
+                    <td>{formatVotes(film.imdb_votes)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </Collapse>
         </TableCell>
       </TableRow>
     </>
-  );
-};
+  )
+}
 
-export default DiaryTableRow;
+export default DiaryTableRow

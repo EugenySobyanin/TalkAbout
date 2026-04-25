@@ -1,8 +1,10 @@
-import React from 'react';
-import FilmStripLogo from './components/FilmStripLogo';
-import SearchBar from './components/SearchBar';
-import UserMenu from './components/UserMenu';
-import './Header.css';
+// src/components/Header/Header.jsx
+
+import React from 'react'
+import FilmStripLogo from './components/FilmStripLogo'
+import SearchBar from './components/SearchBar'
+import UserMenu from './components/UserMenu'
+import './Header.css'
 
 function Header() {
   return (
@@ -19,7 +21,7 @@ function Header() {
         <UserMenu />
       </div>
     </header>
-  );
+  )
 }
 
-export default Header;
+export default Header

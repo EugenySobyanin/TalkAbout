@@ -9,6 +9,7 @@ from gallery.models import (Film,
                             Person,
                             Profession,
                             FilmPerson,
+                            FilmGenre,
                             FilmPersonProfession,
                             SequelsAndPrequels,
                             SimilarFilms,
@@ -149,13 +150,8 @@ class FilmDetailSerializer(serializers.ModelSerializer):
 
     # Связанные модели
     type = TypeSerializer(read_only=True)
-    genres = serializers.SerializerMethodField()
-    countries = serializers.SerializerMethodField()
-
-    # Медиа
-    # poster_url = serializers.SerializerMethodField()
-    # logo_url = serializers.SerializerMethodField()
-    # backdrop_url = serializers.SerializerMethodField()
+    genres = GenreSerializer(many=True, read_only=True)
+    countries = CountrySerializer(many=True, read_only=True)
 
     # Видео и факты
     videos = VideoSerializer(many=True, read_only=True)
@@ -237,42 +233,6 @@ class FilmDetailSerializer(serializers.ModelSerializer):
             # Активити (если пользоователь не анонимный)
             'activity',
         ]
-
-    # def get_poster_url(self, obj):
-    #     if obj.poster:
-    #         request = self.context.get('request')
-    #         return request.build_absolute_uri(obj.poster.url)
-    #     return None
-
-    # def get_logo_url(self, obj):
-    #     if obj.logo:
-    #         request = self.context.get('request')
-    #         return request.build_absolute_uri(obj.logo.url)
-    #     return None
-
-    # def get_backdrop_url(self, obj):
-    #     if obj.backdrop:
-    #         request = self.context.get('request')
-    #         return request.build_absolute_uri(obj.backdrop.url)
-    #     return None
-
-    def get_genres(self, obj):
-        """
-        Получаем жанры через правильную связь.
-        related_name='film_genres' из модели FilmGenre
-        """
-        film_genres = obj.film_genres.select_related('genre').all()
-        genres = [fg.genre for fg in film_genres]
-        return GenreSerializer(genres, many=True).data
-
-    def get_countries(self, obj):
-        """
-        Получаем страны через правильную связь.
-        related_name='film_countries' из модели FilmCountry
-        """
-        film_countries = obj.film_countries.select_related('country').all()
-        countries = [fc.country for fc in film_countries]
-        return CountrySerializer(countries, many=True).data
 
     def get_persons_by_profession(self, obj):
         """
@@ -381,25 +341,28 @@ class FilmDetailSerializer(serializers.ModelSerializer):
 
 class SearchListFilmSerilizer(serializers.ModelSerializer):
     """
-    Сериализатор для списка фильмов (поиск).
-    Упрощенная версия для оптимизации.
+    Сериализатор для списка фильмов.
     """
 
     rating = serializers.SerializerMethodField()
+    genres = GenreSerializer(many=True, read_only=True)
 
     class Meta:
         model = Film
         fields = [
-            'id', 'name', 'alternative_name', 'en_name', 'year',
-            'movie_length', 'poster_url', 'kinopoisk_rating', 'imdb_rating',
-            'short_description', 'rating'
+            'id',
+            'name',
+            'alternative_name',
+            'en_name',
+            'year',
+            'movie_length',
+            'poster_url',
+            'kinopoisk_rating',
+            'imdb_rating',
+            'short_description',
+            'rating',  # рейтинг на нашем портале
+            'genres',
         ]
-
-    # def get_poster_url(self, obj):
-    #     if obj.poster:
-    #         request = self.context.get('request')
-    #         return request.build_absolute_uri(obj.poster.url)
-    #     return None
 
     def get_rating(self, obj):
         """Вычисляет средний рейтинг фильма из активностей пользователей."""

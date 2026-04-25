@@ -1,218 +1,125 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import AuthPage from './components/Auth/AuthPage';
-import Header from './components/Header/Header';
-import Sidebar from './components/Sidebar/Sidebar';
-import HomePage from './pages/HomePage/HomePage';
-import FilmPage from './pages/FilmPage/FilmPage';
-import CompilationsPage from './pages/CompilationsPage/CompilationsPage';
-import DiaryPageComponent from './pages/DiaryPage/DiaryPage'; // ← Переименовываем импорт
-import SearchResultsPage from './pages/SearchResultsPage/SearchResultsPage';
-import FilmPickerPage from './pages/FilmPickerPage/FilmPickerPage';
-import PickerResultsPage from './pages/PickerResultsPage/PickerResultsPage';
-import ProfilePage from './pages/ProfilePage/ProfilePage';
-import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
-import './App.css';
+// src/App.jsx
 
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 
-const SubscriptionsPage = () => {
-    return (
-        <div className="page-container">
-            <h1>Подписки</h1>
-        </div>
-    )
-}
+import Layout from './components/Layout/Layout'
+import AuthPage from './components/Auth/AuthPage'
 
-const FeedPage = () => {
-    return (
-        <div className="page-container">
-            <h1>Лента</h1>
-        </div>
-    )
-}
+import HomePage from './pages/HomePage/HomePage'
+import FilmPage from './pages/FilmPage/FilmPage'
+import CompilationsPage from './pages/CompilationsPage/CompilationsPage'
+import DiaryPage from './pages/DiaryPage/DiaryPage'
+import SearchResultsPage from './pages/SearchResultsPage/SearchResultsPage'
+import FilmPickerPage from './pages/FilmPickerPage/FilmPickerPage'
+import PickerResultsPage from './pages/PickerResultsPage/PickerResultsPage'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
+import UserProfilePage from './pages/UserProfilePage/UserProfilePage'
 
+import './App.css'
 
-const RecommendationsPage = () => {
-    return (
-        <div className="page-container">
-            <h1>Рекомендации</h1>
-        </div>
-    )
-}
+const SubscriptionsPage = () => (
+  <div className="page-container">
+    <h1>Подписки</h1>
+  </div>
+)
 
-// Защищенный маршрут
+const FeedPage = () => (
+  <div className="page-container">
+    <h1>Лента</h1>
+  </div>
+)
+
+const RecommendationsPage = () => (
+  <div className="page-container">
+    <h1>Рекомендации</h1>
+  </div>
+)
+
 const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated, loading } = useAuth();
-    
-    if (loading) {
-        return (
-            <div className="loading-container">
-                <div className="loading-spinner">Загрузка...</div>
-            </div>
-        )
-    }
-    
-    return isAuthenticated ? children : <Navigate to="/login" replace />
+  const { isAuthenticated, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner">Загрузка...</div>
+      </div>
+    )
+  }
+
+  return isAuthenticated ? children : <Navigate to="/login" replace />
 }
 
-// Публичный маршрут (только для неавторизованных)
 const PublicRoute = ({ children }) => {
-    const { isAuthenticated, loading } = useAuth();
-    
-    if (loading) {
-        return (
-            <div className="loading-container">
-                <div className="loading-spinner">Загрузка...</div>
-            </div>
-        );
-    }
+  const { isAuthenticated, loading } = useAuth()
 
-    return !isAuthenticated ? children : <Navigate to="/" replace />;
-};
-
-// Основной layout с Header и Sidebar
-const MainLayout = ({ children }) => {
+  if (loading) {
     return (
-        <div className="app-layout">
-            <Header />
-            <div className="content-wrapper">
-                <Sidebar />
-                <main className="main-content">
-                    {children}
-                </main>
-            </div>
-        </div>
-    );
-};
-
-const AppContent = () => {
-    return (
-        <Router>
-            <Routes>
-                {/* Публичные маршруты без Header и Sidebar */}
-                <Route path="/login" element={
-                    <PublicRoute>
-                        <AuthPage />
-                    </PublicRoute>
-                } />
-                
-                {/* Защищенные маршруты с Header и Sidebar */}
-                <Route path="/" element={
-                    <ProtectedRoute>
-                        <MainLayout>
-                            <HomePage />
-                        </MainLayout>
-                    </ProtectedRoute>
-                } />
-                
-                <Route path="/profile" element={
-                    <ProtectedRoute>
-                        <MainLayout>
-                            <ProfilePage />
-                        </MainLayout>
-                    </ProtectedRoute>
-                } />
-                
-                <Route path="/diary" element={
-                    <ProtectedRoute>
-                        <MainLayout>
-                            <DiaryPageComponent /> {/* ← Используем переименованный компонент */}
-                        </MainLayout>
-                    </ProtectedRoute>
-                } />
-                
-                <Route path="/subscriptions" element={
-                    <ProtectedRoute>
-                        <MainLayout>
-                            <SubscriptionsPage />
-                        </MainLayout>
-                    </ProtectedRoute>
-                } />
-                
-                <Route path="/feed" element={
-                    <ProtectedRoute>
-                        <MainLayout>
-                            <FeedPage />
-                        </MainLayout>
-                    </ProtectedRoute>
-                } />
-                
-                <Route path="/compilations" element={
-                    <ProtectedRoute>
-                        <MainLayout>
-                            <CompilationsPage />
-                        </MainLayout>
-                    </ProtectedRoute>
-                } />
-                
-                <Route path="/recommendations" element={
-                    <ProtectedRoute>
-                        <MainLayout>
-                            <RecommendationsPage />
-                        </MainLayout>
-                    </ProtectedRoute>
-                } />
-                
-                {/* Публичный маршрут с Header и Sidebar */}
-                <Route path="/film/:id" element={
-                    <MainLayout>
-                        <FilmPage />
-                    </MainLayout>
-                } />
-                
-                {/* Редирект для неизвестных маршрутов */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-
-                {/* Все результаты поиска фильма */}
-                <Route path="/films/search" element={
-                    <MainLayout>
-                        <SearchResultsPage />
-                    </MainLayout>
-                } />
-
-                {/*Страница с формой подбора фильмов*/}
-                <Route path="/films/picker" element={
-                    <MainLayout>
-                        <FilmPickerPage />
-                    </MainLayout>
-                    
-                } />
-
-                {/*Страница с результатами подбора*/}
-                <Route path="/films/picker/results" element={
-                    <MainLayout>
-                        <PickerResultsPage />
-                    </MainLayout>
-                } />
-
-                {/*Профиль текущего пользователя*/}
-                <Route path="/profile" element={
-                    <MainLayout>
-                        <ProfilePage />
-                    </MainLayout>
-                    
-                } />
-
-                {/*Профиль другого пользователя*/}
-                <Route path="/users/:id" element={
-                    <MainLayout>
-                        <UserProfilePage />
-                    </MainLayout>
-                    
-                } />
-
-            </Routes>
-        </Router>
+      <div className="loading-container">
+        <div className="loading-spinner">Загрузка...</div>
+      </div>
     )
+  }
+
+  return !isAuthenticated ? children : <Navigate to="/" replace />
+}
+
+const withLayout = (page) => (
+  <Layout>
+    {page}
+  </Layout>
+)
+
+const withProtectedLayout = (page) => (
+  <ProtectedRoute>
+    <Layout>
+      {page}
+    </Layout>
+  </ProtectedRoute>
+)
+
+function AppContent() {
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <AuthPage />
+            </PublicRoute>
+          }
+        />
+
+        <Route path="/" element={withProtectedLayout(<HomePage />)} />
+        <Route path="/profile" element={withProtectedLayout(<ProfilePage />)} />
+        <Route path="/diary" element={withProtectedLayout(<DiaryPage />)} />
+        <Route path="/subscriptions" element={withProtectedLayout(<SubscriptionsPage />)} />
+        <Route path="/feed" element={withProtectedLayout(<FeedPage />)} />
+        <Route path="/compilations" element={withProtectedLayout(<CompilationsPage />)} />
+        <Route path="/recommendations" element={withProtectedLayout(<RecommendationsPage />)} />
+
+        <Route path="/film/:id" element={withLayout(<FilmPage />)} />
+        <Route path="/films/search" element={withLayout(<SearchResultsPage />)} />
+        <Route path="/films/picker" element={withLayout(<FilmPickerPage />)} />
+        <Route path="/films/picker/results" element={withLayout(<PickerResultsPage />)} />
+        <Route path="/users/:id" element={withLayout(<UserProfilePage />)} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
+  )
 }
 
 function App() {
-    return (
-        <AuthProvider>
-            <AppContent />
-        </AuthProvider>
-    )
+  return (
+    <AuthProvider>
+      <div className="app">
+        <AppContent />
+      </div>
+    </AuthProvider>
+  )
 }
 
 export default App

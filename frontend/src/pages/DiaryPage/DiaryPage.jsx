@@ -1,141 +1,152 @@
-// src/pages/DiaryPage/DiaryPage.jsx
-import React, { useState, useEffect } from 'react';
-import { Box, CircularProgress } from '@mui/material';
-import { LocalMovies as MovieIcon } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   getPlannedFilms,
   getWatchedFilms,
   toggleVisibility,
   removeFromPlanned,
   updateRating,
-  markAsWatchedWithRating
-} from '../../api/activities';
-import DiaryTabs from './components/DiaryTabs';
-import DiaryTable from './components/DiaryTable';
-import RatingDialog from './components/RatingDialog';
-import './DiaryPage.css';
+  markAsWatchedWithRating,
+} from '../../api/activities'
+import DiaryTabs from './components/DiaryTabs'
+import DiaryTable from './components/DiaryTable'
+import RatingDialog from './components/RatingDialog'
+import './DiaryPage.css'
 
 const DiaryPage = () => {
-  const navigate = useNavigate();
-  const [currentTab, setCurrentTab] = useState(0);
-  const [activities, setActivities] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [expandedRow, setExpandedRow] = useState(null);
-  const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
-  const [selectedActivity, setSelectedActivity] = useState(null);
-  const [tempRating, setTempRating] = useState(0);
+  const navigate = useNavigate()
+
+  const [currentTab, setCurrentTab] = useState(0)
+  const [activities, setActivities] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [expandedRow, setExpandedRow] = useState(null)
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false)
+  const [selectedActivity, setSelectedActivity] = useState(null)
+  const [tempRating, setTempRating] = useState(0)
 
   useEffect(() => {
-    fetchActivities();
-  }, [currentTab]);
+    fetchActivities()
+  }, [currentTab])
 
   const fetchActivities = async () => {
-    setLoading(true);
+    setLoading(true)
+
     try {
-      const data = currentTab === 0 
+      const data = currentTab === 0
         ? await getPlannedFilms()
-        : await getWatchedFilms();
-      setActivities(data);
+        : await getWatchedFilms()
+
+      setActivities(data)
     } catch (error) {
-      console.error('Ошибка загрузки активностей:', error);
+      console.error('Ошибка загрузки активностей:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleTabChange = (event, newValue) => {
-    setCurrentTab(newValue);
-  };
+    setCurrentTab(newValue)
+    setExpandedRow(null)
+  }
 
   const handleToggleVisibility = async (activity, type) => {
     try {
-      const field = type === 'planned' ? 'is_public_for_planned' : 'is_public_for_watched';
-      const newValue = !activity[field];
-      
-      await toggleVisibility(activity.id, field, newValue);
-      
-      setActivities(prev => prev.map(item => 
-        item.id === activity.id 
-          ? { ...item, [field]: newValue }
-          : item
-      ));
+      const field = type === 'planned'
+        ? 'is_public_for_planned'
+        : 'is_public_for_watched'
+
+      const newValue = !activity[field]
+
+      await toggleVisibility(activity.id, field, newValue)
+
+      setActivities((prev) =>
+        prev.map((item) =>
+          item.id === activity.id
+            ? { ...item, [field]: newValue }
+            : item
+        )
+      )
     } catch (error) {
-      console.error('Ошибка изменения публичности:', error);
+      console.error('Ошибка изменения публичности:', error)
     }
-  };
+  }
 
   const handleRemoveFromPlanned = async (activity) => {
     try {
-      await removeFromPlanned(activity.id);
-      setActivities(prev => prev.filter(item => item.id !== activity.id));
+      await removeFromPlanned(activity.id)
+
+      setActivities((prev) =>
+        prev.filter((item) => item.id !== activity.id)
+      )
     } catch (error) {
-      console.error('Ошибка удаления из планируемых:', error);
+      console.error('Ошибка удаления из планируемых:', error)
     }
-  };
+  }
 
   const handleUpdateRating = async (activity, newRating) => {
     try {
-      await updateRating(activity.id, newRating);
-      setActivities(prev => prev.map(item => 
-        item.id === activity.id 
-          ? { ...item, rating: newRating }
-          : item
-      ));
+      await updateRating(activity.id, newRating)
+
+      setActivities((prev) =>
+        prev.map((item) =>
+          item.id === activity.id
+            ? { ...item, rating: newRating }
+            : item
+        )
+      )
     } catch (error) {
-      console.error('Ошибка обновления оценки:', error);
+      console.error('Ошибка обновления оценки:', error)
     }
-  };
+  }
 
   const handleMarkAsWatched = (activity) => {
-    setSelectedActivity(activity);
-    setTempRating(activity.rating || 0);
-    setRatingDialogOpen(true);
-  };
+    setSelectedActivity(activity)
+    setTempRating(activity.rating || 0)
+    setRatingDialogOpen(true)
+  }
 
   const handleMarkAsWatchedSubmit = async () => {
     try {
-      await markAsWatchedWithRating(selectedActivity.id, tempRating);
-      setActivities(prev => prev.filter(item => item.id !== selectedActivity.id));
-      setRatingDialogOpen(false);
-      setSelectedActivity(null);
+      await markAsWatchedWithRating(selectedActivity.id, tempRating)
+
+      setActivities((prev) =>
+        prev.filter((item) => item.id !== selectedActivity.id)
+      )
+
+      setRatingDialogOpen(false)
+      setSelectedActivity(null)
     } catch (error) {
-      console.error('Ошибка отметки как просмотренного:', error);
+      console.error('Ошибка отметки как просмотренного:', error)
     }
-  };
+  }
 
   const handleNavigateToFilm = (filmId) => {
-    navigate(`/films/${filmId}`);
-  };
+    navigate(`/film/${filmId}`)
+  }
 
   const handleToggleExpand = (activityId) => {
-    setExpandedRow(expandedRow === activityId ? null : activityId);
-  };
+    setExpandedRow((prev) => (prev === activityId ? null : activityId))
+  }
 
   if (loading) {
     return (
-      <Box className="pulp-container">
-        <Box className="pulp-loading">
-          <CircularProgress className="pulp-loading-spinner" />
-        </Box>
-      </Box>
-    );
+      <div className="pulp-container">
+        <div className="pulp-loading">
+          <div className="pulp-loading-spinner" />
+        </div>
+      </div>
+    )
   }
 
   return (
-    <Box className="pulp-container">
-      <Box sx={{ position: 'relative', zIndex: 2 }}>
-        <Box className="pulp-title-wrapper">
-          {/* <MovieIcon className="pulp-icon" /> */}
-          {/* <h1 className="pulp-title">ДНЕВНИК</h1> */}
-        </Box>
-
-        <DiaryTabs 
+    <div className="pulp-container">
+      <div className="pulp-page-inner">
+        <DiaryTabs
           currentTab={currentTab}
           onTabChange={handleTabChange}
         />
 
-        <DiaryTable 
+        <DiaryTable
           activities={activities}
           currentTab={currentTab}
           loading={loading}
@@ -147,9 +158,9 @@ const DiaryPage = () => {
           onRemove={handleRemoveFromPlanned}
           onNavigateToFilm={handleNavigateToFilm}
         />
-      </Box>
+      </div>
 
-      <RatingDialog 
+      <RatingDialog
         open={ratingDialogOpen}
         onClose={() => setRatingDialogOpen(false)}
         filmName={selectedActivity?.film.name}
@@ -157,8 +168,8 @@ const DiaryPage = () => {
         onRatingChange={setTempRating}
         onSubmit={handleMarkAsWatchedSubmit}
       />
-    </Box>
-  );
-};
+    </div>
+  )
+}
 
-export default DiaryPage;
+export default DiaryPage

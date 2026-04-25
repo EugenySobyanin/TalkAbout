@@ -27,8 +27,14 @@ class FilmSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'year',
-            'poster',
+            'poster_url',
+            'poster_preview_url',
             'description',
+            'movie_length',
+            'kinopoisk_rating',
+            'kinopoisk_votes',
+            'imdb_rating',
+            'imdb_votes',
         )
 
 

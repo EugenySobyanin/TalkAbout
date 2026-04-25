@@ -1,3 +1,5 @@
+// src/components/Sidebar/Sidebar.jsx
+
 import { NavLink } from 'react-router-dom'
 import './Sidebar.css'
 
@@ -6,7 +8,7 @@ function Sidebar() {
     { path: '/', label: 'Главная', icon: '🏠' },
     { path: '/profile', label: 'Профиль', icon: '👤' },
     { path: '/diary', label: 'Дневник', icon: '📓' },
-    { path: '/films/picker', label: 'Подбор' },
+    { path: '/films/picker', label: 'Подбор', icon: '🎲' },
     { path: '/subscriptions', label: 'Подписки', icon: '🔔' },
     { path: '/feed', label: 'Лента', icon: '📰' },
     { path: '/compilations', label: 'Подборки', icon: '📚' },
@@ -15,28 +17,36 @@ function Sidebar() {
 
   return (
     <aside className="sidebar">
-      {/* <div className="sidebar-header">
-        <span className="sidebar-title">МЕНЮ</span>
-      </div> */}
       <nav>
         <ul className="menu">
           {menuItems.map((item) => (
             <li key={item.path}>
-              <NavLink 
-                to={item.path} 
-                className={({ isActive }) => isActive ? 'menu-link active' : 'menu-link'}
+              <NavLink
+                to={item.path}
+                className={({ isActive }) =>
+                  isActive ? 'menu-link active' : 'menu-link'
+                }
               >
-                <span className="menu-icon">{item.icon}</span>
-                <span className="menu-label">{item.label}</span>
-                <span className="menu-arrow">▶</span>
+                <span className="menu-icon" aria-hidden="true">
+                  {item.icon}
+                </span>
+
+                <span className="menu-label">
+                  {item.label}
+                </span>
+
+                <span className="menu-arrow" aria-hidden="true">
+                  ▶
+                </span>
               </NavLink>
             </li>
           ))}
         </ul>
       </nav>
-      <div className="sidebar-footer">
-        <div className="blood-splatter"></div>
-        <div className="blood-splatter small"></div>
+
+      <div className="sidebar-footer" aria-hidden="true">
+        <div className="blood-splatter" />
+        <div className="blood-splatter small" />
       </div>
     </aside>
   )

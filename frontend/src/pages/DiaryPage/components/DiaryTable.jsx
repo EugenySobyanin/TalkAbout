@@ -1,20 +1,19 @@
-// src/pages/DiaryPage/components/DiaryTable.jsx
-import React from 'react';
+import React from 'react'
 import {
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Typography
-} from '@mui/material';
-import DiaryTableRow from './DiaryTableRow';
+  Typography,
+} from '@mui/material'
+import DiaryTableRow from './DiaryTableRow'
 
-const DiaryTable = ({ 
-  activities, 
-  currentTab, 
+const DiaryTable = ({
+  activities,
+  currentTab,
   loading,
   expandedRow,
   onToggleExpand,
@@ -22,38 +21,30 @@ const DiaryTable = ({
   onUpdateRating,
   onMarkAsWatched,
   onRemove,
-  onNavigateToFilm
+  onNavigateToFilm,
 }) => {
-  const columns = [
-    { id: 'number', label: '№', width: '50px' },
-    { id: 'poster', label: 'Постер', width: '100px' },
-    { id: 'name', label: 'Название', width: 'auto' },
-    { id: 'year', label: 'Год', width: '80px' },
-    { id: 'rating', label: 'Оценка', width: '150px' },
-    { id: 'visibility', label: 'Приватность', width: '120px' },
-    { 
-      id: 'date', 
-      label: currentTab === 0 ? 'Дата добавления' : 'Дата просмотра',
-      width: '180px' 
-    },
-    { id: 'actions', label: '', width: '100px' },
-  ];
+  const emptyText = currentTab === 0
+    ? 'У тебя нет планируемых фильмов'
+    : 'Ты ещё ничего не посмотрел'
 
   return (
     <TableContainer component={Paper} className="pulp-table-container">
-      <Table>
+      <Table className="pulp-table">
         <TableHead className="pulp-table-head">
           <TableRow>
-            {columns.map(column => (
-              <TableCell 
-                key={column.id}
-                sx={{ width: column.width }}
-              >
-                {column.label}
-              </TableCell>
-            ))}
+            <TableCell className="pulp-cell-number">№</TableCell>
+            <TableCell className="pulp-cell-poster">Постер</TableCell>
+            <TableCell className="pulp-cell-name">Название</TableCell>
+            <TableCell className="pulp-cell-year">Год</TableCell>
+            <TableCell className="pulp-cell-rating">Оценка</TableCell>
+            <TableCell className="pulp-cell-visibility">Приватность</TableCell>
+            <TableCell className="pulp-cell-date">
+              {currentTab === 0 ? 'Дата добавления' : 'Дата просмотра'}
+            </TableCell>
+            <TableCell className="pulp-cell-actions" />
           </TableRow>
         </TableHead>
+
         <TableBody>
           {activities.map((activity, index) => (
             <DiaryTableRow
@@ -70,15 +61,16 @@ const DiaryTable = ({
               onNavigateToFilm={onNavigateToFilm}
             />
           ))}
-          
+
           {activities.length === 0 && !loading && (
             <TableRow>
-              <TableCell colSpan={columns.length} align="center" sx={{ py: 6 }}>
+              <TableCell
+                colSpan={8}
+                align="center"
+                className="pulp-empty-cell"
+              >
                 <Typography className="pulp-empty-message">
-                  {currentTab === 0 
-                    ? '🚫 У ТЕБЯ НЕТ ПЛАНИРУЕМЫХ ФИЛЬМОВ, ЧУВАК'
-                    : '🚫 ТЫ ЕЩЕ НИЧЕГО НЕ ПОСМОТРЕЛ, ПРИЯТЕЛЬ'
-                  }
+                  {emptyText}
                 </Typography>
               </TableCell>
             </TableRow>
@@ -86,7 +78,7 @@ const DiaryTable = ({
         </TableBody>
       </Table>
     </TableContainer>
-  );
-};
+  )
+}
 
-export default DiaryTable;
+export default DiaryTable

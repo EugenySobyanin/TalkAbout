@@ -1,12 +1,11 @@
-/* Layout.css - Стиль Тарантино */
+/* src/components/Layout/Layout.css */
 
 .layout {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #141414 50%, #0f0f0f 100%);
   position: relative;
+  background: var(--color-bg);
 }
 
-/* Декоративные "кровавые" пятна на фоне */
 .layout::before {
   content: '';
   position: fixed;
@@ -35,346 +34,49 @@
 }
 
 .main-content {
-  margin-left: 260px;
-  margin-top: 90px;
-  padding: 2.5rem;
-  min-height: calc(100vh - 90px);
+  width: calc(100% - var(--sidebar-width));
+  min-height: calc(100vh - var(--header-height));
+  margin-top: var(--header-height);
+  margin-left: var(--sidebar-width);
+  padding: 30px;
   position: relative;
   z-index: 1;
   background: transparent;
-  color: #ffffff;
-  font-family: 'Oswald', sans-serif;
 }
 
-/* Контейнер для контента с эффектом "гранж" */
 .main-content::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    repeating-linear-gradient(
-      45deg,
-      rgba(255, 140, 0, 0.01) 0px,
-      rgba(255, 140, 0, 0.01) 2px,
-      transparent 2px,
-      transparent 8px
-    );
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* Декоративная полоса сверху контента */
-.main-content::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    #ff8c00 20%, 
-    #ffd700 50%, 
-    #ff8c00 80%, 
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-orange) 20%,
+    var(--color-accent) 50%,
+    var(--color-orange) 80%,
     transparent 100%
   );
-  opacity: 0.6;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
-/* Стилизация заголовков внутри контента */
-.main-content h1,
-.main-content h2,
-.main-content h3 {
-  font-family: 'Bebas Neue', cursive;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #ffd700;
-  text-shadow: 2px 2px 0 #ff8c00, 3px 3px 0 rgba(0, 0, 0, 0.5);
-  margin-bottom: 1.5rem;
-  position: relative;
-  display: inline-block;
-}
-
-.main-content h1::after,
-.main-content h2::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  width: 60%;
-  height: 3px;
-  background: linear-gradient(90deg, #ff0000 0%, #ff8c00 50%, transparent 100%);
-}
-
-/* Стилизация карточек и блоков */
-.main-content .card,
-.main-content .section {
-  background: rgba(20, 20, 20, 0.8);
-  border: 1px solid #ff8c00;
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 15px rgba(255, 140, 0, 0.1);
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-}
-
-.main-content .card:hover,
-.main-content .section:hover {
-  border-color: #ffd700;
-  box-shadow: 0 6px 20px rgba(255, 140, 0, 0.2);
-  transform: translateY(-2px);
-}
-
-/* Стилизация ссылок в контенте */
-.main-content a {
-  color: #ff8c00;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  font-weight: 500;
-}
-
-.main-content a:hover {
-  color: #ffd700;
-  text-decoration: underline;
-  text-decoration-color: #ff0000;
-  text-underline-offset: 3px;
-}
-
-/* Стилизация кнопок в контенте */
-.main-content button {
-  font-family: 'Bebas Neue', cursive;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* Стилизация таблиц */
-.main-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-}
-
-.main-content th {
-  background: linear-gradient(180deg, #1a1a1a 0%, #111 100%);
-  color: #ffd700;
-  font-family: 'Bebas Neue', cursive;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  padding: 12px 15px;
-  border-bottom: 2px solid #ff8c00;
-}
-
-.main-content td {
-  padding: 10px 15px;
-  border-bottom: 1px solid #333;
-  color: #ddd;
-}
-
-.main-content tr:hover td {
-  background: rgba(255, 140, 0, 0.05);
-}
-
-/* Стилизация форм */
-.main-content input,
-.main-content textarea,
-.main-content select {
-  background: rgba(20, 20, 20, 0.9);
-  border: 1px solid #ff8c00;
-  border-radius: 6px;
-  padding: 10px 15px;
-  color: #fff;
-  font-family: 'Oswald', sans-serif;
-  transition: all 0.3s ease;
-}
-
-.main-content input:focus,
-.main-content textarea:focus,
-.main-content select:focus {
-  outline: none;
-  border-color: #ffd700;
-  box-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
-}
-
-/* Стилизация скроллбара для контента */
-.main-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.main-content::-webkit-scrollbar-track {
-  background: #1a1a1a;
-}
-
-.main-content::-webkit-scrollbar-thumb {
-  background: #ff8c00;
-  border-radius: 4px;
-  border: 1px solid #ffd700;
-}
-
-.main-content::-webkit-scrollbar-thumb:hover {
-  background: #ffd700;
-}
-
-/* Загрузка (спиннер) */
-.main-content .loading-spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
-}
-
-.main-content .spinner {
-  width: 60px;
-  height: 60px;
-  border: 4px solid rgba(255, 140, 0, 0.2);
-  border-top-color: #ffd700;
-  border-right-color: #ff8c00;
-  border-radius: 0px;
-  animation: spin 1s linear infinite;
-  clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Сообщение об ошибке */
-.main-content .error-message {
-  background: linear-gradient(90deg, rgba(255, 0, 0, 0.15) 0%, transparent 100%);
-  border-left: 4px solid #ff0000;
-  padding: 15px 20px;
-  color: #ff6666;
-  font-style: italic;
-  margin: 1rem 0;
-  clip-path: polygon(0% 0%, 100% 0%, 98% 100%, 0% 100%);
-}
-
-/* Успешное сообщение */
-.main-content .success-message {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, transparent 100%);
-  border-left: 4px solid #ffd700;
-  padding: 15px 20px;
-  color: #ffd700;
-  margin: 1rem 0;
-  clip-path: polygon(0% 0%, 100% 0%, 98% 100%, 0% 100%);
-}
-
-/* Пагинация */
-.main-content .pagination {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 2rem;
-}
-
-.main-content .pagination button {
-  background: transparent;
-  border: 1px solid #ff8c00;
-  color: #ffd700;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-family: 'Bebas Neue', cursive;
-  font-size: 1rem;
-  clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
-  transition: all 0.3s ease;
-}
-
-.main-content .pagination button:hover {
-  background: #ff8c00;
-  color: #0a0a0a;
-}
-
-.main-content .pagination button.active {
-  background: #ffd700;
-  border-color: #ffd700;
-  color: #0a0a0a;
-}
-
-/* Адаптивность */
 @media (max-width: 1024px) {
   .main-content {
-    padding: 2rem;
-  }
-}
-
-@media (max-width: 900px) {
-  .main-content {
-    margin-left: 200px;
-    padding: 1.5rem;
-  }
-  
-  .main-content h1 {
-    font-size: 1.8rem;
-  }
-  
-  .main-content h2 {
-    font-size: 1.5rem;
+    padding: 20px;
   }
 }
 
 @media (max-width: 768px) {
   .main-content {
-    margin-left: 70px;
-    margin-top: 70px;
-    padding: 1.2rem;
-  }
-  
-  .main-content h1 {
-    font-size: 1.5rem;
-    text-shadow: 1.5px 1.5px 0 #ff8c00, 2px 2px 0 rgba(0, 0, 0, 0.5);
-  }
-  
-  .main-content h2 {
-    font-size: 1.3rem;
-  }
-  
-  .main-content .card,
-  .main-content .section {
-    padding: 1rem;
+    padding: 15px;
   }
 }
 
 @media (max-width: 480px) {
   .main-content {
-    margin-left: 60px;
-    padding: 1rem;
+    padding: 10px;
   }
-  
-  .main-content h1 {
-    font-size: 1.3rem;
-  }
-}
-
-/* Анимация появления контента */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.main-content > * {
-  animation: fadeInUp 0.5s ease forwards;
-}
-
-/* Эффект "зернистости" для всего контента (опционально) */
-.layout.grainy::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 2;
 }

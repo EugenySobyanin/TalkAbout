@@ -1,6 +1,7 @@
-/* Header.css - Основные стили шапки */
+/* src/components/Header/Header.css */
 
 .header {
+  height: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -12,9 +13,7 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  /* border-bottom: 1px solid rgba(255, 140, 0, 0.3); */
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.6);
-  height: 80px;
   font-family: var(--font-display);
 }
 
@@ -40,13 +39,11 @@
   flex: 0 0 auto;
 }
 
-/*Адаптивность*/
-
 @media (max-width: 1200px) {
   .header {
     padding: 0 2.5rem;
   }
-  
+
   .header-center {
     margin: 0 2rem;
   }
@@ -56,7 +53,7 @@
   .header {
     padding: 0 2rem;
   }
-  
+
   .header-center {
     max-width: 450px;
     margin: 0 1.5rem;
@@ -67,7 +64,7 @@
   .header {
     padding: 0 1.5rem;
   }
-  
+
   .header-center {
     max-width: 380px;
     margin: 0 1rem;
@@ -76,10 +73,9 @@
 
 @media (max-width: 768px) {
   .header {
-    height: 75px;
     padding: 0 1.2rem;
   }
-  
+
   .header-center {
     max-width: 300px;
   }
@@ -89,7 +85,7 @@
   .header {
     padding: 0 1rem;
   }
-  
+
   .header-center {
     max-width: 250px;
     margin: 0 0.8rem;
@@ -98,10 +94,9 @@
 
 @media (max-width: 480px) {
   .header {
-    height: 70px;
     padding: 0 0.8rem;
   }
-  
+
   .header-center {
     max-width: 200px;
   }
