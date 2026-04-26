@@ -32,7 +32,9 @@ from gallery.models import (
 API_BASE = "https://api.kinopoisk.dev"
 TOKEN_INFO_URL = f"{API_BASE}/v1.5/token"
 MOVIES_URL = f"{API_BASE}/v1.5/movie"
-IMPORT_SOURCE_NAME = "kinopoisk_movies"
+
+SOURCE_PREFIX = "kinopoisk_movies_quality"
+MAX_VOTES_FILTER_VALUE = 99999999
 
 
 @dataclass
@@ -47,6 +49,74 @@ class KinopoiskAPIError(Exception):
     """Ошибка при работе с Kinopoisk API."""
 
 
+def format_number(value: float) -> str:
+    """Форматирует число для query-параметров Kinopoisk API."""
+    if float(value).is_integer():
+        return str(int(value))
+    return str(value)
+
+
+def make_range_filter(
+    min_value: Optional[float],
+    max_value: Optional[float],
+) -> Optional[str]:
+    """
+    Делает строку диапазона для API:
+    7-10, 500000-99999999, 1990-2026.
+    """
+    if min_value is None and max_value is None:
+        return None
+
+    if min_value is None:
+        return f"0-{format_number(max_value)}"
+
+    if max_value is None:
+        return f"{format_number(min_value)}-{MAX_VOTES_FILTER_VALUE}"
+
+    return f"{format_number(min_value)}-{format_number(max_value)}"
+
+
+def make_import_source_name(
+    min_rating: float,
+    min_votes: int,
+    year_min: Optional[int],
+    year_max: Optional[int],
+    require_backdrop: bool,
+) -> str:
+    """
+    Делаем отдельный ImportState под конкретный набор фильтров,
+    чтобы курсор старого импорта не ломал новый импорт.
+    """
+    rating_part = str(min_rating).replace(".", "_")
+    year_part = f"{year_min or 'any'}_{year_max or 'any'}"
+    backdrop_part = "with_backdrop" if require_backdrop else "no_backdrop"
+
+    source = (
+        f"{SOURCE_PREFIX}_r{rating_part}_v{min_votes}_"
+        f"y{year_part}_{backdrop_part}"
+    )
+
+    return source[:100]
+
+
+def to_float(value: Any) -> Optional[float]:
+    try:
+        if value is None:
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def to_int(value: Any) -> Optional[int]:
+    try:
+        if value is None:
+            return None
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 class KinopoiskClient:
     def __init__(self, api_key: str, timeout: int = 30):
         self.session = requests.Session()
@@ -56,16 +126,20 @@ class KinopoiskClient:
     def _get(
         self,
         url: str,
-        params: Optional[List[Tuple[str, str]]] = None
+        params: Optional[List[Tuple[str, str]]] = None,
     ) -> Dict[str, Any]:
         response = self.session.get(url, params=params, timeout=self.timeout)
 
         if response.status_code == 401:
             raise KinopoiskAPIError("Неверный API ключ или он не передан.")
+
         if response.status_code == 403:
             raise KinopoiskAPIError("Превышен суточный лимит запросов.")
+
         if response.status_code == 400:
-            raise KinopoiskAPIError("Невалидный запрос: {0}".format(response.text))
+            raise KinopoiskAPIError(
+                "Невалидный запрос: {0}".format(response.text)
+            )
 
         try:
             response.raise_for_status()
@@ -91,11 +165,20 @@ class KinopoiskClient:
         limit: int = 250,
         next_cursor: Optional[str] = None,
         updated_since: Optional[str] = None,
-        only_movies: bool = True,
+        min_rating: float = 7.0,
+        min_votes: int = 500000,
+        year_min: Optional[int] = None,
+        year_max: Optional[int] = None,
+        require_backdrop: bool = True,
     ) -> Dict[str, Any]:
+        rating_filter = make_range_filter(min_rating, 10)
+        votes_filter = make_range_filter(min_votes, MAX_VOTES_FILTER_VALUE)
+        year_filter = make_range_filter(year_min, year_max)
+
         params = [
             ("limit", str(limit)),
 
+            # Основные поля
             ("selectFields", "id"),
             ("selectFields", "name"),
             ("selectFields", "enName"),
@@ -106,12 +189,18 @@ class KinopoiskClient:
             ("selectFields", "type"),
             ("selectFields", "isSeries"),
             ("selectFields", "year"),
+
+            # Рейтинги и голоса
             ("selectFields", "rating"),
+            ("selectFields", "votes"),
             ("selectFields", "ratingMpaa"),
             ("selectFields", "ageRating"),
-            ("selectFields", "votes"),
+
+            # Детали
             ("selectFields", "budget"),
             ("selectFields", "movieLength"),
+
+            # Связи и медиа
             ("selectFields", "genres"),
             ("selectFields", "countries"),
             ("selectFields", "poster"),
@@ -123,12 +212,40 @@ class KinopoiskClient:
             ("selectFields", "fees"),
             ("selectFields", "similarMovies"),
             ("selectFields", "sequelsAndPrequels"),
+
+            # Служебные
             ("selectFields", "updatedAt"),
             ("selectFields", "createdAt"),
+
+            # Жёсткие фильтры качества
+            ("type", "movie"),
+            ("isSeries", "false"),
+            ("rating.kp", rating_filter),
+            ("votes.kp", votes_filter),
+
+            # Нужные поля не должны быть пустыми
+            ("notNullFields", "id"),
+            ("notNullFields", "name"),
+            ("notNullFields", "year"),
+            ("notNullFields", "rating.kp"),
+            ("notNullFields", "votes.kp"),
+            ("notNullFields", "poster.url"),
+            ("notNullFields", "genres.name"),
+
+            # Сортировка: сначала новее, потом популярнее, потом выше рейтинг
+            ("sortField", "year"),
+            ("sortType", "-1"),
+            ("sortField", "votes.kp"),
+            ("sortType", "-1"),
+            ("sortField", "rating.kp"),
+            ("sortType", "-1"),
         ]
 
-        if only_movies:
-            params.append(("type", "movie"))
+        if require_backdrop:
+            params.append(("notNullFields", "backdrop.url"))
+
+        if year_filter:
+            params.append(("year", year_filter))
 
         if updated_since:
             params.append(("updatedAt", updated_since))
@@ -140,13 +257,35 @@ class KinopoiskClient:
 
 
 class Command(BaseCommand):
-    help = "Импорт фильмов из Kinopoisk API v1.5 с сохранением состояния"
+    help = (
+        "Импорт качественных популярных фильмов из Kinopoisk API v1.5: "
+        "по умолчанию КП >= 7.0, голосов КП >= 500000, только movie."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument("--limit", type=int, default=250)
         parser.add_argument("--reserve", type=int, default=15)
         parser.add_argument("--max-pages", type=int, default=None)
         parser.add_argument("--sleep", type=float, default=0.2)
+
+        parser.add_argument("--min-rating", type=float, default=7.0)
+        parser.add_argument("--min-votes", type=int, default=500000)
+        parser.add_argument("--year-min", type=int, default=None)
+        parser.add_argument("--year-max", type=int, default=None)
+
+        parser.add_argument(
+            "--no-require-backdrop",
+            action="store_true",
+            help="Не требовать backdrop.url. По умолчанию обои требуются.",
+        )
+        parser.add_argument(
+            "--allow-related-placeholders",
+            action="store_true",
+            help=(
+                "Разрешить создавать Film-заглушки для похожих фильмов и "
+                "сиквелов. По умолчанию отключено, чтобы не засорять БД."
+            ),
+        )
 
         parser.add_argument(
             "--updated-since",
@@ -185,6 +324,14 @@ class Command(BaseCommand):
         max_pages = options["max_pages"]
         sleep_seconds = options["sleep"]
         dry_run = options["dry_run"]
+
+        self.min_rating = options["min_rating"]
+        self.min_votes = options["min_votes"]
+        self.year_min = options["year_min"]
+        self.year_max = options["year_max"]
+        self.require_backdrop = not options["no_require_backdrop"]
+        self.allow_related_placeholders = options["allow_related_placeholders"]
+
         manual_updated_since = options["updated_since"]
         manual_start_cursor = options["start_cursor"]
         reset_state = options["reset_state"]
@@ -193,29 +340,52 @@ class Command(BaseCommand):
         if limit < 1 or limit > 250:
             raise CommandError("--limit должен быть от 1 до 250")
 
-        state, _ = ImportState.objects.get_or_create(source=IMPORT_SOURCE_NAME)
+        if self.min_rating < 0 or self.min_rating > 10:
+            raise CommandError("--min-rating должен быть от 0 до 10")
 
-        if state.is_running:
-            raise CommandError(
-                "Импорт уже помечен как запущенный. "
-                "Если это зависшее состояние, снимите is_running вручную."
-            )
+        if self.min_votes < 0:
+            raise CommandError("--min-votes не может быть отрицательным")
 
-        if reset_state:
-            state.next_cursor = None
-            state.last_error = None
-            state.pages_processed = 0
-            state.movies_processed = 0
-            state.movies_saved = 0
-            state.save(update_fields=[
-                "next_cursor",
-                "last_error",
-                "pages_processed",
-                "movies_processed",
-                "movies_saved",
-                "updated_at",
-            ])
-            self.stdout.write(self.style.WARNING("Состояние импорта сброшено"))
+        if (
+            self.year_min is not None
+            and self.year_max is not None
+            and self.year_min > self.year_max
+        ):
+            raise CommandError("--year-min не может быть больше --year-max")
+
+        source_name = make_import_source_name(
+            min_rating=self.min_rating,
+            min_votes=self.min_votes,
+            year_min=self.year_min,
+            year_max=self.year_max,
+            require_backdrop=self.require_backdrop,
+        )
+
+        state = None
+        if not dry_run:
+            state, _ = ImportState.objects.get_or_create(source=source_name)
+
+            if state.is_running:
+                raise CommandError(
+                    "Импорт уже помечен как запущенный. "
+                    "Если это зависшее состояние, снимите is_running вручную."
+                )
+
+            if reset_state:
+                state.next_cursor = None
+                state.last_error = None
+                state.pages_processed = 0
+                state.movies_processed = 0
+                state.movies_saved = 0
+                state.save(update_fields=[
+                    "next_cursor",
+                    "last_error",
+                    "pages_processed",
+                    "movies_processed",
+                    "movies_saved",
+                    "updated_at",
+                ])
+                self.stdout.write(self.style.WARNING("Состояние импорта сброшено"))
 
         client = KinopoiskClient(api_key=api_key)
 
@@ -248,6 +418,7 @@ class Command(BaseCommand):
         pages_processed = 0
         movies_seen = 0
         movies_saved = 0
+        movies_skipped = 0
 
         next_cursor = None
         updated_since = None
@@ -259,12 +430,12 @@ class Command(BaseCommand):
         else:
             if manual_start_cursor:
                 next_cursor = manual_start_cursor
-            else:
+            elif state:
                 next_cursor = state.next_cursor
 
             if manual_updated_since:
                 updated_since = manual_updated_since
-            elif not next_cursor and state.last_completed_sync_at:
+            elif state and not next_cursor and state.last_completed_sync_at:
                 start_dt = state.last_completed_sync_at - timedelta(hours=1)
                 end_dt = timezone.now()
                 updated_since = "{0}-{1}".format(
@@ -273,15 +444,26 @@ class Command(BaseCommand):
                 )
 
         self.stdout.write(
-            "Стартовые параметры: cursor={0}, updated_since={1}".format(
+            "Стартовые параметры: source={0}, cursor={1}, updated_since={2}".format(
+                source_name,
                 "есть" if next_cursor else "нет",
                 updated_since or "не задан",
             )
         )
+        self.stdout.write(
+            "Фильтры: КП >= {0}, голосов КП >= {1}, year_min={2}, year_max={3}, require_backdrop={4}".format(
+                self.min_rating,
+                self.min_votes,
+                self.year_min or "не задан",
+                self.year_max or "не задан",
+                self.require_backdrop,
+            )
+        )
 
-        state.is_running = True
-        state.last_error = None
-        state.save(update_fields=["is_running", "last_error", "updated_at"])
+        if state:
+            state.is_running = True
+            state.last_error = None
+            state.save(update_fields=["is_running", "last_error", "updated_at"])
 
         completed_full_pass = False
 
@@ -303,8 +485,13 @@ class Command(BaseCommand):
                     limit=limit,
                     next_cursor=next_cursor,
                     updated_since=updated_since,
-                    only_movies=True,
+                    min_rating=self.min_rating,
+                    min_votes=self.min_votes,
+                    year_min=self.year_min,
+                    year_max=self.year_max,
+                    require_backdrop=self.require_backdrop,
                 )
+
                 budget -= 1
                 pages_processed += 1
 
@@ -318,13 +505,19 @@ class Command(BaseCommand):
                     movies_seen += 1
 
                     if dry_run:
+                        if self.passes_quality_filters(payload):
+                            movies_saved += 1
+                        else:
+                            movies_skipped += 1
                         continue
 
                     saved = self.save_movie(payload)
                     if saved:
                         movies_saved += 1
+                    else:
+                        movies_skipped += 1
 
-                if not dry_run:
+                if state:
                     state.next_cursor = next_cursor
                     state.pages_processed = pages_processed
                     state.movies_processed = movies_seen
@@ -341,11 +534,12 @@ class Command(BaseCommand):
 
                 self.stdout.write(
                     self.style.SUCCESS(
-                        "Обработано страниц: {0}; фильмов просмотрено: {1}; "
-                        "фильмов сохранено/обновлено: {2}; has_next={3}".format(
+                        "Страниц: {0}; просмотрено: {1}; сохранено/подходит: {2}; "
+                        "пропущено: {3}; has_next={4}".format(
                             pages_processed,
                             movies_seen,
                             movies_saved,
+                            movies_skipped,
                             has_next,
                         )
                     )
@@ -358,7 +552,7 @@ class Command(BaseCommand):
 
                 time.sleep(sleep_seconds)
 
-            if not dry_run:
+            if state:
                 state.is_running = False
                 state.last_successful_run_at = timezone.now()
 
@@ -381,7 +575,7 @@ class Command(BaseCommand):
                 ])
 
         except Exception as exc:
-            if not dry_run:
+            if state:
                 state.is_running = False
                 state.last_error = str(exc)
                 state.pages_processed = pages_processed
@@ -400,16 +594,16 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 "Готово. Страниц: {0}, просмотрено фильмов: {1}, "
-                "сохранено/обновлено: {2}".format(
+                "сохранено/подходит: {2}, пропущено: {3}".format(
                     pages_processed,
                     movies_seen,
                     movies_saved,
+                    movies_skipped,
                 )
             )
         )
 
-    @transaction.atomic
-    def save_movie(self, payload: Dict[str, Any]) -> bool:
+    def passes_quality_filters(self, payload: Dict[str, Any]) -> bool:
         movie_type = payload.get("type")
         is_series = payload.get("isSeries")
 
@@ -418,6 +612,52 @@ class Command(BaseCommand):
 
         if is_series is True:
             return False
+
+        rating = payload.get("rating") or {}
+        votes = payload.get("votes") or {}
+        poster = payload.get("poster") or {}
+        backdrop = payload.get("backdrop") or {}
+
+        kp_rating = to_float(rating.get("kp"))
+        kp_votes = to_int(votes.get("kp"))
+        year = to_int(payload.get("year"))
+
+        if kp_rating is None or kp_rating < self.min_rating:
+            return False
+
+        if kp_votes is None or kp_votes < self.min_votes:
+            return False
+
+        if year is None:
+            return False
+
+        if self.year_min is not None and year < self.year_min:
+            return False
+
+        if self.year_max is not None and year > self.year_max:
+            return False
+
+        if not poster.get("url"):
+            return False
+
+        if self.require_backdrop and not backdrop.get("url"):
+            return False
+
+        if not payload.get("name"):
+            return False
+
+        genres = payload.get("genres") or []
+        if not genres:
+            return False
+
+        return True
+
+    @transaction.atomic
+    def save_movie(self, payload: Dict[str, Any]) -> bool:
+        if not self.passes_quality_filters(payload):
+            return False
+
+        movie_type = payload.get("type")
 
         type_obj, _ = Type.objects.get_or_create(name=movie_type)
 
@@ -612,22 +852,30 @@ class Command(BaseCommand):
             if not similar_id:
                 continue
 
-            poster = item.get("poster") or {}
-            rating = item.get("rating") or {}
+            similar_film = Film.objects.filter(
+                kinopoisk_api_id=similar_id
+            ).first()
 
-            similar_film, _ = Film.objects.get_or_create(
-                kinopoisk_api_id=similar_id,
-                defaults={
-                    "name": item.get("name"),
-                    "en_name": item.get("enName"),
-                    "alternative_name": item.get("alternativeName"),
-                    "year": item.get("year"),
-                    "poster_url": poster.get("url"),
-                    "poster_preview_url": poster.get("previewUrl"),
-                    "kinopoisk_rating": rating.get("kp"),
-                    "imdb_rating": rating.get("imdb"),
-                }
-            )
+            if not similar_film and self.allow_related_placeholders:
+                poster = item.get("poster") or {}
+                rating = item.get("rating") or {}
+
+                similar_film, _ = Film.objects.get_or_create(
+                    kinopoisk_api_id=similar_id,
+                    defaults={
+                        "name": item.get("name"),
+                        "en_name": item.get("enName"),
+                        "alternative_name": item.get("alternativeName"),
+                        "year": item.get("year"),
+                        "poster_url": poster.get("url"),
+                        "poster_preview_url": poster.get("previewUrl"),
+                        "kinopoisk_rating": rating.get("kp"),
+                        "imdb_rating": rating.get("imdb"),
+                    }
+                )
+
+            if not similar_film:
+                continue
 
             SimilarFilms.objects.get_or_create(
                 film=film,
@@ -640,22 +888,30 @@ class Command(BaseCommand):
             if not related_id:
                 continue
 
-            poster = item.get("poster") or {}
-            rating = item.get("rating") or {}
+            related_film = Film.objects.filter(
+                kinopoisk_api_id=related_id
+            ).first()
 
-            related_film, _ = Film.objects.get_or_create(
-                kinopoisk_api_id=related_id,
-                defaults={
-                    "name": item.get("name"),
-                    "en_name": item.get("enName"),
-                    "alternative_name": item.get("alternativeName"),
-                    "year": item.get("year"),
-                    "poster_url": poster.get("url"),
-                    "poster_preview_url": poster.get("previewUrl"),
-                    "kinopoisk_rating": rating.get("kp"),
-                    "imdb_rating": rating.get("imdb"),
-                }
-            )
+            if not related_film and self.allow_related_placeholders:
+                poster = item.get("poster") or {}
+                rating = item.get("rating") or {}
+
+                related_film, _ = Film.objects.get_or_create(
+                    kinopoisk_api_id=related_id,
+                    defaults={
+                        "name": item.get("name"),
+                        "en_name": item.get("enName"),
+                        "alternative_name": item.get("alternativeName"),
+                        "year": item.get("year"),
+                        "poster_url": poster.get("url"),
+                        "poster_preview_url": poster.get("previewUrl"),
+                        "kinopoisk_rating": rating.get("kp"),
+                        "imdb_rating": rating.get("imdb"),
+                    }
+                )
+
+            if not related_film:
+                continue
 
             SequelsAndPrequels.objects.get_or_create(
                 film=film,

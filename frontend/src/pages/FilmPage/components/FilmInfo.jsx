@@ -1,68 +1,69 @@
-// src/pages/FilmPage/components/FilmInfo.jsx
-
-import { useState } from 'react'
-
 function FilmInfo({ film }) {
-  const [showFullDescription, setShowFullDescription] = useState(false)
-
   return (
-    <div className="film-info-section">
-      {film.slogan && (
-        <div className="film-slogan">"{film.slogan}"</div>
-      )}
-      
-      {/* {film.short_description && (
-        <div className="film-short-description">
-          {film.short_description}
+    <section className="film-info-section">
+      <div className="film-section-head">
+        <div>
+          <h2>О фильме</h2>
+          <p>Описание и основные детали</p>
         </div>
-      )} */}
-      
+      </div>
+
+      {film.slogan && (
+        <div className="film-slogan">
+          «{film.slogan}»
+        </div>
+      )}
+
       {film.description && (
         <div className="film-description">
           <h3>Описание</h3>
-          <div className={`description-text ${!showFullDescription ? 'collapsed' : ''}`}>
+          <p className="description-text">
             {film.description}
-          </div>
-          {film.description.length > 300 && (
-            <button 
-              className="show-more-btn"
-              onClick={() => setShowFullDescription(!showFullDescription)}
-            >
-              {showFullDescription ? 'Свернуть' : 'Развернуть'}
-            </button>
-          )}
+          </p>
         </div>
       )}
-      
-      {/* Дополнительная информация */}
+
       <div className="film-details">
         <h3>Детали</h3>
+
         <div className="details-grid">
           {film.formatted_budget && (
             <div className="detail-item">
-              <span className="detail-label">Бюджет:</span>
+              <span className="detail-label">Бюджет</span>
               <span className="detail-value">{film.formatted_budget}</span>
             </div>
           )}
-          
+
           {film.type && (
             <div className="detail-item">
-              <span className="detail-label">Тип:</span>
+              <span className="detail-label">Тип</span>
               <span className="detail-value">{film.type.name}</span>
             </div>
           )}
-          
-          {film.networks && film.networks.length > 0 && (
+
+          {film.formatted_duration && (
             <div className="detail-item">
-              <span className="detail-label">Стриминг:</span>
-              <span className="detail-value">
-                {film.networks.map(n => n.name).join(', ')}
-              </span>
+              <span className="detail-label">Длительность</span>
+              <span className="detail-value">{film.formatted_duration}</span>
+            </div>
+          )}
+
+          {film.age_rating && (
+            <div className="detail-item">
+              <span className="detail-label">Возраст</span>
+              <span className="detail-value">{film.age_rating}+</span>
+            </div>
+          )}
+
+          {film.rating_mpaa && (
+            <div className="detail-item">
+              <span className="detail-label">MPAA</span>
+              <span className="detail-value">{film.rating_mpaa}</span>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

@@ -119,40 +119,92 @@ class HistoryWatching(BaseCreatedUpdated):
     )
 
 
-
-
-
 class Review(BaseCreatedUpdated):
     """Рецензии к кинопроизведениям."""
+
+    class ReviewType(models.TextChoices):
+        POSITIVE = 'positive', 'Положительная'
+        NEUTRAL = 'neutral', 'Нейтральная'
+        NEGATIVE = 'negative', 'Отрицательная'
 
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name='Пользователь',
+        verbose_name='Автор',
+        related_name='film_reviews',
     )
     film = models.ForeignKey(
         Film,
         on_delete=models.CASCADE,
         verbose_name='Фильм',
+        related_name='reviews',
     )
-    text = models.TextField('Текст рецензии')
+    title = models.CharField(
+        'Заголовок рецензии',
+        max_length=160,
+        blank=True,
+    )
+    text = models.TextField(
+        'Текст рецензии',
+    )
+    review_type = models.CharField(
+        'Тип рецензии',
+        max_length=16,
+        choices=ReviewType.choices,
+        default=ReviewType.NEUTRAL,
+        db_index=True,
+    )
+    is_spoiler = models.BooleanField(
+        'Есть спойлеры',
+        default=False,
+    )
 
     class Meta:
-        default_related_name = 'reviews'
+        ordering = ['-created_at']
+        verbose_name = 'Рецензия'
+        verbose_name_plural = 'Рецензии'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'film'],
+                name='unique_author_film_review',
+            ),
+        ]
+        indexes = [
+            models.Index(fields=['film', '-created_at']),
+            models.Index(fields=['film', 'review_type']),
+        ]
+
+    def __str__(self):
+        return f'{self.author} — {self.film} — {self.review_type}'
 
 
-class CommentReview(models.Model):
+class CommentReview(BaseCreatedUpdated):
     """Комментарий к рецензии."""
 
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name='Пользователь',
+        verbose_name='Автор',
+        related_name='review_comments',
     )
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
-        verbose_name='Комментарий',
+        verbose_name='Рецензия',
+        related_name='comments',
     )
-    text = models.CharField('Текст комментария', max_length=2000)
-    created_at = models.DateTimeField(auto_now_add=True)
+    text = models.CharField(
+        'Текст комментария',
+        max_length=2000,
+    )
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Комментарий к рецензии'
+        verbose_name_plural = 'Комментарии к рецензиям'
+        indexes = [
+            models.Index(fields=['review', 'created_at']),
+        ]
+
+    def __str__(self):
+        return f'{self.author} — {self.review}'

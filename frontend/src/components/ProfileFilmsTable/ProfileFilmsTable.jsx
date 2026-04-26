@@ -28,15 +28,11 @@ function ProfileFilmsTable({
   const canShowMore = items.length > visibleCount
 
   const getStatusLabel = (item) => {
-    if (mode === 'watched') {
-      return item.rating ? `${item.rating}/10` : '—'
-    }
-
     return item.rating ? `${item.rating}/10` : '—'
   }
 
   return (
-    <section className="profile-table-block">
+    <section className={`profile-table-block profile-table-block--${mode}`}>
       <div className="profile-block__head">
         <div>
           <h2 className="profile-block__title">{title}</h2>

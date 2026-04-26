@@ -63,12 +63,21 @@ class ActivitySerializer(serializers.ModelSerializer):
 class AddActivitySerializer(serializers.ModelSerializer):
     """Сериализатор для добавления активностей."""
 
-    film_id = serializers.IntegerField(write_only=True)  # Принимаем ID
-    film = FilmSerializer(read_only=True)  # Возвращаем полный объект
+    film_id = serializers.IntegerField(write_only=True)
+    film = FilmSerializer(read_only=True)
 
     class Meta:
         model = UserFilmActivity
-        fields = ('id', 'film_id', 'film', 'is_planned', 'is_watched')
+        fields = (
+            'id',
+            'film_id',
+            'film',
+            'is_planned',
+            'is_watched',
+            'rating',
+            'is_public_for_planned',
+            'is_public_for_watched',
+        )
 
     def validate_film_id(self, value):
         """Проверяем, что фильм с таким ID существует."""
@@ -80,20 +89,19 @@ class AddActivitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Создаем или обновляем активность."""
-        print(validated_data)
         film_id = validated_data.pop('film_id')
         film = Film.objects.get(pk=film_id)
-        user = validated_data.get('user')
-        print(user)
+        user = validated_data.pop('user')
 
-        # Проверяем существование активности
-        try:
-            activity = UserFilmActivity.objects.get(film=film, user=user)
-            # Если активность существует, обновляем её
-            return self.update(activity, validated_data)
-        except UserFilmActivity.DoesNotExist:
-            # Если активности нет, создаем новую
-            return UserFilmActivity.objects.create(
-                film=film,
-                **validated_data
-            )
+        activity, created = UserFilmActivity.objects.get_or_create(
+            film=film,
+            user=user,
+            defaults=validated_data,
+        )
+
+        if not created:
+            for attr, value in validated_data.items():
+                setattr(activity, attr, value)
+            activity.save()
+
+        return activity

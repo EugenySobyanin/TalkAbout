@@ -50,16 +50,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--color-orange) 20%,
-    var(--color-accent) 50%,
-    var(--color-orange) 80%,
-    transparent 100%
-  );
-  opacity: 0.5;
+  height: 1px;
+  background: rgba(80, 80, 86, 0.45);
   pointer-events: none;
 }
 

@@ -1,4 +1,4 @@
-from django.db.models import Avg
+from django.db.models import Avg, Count, Q
 from rest_framework import serializers
 
 from gallery.models import (Film,
@@ -15,7 +15,8 @@ from gallery.models import (Film,
                             SimilarFilms,
                             Type,
                             UserTopFilm)
-from activities.models import UserFilmActivity
+from activities.models import UserFilmActivity, Review
+from api.serializers.reviews import ReviewListSerializer
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -176,6 +177,10 @@ class FilmDetailSerializer(serializers.ModelSerializer):
     # Активити (если пользователь не анонимный)
     activity = serializers.SerializerMethodField()
 
+    # Ревью
+    latest_reviews = serializers.SerializerMethodField()
+    reviews_stats = serializers.SerializerMethodField()
+
     class Meta:
         model = Film
         fields = [
@@ -221,6 +226,11 @@ class FilmDetailSerializer(serializers.ModelSerializer):
 
             # Персоны
             'persons_by_profession',
+
+            # Рецензии
+            'persons_by_profession',
+            'latest_reviews',
+            'reviews_stats',
 
             # Связи с другими фильмами
             'sequels_and_prequels',
@@ -338,6 +348,55 @@ class FilmDetailSerializer(serializers.ModelSerializer):
             if activity:
                 return ActivityInFilmDetailSerializer(activity).data
         return None
+
+    def get_latest_reviews(self, obj):
+        reviews = (
+            obj.reviews
+            .select_related('author', 'film')
+            .annotate(comments_count=Count('comments'))
+            .order_by('-created_at')[:7]
+        )
+
+        return ReviewListSerializer(
+            reviews,
+            many=True,
+            context=self.context,
+        ).data
+
+    def get_reviews_stats(self, obj):
+        queryset = Review.objects.filter(film=obj)
+
+        total = queryset.count()
+
+        counts = queryset.aggregate(
+            positive=Count(
+                'id',
+                filter=Q(review_type=Review.ReviewType.POSITIVE),
+            ),
+            neutral=Count(
+                'id',
+                filter=Q(review_type=Review.ReviewType.NEUTRAL),
+            ),
+            negative=Count(
+                'id',
+                filter=Q(review_type=Review.ReviewType.NEGATIVE),
+            ),
+        )
+
+        def item(value):
+            percent = round(value * 100 / total, 1) if total else 0
+
+            return {
+                'count': value,
+                'percent': percent,
+            }
+
+        return {
+            'total': total,
+            'positive': item(counts['positive']),
+            'neutral': item(counts['neutral']),
+            'negative': item(counts['negative']),
+        }
 
 
 class SearchListFilmSerilizer(serializers.ModelSerializer):

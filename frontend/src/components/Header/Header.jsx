@@ -1,5 +1,3 @@
-// src/components/Header/Header.jsx
-
 import React from 'react'
 import FilmStripLogo from './components/FilmStripLogo'
 import SearchBar from './components/SearchBar'
@@ -13,11 +11,11 @@ function Header() {
         <FilmStripLogo />
       </div>
 
-      <div className="header-center">
-        <SearchBar />
-      </div>
-
       <div className="header-right">
+        <div className="header-search">
+          <SearchBar />
+        </div>
+
         <UserMenu />
       </div>
     </header>

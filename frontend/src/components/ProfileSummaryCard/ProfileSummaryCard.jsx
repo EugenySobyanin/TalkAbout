@@ -16,14 +16,41 @@ function ProfileSummaryCard({
     ? new Date(profile.registered).toLocaleDateString('ru-RU')
     : '—'
 
+  const stats = [
+    {
+      label: 'Подписок',
+      value: profile.subscriptions_count ?? 0,
+    },
+    {
+      label: 'Подписчиков',
+      value: profile.subscribers_count ?? 0,
+    },
+    {
+      label: 'Просмотрено',
+      value: profile.watched_count ?? 0,
+    },
+    {
+      label: 'Планируемых',
+      value: profile.planned_count ?? 0,
+    },
+    {
+      label: 'Подборок',
+      value: profile.compilations_count ?? 0,
+    },
+  ]
+
   return (
     <section className="profile-summary">
       <div className="profile-summary__main">
         <div className="profile-summary__avatar-wrap">
           <img
-            src={profile.avatar_url || profile.avatar || ''}
+            src={profile.avatar_url || profile.avatar || '/placeholder-avatar.jpg'}
             alt={profile.full_name || profile.username}
             className="profile-summary__avatar"
+            onError={(event) => {
+              event.target.onerror = null
+              event.target.src = '/placeholder-avatar.jpg'
+            }}
           />
 
           {isOwner && (
@@ -40,43 +67,27 @@ function ProfileSummaryCard({
         </div>
 
         <div className="profile-summary__identity">
-          <p className="profile-summary__eyebrow">Frame25</p>
           <h1 className="profile-summary__title">
             {profile.full_name || profile.username}
           </h1>
-          <p className="profile-summary__username">@{profile.username}</p>
+
+          <p className="profile-summary__username">
+            @{profile.username}
+          </p>
 
           <div className="profile-summary__meta">
             <span>Дата регистрации: {registeredLabel}</span>
             {profile.email ? <span>Email: {profile.email}</span> : null}
           </div>
-        </div>
-      </div>
 
-      <div className="profile-summary__stats">
-        <div className="profile-stat">
-          <span className="profile-stat__value">{profile.subscriptions_count ?? 0}</span>
-          <span className="profile-stat__label">Подписок</span>
-        </div>
-
-        <div className="profile-stat">
-          <span className="profile-stat__value">{profile.subscribers_count ?? 0}</span>
-          <span className="profile-stat__label">Подписчиков</span>
-        </div>
-
-        <div className="profile-stat">
-          <span className="profile-stat__value">{profile.watched_count ?? 0}</span>
-          <span className="profile-stat__label">Просмотрено</span>
-        </div>
-
-        <div className="profile-stat">
-          <span className="profile-stat__value">{profile.planned_count ?? 0}</span>
-          <span className="profile-stat__label">Планируемых</span>
-        </div>
-
-        <div className="profile-stat">
-          <span className="profile-stat__value">{profile.compilations_count ?? 0}</span>
-          <span className="profile-stat__label">Подборок</span>
+          <div className="profile-summary__stats">
+            {stats.map((item) => (
+              <div key={item.label} className="profile-stat">
+                <span className="profile-stat__label">{item.label}</span>
+                <span className="profile-stat__value">{item.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

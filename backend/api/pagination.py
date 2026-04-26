@@ -5,3 +5,15 @@ class FilmSearchPagination(PageNumberPagination):
     page_size = 24
     page_size_query_param = 'page_size'
     max_page_size = 48
+
+
+class ReviewPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 30
+
+
+class ReviewCommentPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 30

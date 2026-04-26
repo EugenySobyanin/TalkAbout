@@ -2,13 +2,22 @@
 
 import api from './config'
 
+const normalizeActivities = (data) => {
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.results)) return data.results
+  return []
+}
+
 // Получение активности пользователя для фильма
 export const getUserFilmActivity = async (filmId) => {
   try {
     const response = await api.get('/activities/', {
       params: { film_id: filmId }
     })
-    return response.data[0] || null
+
+    const activities = normalizeActivities(response.data)
+
+    return activities[0] || null
   } catch (error) {
     console.error('Error fetching user activity:', error)
     return null
@@ -19,7 +28,7 @@ export const getUserFilmActivity = async (filmId) => {
 export const getUserActivities = async (params = {}) => {
   try {
     const response = await api.get('/activities/', { params })
-    return response.data
+    return normalizeActivities(response.data)
   } catch (error) {
     console.error('Error fetching user activities:', error)
     return []
@@ -39,14 +48,17 @@ export const getWatchedFilms = async () => {
 // Создание или обновление активности
 export const createOrUpdateActivity = async (activityData, activity) => {
   try {
-    if (activity) {
-      const response = await api.patch(`/activities/${activity.id}/`, activityData)
-      return response.data
-    } else {
-      console.log('Отправляется OPTIONS вместо POST')
-      const response = await api.post('/activities/', activityData)
+    if (activity?.id) {
+      const response = await api.patch(
+        `/activities/${activity.id}/`,
+        activityData
+      )
+
       return response.data
     }
+
+    const response = await api.post('/activities/', activityData)
+    return response.data
   } catch (error) {
     console.error('Error creating/updating activity:', error)
     throw error
@@ -59,6 +71,7 @@ export const toggleVisibility = async (activityId, field, value) => {
     const response = await api.patch(`/activities/${activityId}/`, {
       [field]: value
     })
+
     return response.data
   } catch (error) {
     console.error('Error toggling visibility:', error)
@@ -66,12 +79,13 @@ export const toggleVisibility = async (activityId, field, value) => {
   }
 }
 
-// Удаление из планируемых
+// Удаление из планируемых — активити не удаляем, просто снимаем флаг
 export const removeFromPlanned = async (activityId) => {
   try {
     const response = await api.patch(`/activities/${activityId}/`, {
       is_planned: false
     })
+
     return response.data
   } catch (error) {
     console.error('Error removing from planned:', error)
@@ -79,36 +93,61 @@ export const removeFromPlanned = async (activityId) => {
   }
 }
 
+// Удаление из просмотренных — активити не удаляем, просто снимаем флаг
+export const removeFromWatched = async (activityId) => {
+  try {
+    const response = await api.patch(`/activities/${activityId}/`, {
+      is_watched: false
+    })
+
+    return response.data
+  } catch (error) {
+    console.error('Error removing from watched:', error)
+    throw error
+  }
+}
+
 // Установка оценки
 export const rateFilm = async (filmId, rating, activity) => {
-  return await createOrUpdateActivity({
-    film_id: filmId,
-    rating: rating
-  }, activity)
+  return createOrUpdateActivity(
+    {
+      film_id: filmId,
+      rating
+    },
+    activity
+  )
 }
 
 // Добавление в "Буду смотреть"
 export const addToWatchlist = async (filmId, activity, isPlanned) => {
-  return await createOrUpdateActivity({
-    film_id: filmId,
-    is_planned: isPlanned,
-  }, activity)
+  return createOrUpdateActivity(
+    {
+      film_id: filmId,
+      is_planned: isPlanned
+    },
+    activity
+  )
 }
 
 // Отметка как "Просмотрено"
 export const markAsWatched = async (filmId, activity, isWatched) => {
-  return await createOrUpdateActivity({
-    film_id: filmId,
-    is_watched: isWatched,
-  }, activity)
+  return createOrUpdateActivity(
+    {
+      film_id: filmId,
+      is_watched: isWatched,
+      is_planned: isWatched ? false : activity?.is_planned
+    },
+    activity
+  )
 }
 
 // Обновление оценки
 export const updateRating = async (activityId, rating) => {
   try {
     const response = await api.patch(`/activities/${activityId}/`, {
-      rating: rating
+      rating: rating || null
     })
+
     return response.data
   } catch (error) {
     console.error('Error updating rating:', error)
@@ -122,8 +161,9 @@ export const markAsWatchedWithRating = async (activityId, rating) => {
     const response = await api.patch(`/activities/${activityId}/`, {
       is_planned: false,
       is_watched: true,
-      rating: rating
+      rating: rating || null
     })
+
     return response.data
   } catch (error) {
     console.error('Error marking as watched:', error)

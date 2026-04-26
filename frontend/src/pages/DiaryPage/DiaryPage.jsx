@@ -5,6 +5,7 @@ import {
   getWatchedFilms,
   toggleVisibility,
   removeFromPlanned,
+  removeFromWatched,
   updateRating,
   markAsWatchedWithRating,
 } from '../../api/activities'
@@ -71,15 +72,23 @@ const DiaryPage = () => {
     }
   }
 
-  const handleRemoveFromPlanned = async (activity) => {
+  const handleRemoveFromDiary = async (activity) => {
     try {
-      await removeFromPlanned(activity.id)
+      if (currentTab === 0) {
+        await removeFromPlanned(activity.id)
+      } else {
+        await removeFromWatched(activity.id)
+      }
 
       setActivities((prev) =>
         prev.filter((item) => item.id !== activity.id)
       )
+
+      setExpandedRow((prev) =>
+        prev === activity.id ? null : prev
+      )
     } catch (error) {
-      console.error('Ошибка удаления из планируемых:', error)
+      console.error('Ошибка удаления из дневника:', error)
     }
   }
 
@@ -155,7 +164,7 @@ const DiaryPage = () => {
           onToggleVisibility={handleToggleVisibility}
           onUpdateRating={handleUpdateRating}
           onMarkAsWatched={handleMarkAsWatched}
-          onRemove={handleRemoveFromPlanned}
+          onRemove={handleRemoveFromDiary}
           onNavigateToFilm={handleNavigateToFilm}
         />
       </div>

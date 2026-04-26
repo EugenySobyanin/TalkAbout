@@ -16,14 +16,11 @@ import FilmPickerPage from './pages/FilmPickerPage/FilmPickerPage'
 import PickerResultsPage from './pages/PickerResultsPage/PickerResultsPage'
 import ProfilePage from './pages/ProfilePage/ProfilePage'
 import UserProfilePage from './pages/UserProfilePage/UserProfilePage'
+import SubscriptionsPage from './pages/SubscriptionsPage/SubscriptionsPage'
+import FilmReviewsPage from './pages/FilmReviewsPage/FilmReviewsPage'
 
 import './App.css'
 
-const SubscriptionsPage = () => (
-  <div className="page-container">
-    <h1>Подписки</h1>
-  </div>
-)
 
 const FeedPage = () => (
   <div className="page-container">
@@ -101,6 +98,7 @@ function AppContent() {
         <Route path="/recommendations" element={withProtectedLayout(<RecommendationsPage />)} />
 
         <Route path="/film/:id" element={withLayout(<FilmPage />)} />
+        <Route path="/film/:id/reviews" element={withLayout(<FilmReviewsPage />)} />
         <Route path="/films/search" element={withLayout(<SearchResultsPage />)} />
         <Route path="/films/picker" element={withLayout(<FilmPickerPage />)} />
         <Route path="/films/picker/results" element={withLayout(<PickerResultsPage />)} />

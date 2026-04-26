@@ -9,6 +9,8 @@
   --color-surface-glass: rgba(15, 15, 16, 0.88);
 
   --color-accent: #ffd700;
+  --color-accent-table-head: #a78e00;
+  --color-accent-table-head-dark: #312909;
   --color-accent-tired: #a88f2a;
   --color-accent-tired-very: #70682b;
   --color-accent-soft: rgba(255, 215, 0, 0.1);
@@ -18,12 +20,21 @@
   --color-orange-soft: rgba(255, 140, 0, 0.12);
 
   --color-red-bright: #cc0000;
+  --color-red-table-head: #5f0909;
+  --color-red-table-head-dark: #360909;
   --color-red-dark: #8a0303;
   --color-red-soft: rgba(204, 0, 0, 0.12);
 
   --color-green-bright: #248813;
+  --color-green-table-head: #105504;
+  --color-green-table-head-dark: #0b1d07;
   --color-green-soft: rgba(25, 99, 12, 0.66);
   --color-green-border: rgba(57, 255, 20, 0.48);
+
+  --color-purple-table-head: #4a1d66;
+  --color-purple-table-head-dark: #1d0b2b;
+  --color-purple-soft: rgba(74, 29, 102, 0.16);
+  --shadow-purple-glow: 0 0 18px rgba(74, 29, 102, 0.2);
 
   --color-text: #f3eee6;
   --color-text-soft: #c7c2b8;

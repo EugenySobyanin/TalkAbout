@@ -4,10 +4,12 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 import random
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db.models import Case, When, IntegerField, Value, Q
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 
-from gallery.models import (Film, Genre, Country, Type)
+from gallery.models import (Film, Genre, Country, Type, UserTopFilm)
 from api.filters import FilmFilter
 from api.serializers.films import (FilmDetailSerializer,
                                    SearchListFilmSerilizer,
@@ -21,6 +23,9 @@ from talk_about.constants import (MIN_RATING,
                                   EXCLUDED_GENRES,
                                   MIN_SEARCH_VOTES,
                                   SEARCH_SUGGESTIONS_LIMIT)
+
+
+User = get_user_model()
 
 
 class FilmViewSet(viewsets.ModelViewSet):
@@ -281,7 +286,7 @@ class MyTopFilmsView(APIView):
                 status=400
             )
 
-        films_by_id = {film.id: film for film in films}
+        films_by_id = {film.pk: film for film in films}
 
         UserTopFilm.objects.filter(user=request.user).delete()
 

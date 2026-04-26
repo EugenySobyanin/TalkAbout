@@ -2,6 +2,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 from api.views.activities import ActivityViewSet
+from api.views.reviews import ReviewViewSet, ReviewCommentViewSet
 from api.views.compilations import CompilationViewSet
 from api.views.films import FilmViewSet, TypeList, GenreList, CountryList, MyTopFilmsView, UserTopFilmsView
 from api.views.profile import UserProfileView, MeProfileView
@@ -12,6 +13,8 @@ router = routers.DefaultRouter()
 router.register(r'activities', ActivityViewSet, basename='activity')
 router.register(r'compilations', CompilationViewSet, basename='compilation')
 router.register(r'films', FilmViewSet, basename='film')
+router.register(r'reviews', ReviewViewSet, basename='review')
+router.register(r'review-comments', ReviewCommentViewSet, basename='review-comment')
 
 
 urlpatterns = [

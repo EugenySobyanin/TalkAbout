@@ -21,24 +21,28 @@ function ProfileView({
             avatarUploading={avatarUploading}
           />
 
-          <ProfileFilmsTable
-            title="Просмотренные фильмы"
-            items={profile.watched_activities || []}
-            emptyText="Просмотренных фильмов пока нет"
-            mode="watched"
-          />
+          <div className="profile-page__films-grid">
+            <ProfileFilmsTable
+              title="Просмотренные фильмы"
+              items={profile.watched_activities || []}
+              emptyText="Просмотренных фильмов пока нет"
+              mode="watched"
+            />
 
-          <ProfileFilmsTable
-            title="Планируемые фильмы"
-            items={profile.planned_activities || []}
-            emptyText="Планируемых фильмов пока нет"
-            mode="planned"
-          />
+            <ProfileFilmsTable
+              title="Планируемые фильмы"
+              items={profile.planned_activities || []}
+              emptyText="Планируемых фильмов пока нет"
+              mode="planned"
+            />
+          </div>
 
-          <ProfileCompilationsTable
-            items={profile.compilations || []}
-            emptyText="Подборок пока нет"
-          />
+          <div className="profile-page__compilations-row">
+            <ProfileCompilationsTable
+              items={profile.compilations || []}
+              emptyText="Подборок пока нет"
+            />
+          </div>
         </main>
 
         <aside className="profile-page__aside">

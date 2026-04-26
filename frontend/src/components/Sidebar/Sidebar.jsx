@@ -1,53 +1,71 @@
 // src/components/Sidebar/Sidebar.jsx
 
 import { NavLink } from 'react-router-dom'
+import { ChevronRightRounded } from '@mui/icons-material'
 import './Sidebar.css'
 
 function Sidebar() {
   const menuItems = [
-    { path: '/', label: 'Главная', icon: '🏠' },
-    { path: '/profile', label: 'Профиль', icon: '👤' },
-    { path: '/diary', label: 'Дневник', icon: '📓' },
-    { path: '/films/picker', label: 'Подбор', icon: '🎲' },
-    { path: '/subscriptions', label: 'Подписки', icon: '🔔' },
-    { path: '/feed', label: 'Лента', icon: '📰' },
-    { path: '/compilations', label: 'Подборки', icon: '📚' },
-    { path: '/recommendations', label: 'Рекомендации', icon: '⭐' },
+    {
+      path: '/',
+      label: 'Главная',
+      end: true,
+    },
+    {
+      path: '/profile',
+      label: 'Профиль',
+    },
+    {
+      path: '/diary',
+      label: 'Дневник',
+    },
+    {
+      path: '/films/picker',
+      label: 'Подбор',
+    },
+    {
+      path: '/subscriptions',
+      label: 'Подписки',
+    },
+    {
+      path: '/feed',
+      label: 'Лента',
+    },
+    {
+      path: '/compilations',
+      label: 'Подборки',
+    },
+    {
+      path: '/recommendations',
+      label: 'Рекомендации',
+    },
   ]
 
   return (
     <aside className="sidebar">
-      <nav>
+      <nav className="sidebar-nav" aria-label="Основное меню">
         <ul className="menu">
-          {menuItems.map((item) => (
-            <li key={item.path}>
+          {menuItems.map(({ path, label, end }) => (
+            <li key={path} className="menu-item">
               <NavLink
-                to={item.path}
+                to={path}
+                end={end}
                 className={({ isActive }) =>
                   isActive ? 'menu-link active' : 'menu-link'
                 }
               >
-                <span className="menu-icon" aria-hidden="true">
-                  {item.icon}
-                </span>
-
                 <span className="menu-label">
-                  {item.label}
+                  {label}
                 </span>
 
                 <span className="menu-arrow" aria-hidden="true">
-                  ▶
+                  <ChevronRightRounded fontSize="inherit" />
                 </span>
               </NavLink>
             </li>
           ))}
         </ul>
       </nav>
-
-      <div className="sidebar-footer" aria-hidden="true">
-        <div className="blood-splatter" />
-        <div className="blood-splatter small" />
-      </div>
     </aside>
   )
 }

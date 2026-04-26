@@ -210,24 +210,24 @@ const DiaryTableRow = ({
             </IconButton>
 
             {currentTab === 0 && (
-              <>
-                <IconButton
-                  className="pulp-icon-button watched"
-                  onClick={(event) => handleActionClick(event, onMarkAsWatched)}
-                  title="Отметить как просмотренное"
-                >
-                  <WatchedIcon />
-                </IconButton>
-
-                <IconButton
-                  className="pulp-icon-button delete"
-                  onClick={(event) => handleActionClick(event, onRemove)}
-                  title="Удалить из списка"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </>
+              <IconButton
+                className="pulp-icon-button watched"
+                onClick={(event) => handleActionClick(event, onMarkAsWatched)}
+                title="Отметить как просмотренное"
+              >
+                <WatchedIcon />
+              </IconButton>
             )}
+
+            <IconButton
+              className="pulp-icon-button delete"
+              onClick={(event) => handleActionClick(event, onRemove)}
+              title={currentTab === 0
+                ? 'Удалить из списка'
+                : 'Удалить из просмотренных'}
+            >
+              <DeleteIcon />
+            </IconButton>
           </div>
         </TableCell>
       </TableRow>

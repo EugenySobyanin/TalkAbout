@@ -4,6 +4,7 @@
   flex-shrink: 0;
   text-decoration: none;
   white-space: nowrap;
+  outline: none;
 }
 
 .filmstrip-text {
@@ -18,50 +19,43 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 
-  transition: transform var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    filter var(--transition-fast);
 }
 
 .filmstrip-word {
   color: var(--color-accent);
-  text-shadow:
-    2px 2px 0 var(--color-red-dark),
-    4px 4px 0 rgba(0, 0, 0, 0.35);
-}
-
-.filmstrip-number {
-  color: var(--color-text-soft);
-  text-shadow:
-    2px 2px 0 rgba(0, 0, 0, 0.3);
-}
-
-/*Текст увеличивается и поднимается вверх*/
-.filmstrip-logo-link:hover .filmstrip-text,
-.filmstrip-logo-link:focus-visible .filmstrip-text {
-  transform: translateY(-1px) scale(1.01);
-}
-
-/*Усиливаются тени при наведении на Frame*/
-.filmstrip-logo-link:hover .filmstrip-word,
-.filmstrip-logo-link:focus-visible .filmstrip-word {
   text-shadow:
     3px 3px 0 var(--color-red-bright),
     5px 5px 0 rgba(0, 0, 0, 0.42),
     0 0 14px rgba(255, 215, 0, 0.18);
 }
 
-/*Усиливаются тени при наведении на 25*/
+.filmstrip-number {
+  color: var(--color-text);
+  text-shadow:
+    2px 2px 0 var(--color-accent-table-head-dark),
+    4px 4px 0 var(--color-red-dark),
+    0 0 12px rgba(255, 215, 0, 0.12);
+}
+
+.filmstrip-logo-link:hover .filmstrip-text,
+.filmstrip-logo-link:focus-visible .filmstrip-text {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.filmstrip-logo-link:hover .filmstrip-word,
+.filmstrip-logo-link:focus-visible .filmstrip-word {
+  color: #ffe45c;
+}
+
 .filmstrip-logo-link:hover .filmstrip-number,
 .filmstrip-logo-link:focus-visible .filmstrip-number {
-  text-shadow:
-    2px 2px 0 rgba(0, 0, 0, 0.36),
-    0 0 10px rgba(200, 187, 168, 0.14);
+  color: var(--color-accent);
 }
 
-.filmstrip-logo-link:focus-visible {
-  outline: none;
-}
-
-/*Адаптивность для планшета*/
 @media (max-width: 768px) {
   .filmstrip-text {
     font-size: 2.1rem;
@@ -70,7 +64,6 @@
   }
 }
 
-/*Адаптивность для телефона*/
 @media (max-width: 480px) {
   .filmstrip-text {
     font-size: 1.75rem;

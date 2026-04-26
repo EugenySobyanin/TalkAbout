@@ -1,739 +1,799 @@
-/* src/pages/FilmPage/FilmPage.css - Сдержанный Тарантино */
-
-/* ========================================
-   ИМПОРТ ШРИФТОВ
-   ======================================== */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&display=swap');
-
-/* ========================================
-   ПЕРЕМЕННЫЕ
-   ======================================== */
-:root {
-  /* Цвета */
-  --color-bg-primary: #14120F;
-  --color-bg-secondary: #14120F;
-  --color-bg-tertiary: #1a1a1a;
-  --color-bg-hover: #2a2a2a;
-  
-  --color-text-primary: #cccccc;
-  --color-text-secondary: #aaaaaa;
-  --color-text-muted: #888888;
-  --color-text-light: #ffffff;
-  
-  --color-accent: #B8860B;        /* Красный Тарантино */
-  --color-accent-dark: #8b0000;
-  --color-accent-gold: #e3b23c;
-  
-  --color-rating-kp: #ff6600;
-  --color-rating-imdb: #e3b23c;
-  --color-rating-user: #4caf50;
-  
-  --color-border: #333333;
-  --color-border-light: #444444;
-  
-  /* Шрифты */
-  --font-title: 'Impact', sans-serif;
-  --font-heading: 'Arial Narrow', cursive;
-  --font-body: 'Anton', sans-serif;
-  
-  /* Размеры */
-  --sidebar-width: 320px;
-  --poster-width: 320px;
-  --poster-width-tablet: 260px;
-  --poster-width-mobile: 220px;
-  --poster-width-small: 180px;
-  
-  /* Отступы */
-  --spacing-xs: 5px;
-  --spacing-sm: 10px;
-  --spacing-md: 15px;
-  --spacing-lg: 20px;
-  --spacing-xl: 25px;
-  --spacing-xxl: 30px;
-  
-  /* Анимации */
-  --transition-fast: 0.2s ease;
-  --transition-base: 0.3s ease;
-}
-
-/* ========================================
-   СБРОС СТИЛЕЙ ДЛЯ СТРАНИЦЫ
-   ======================================== */
-.film-page {
+.film-page,
+.film-reviews-page {
   min-height: 100vh;
-  color: var(--color-text-light);
-  font-family: var(--font-body);
-  position: relative;
-  background-color: var(--color-bg-primary);
+  padding: 24px;
+  color: var(--color-text);
 }
 
-/* ========================================
-   СОСТОЯНИЯ СТРАНИЦЫ (ЗАГРУЗКА / ОШИБКА)
-   ======================================== */
+.film-page *,
+.film-page *::before,
+.film-page *::after,
+.film-reviews-page *,
+.film-reviews-page *::before,
+.film-reviews-page *::after {
+  box-sizing: border-box;
+}
 
-/* --- Загрузка --- */
-.film-page.loading {
+.film-page--loading,
+.film-page--error {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 500px;
 }
 
-.loading-spinner {
-  text-align: center;
+.film-loading,
+.film-error {
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
 }
 
-.spinner {
-  width: 60px;
-  height: 60px;
-  border: 3px solid rgba(200, 16, 46, 0.2);
+.film-loading__spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(143, 138, 130, 0.28);
   border-top-color: var(--color-accent);
-  border-right-color: var(--color-accent-dark);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto var(--spacing-xl);
+  animation: filmSpin 0.85s linear infinite;
 }
 
-.spinner + p {
-  font-family: var(--font-heading);
-  font-size: 1.3rem;
-  color: var(--color-text-primary);
-  letter-spacing: 3px;
-  text-transform: uppercase;
+.film-error {
+  padding: 32px;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-glass);
+  box-shadow: var(--shadow-card);
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.film-error h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-xl);
 }
 
-/* --- Ошибка --- */
-.film-page.error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 500px;
-}
-
-.error-container {
-  text-align: center;
-  padding: 50px;
-  background: var(--color-bg-secondary);
-  border: 2px solid var(--color-accent);
-  max-width: 500px;
-}
-
-.error-container h2 {
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  margin-bottom: var(--spacing-xl);
-  color: var(--color-text-primary);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.error-container .back-btn {
-  background: var(--color-accent);
-  border: none;
-  color: var(--color-text-light);
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  padding: 12px var(--spacing-xxl);
+.film-error__button,
+.film-back-link,
+.film-section-btn,
+.review-form__submit,
+.review-comment-form__submit {
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid rgba(80, 80, 86, 0.65);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 15, 16, 0.42);
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  line-height: 1;
   cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  transition: all var(--transition-base);
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
 }
 
-.error-container .back-btn:hover {
-  background: var(--color-accent-dark);
-  color: var(--color-text-light);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 0 var(--color-accent);
+.film-error__button:hover,
+.film-back-link:hover,
+.film-section-btn:hover,
+.review-form__submit:hover,
+.review-comment-form__submit:hover {
+  border-color: var(--color-accent-tired);
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+  box-shadow: var(--shadow-gold-glow);
+  transform: translateY(-1px);
 }
 
-/* ========================================
-   КНОПКА НАЗАД
-   ======================================== */
-.back-button {
-  background: transparent;
-  border: none;
-  border-radius: 20px;
-  color: var(--color-text-primary);
-  font-family: var(--font-body);
-  font-size: 1.2rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  padding: var(--spacing-sm) var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
-  transition: all var(--transition-base);
-  display: inline-block;
-  font-weight: 400;
-}
-
-.back-button:hover {
-  background: var(--color-accent);
-  color: var(--color-text-light);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 0 var(--color-accent-dark);
-}
-
-/* ========================================
-   ОСНОВНОЙ КОНТЕНТ
-   ======================================== */
 .film-content {
-  display: flex;
-  gap: var(--spacing-xxl);
-  margin-top: var(--spacing-xxl);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
 }
 
 .film-main {
-  flex: 1;
   min-width: 0;
+  display: grid;
+  gap: 18px;
 }
 
 .film-sidebar {
-  width: var(--sidebar-width);
-  flex-shrink: 0;
+  width: 100%;
+  max-width: 330px;
+  justify-self: end;
+  position: sticky;
+  top: 24px;
 }
 
-/* ========================================
-   HEADER ФИЛЬМА (ПОСТЕР + ЗАГОЛОВОК)
-   ======================================== */
+/* Header */
+
 .film-header {
   position: relative;
-  margin-bottom: var(--spacing-xxl);
+  overflow: hidden;
+  margin-bottom: 18px;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-glass);
+  box-shadow: var(--shadow-card);
 }
 
-/* --- Задник --- */
 .film-backdrop {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 450px;
+  inset: 0;
+  min-height: 100%;
   background-size: cover;
-  background-position: center 20%;
+  background-position: center 28%;
+  opacity: 1;
+  transform: scale(1.01);
 }
 
 .backdrop-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(15, 15, 15, 0.5) 0%,
-    rgba(15, 15, 15, 0.85) 50%,
-    var(--color-bg-primary) 100%
-  );
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(15, 15, 16, 0.94) 0%,
+      rgba(15, 15, 16, 0.74) 42%,
+      rgba(15, 15, 16, 0.9) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(15, 15, 16, 0.12) 0%,
+      rgba(15, 15, 16, 0.78) 68%,
+      rgba(15, 15, 16, 0.98) 100%
+    );
 }
 
-/* --- Контент хедера --- */
 .film-header-content {
   position: relative;
-  display: flex;
-  gap: 35px;
-  padding: var(--spacing-xxl);
-  min-height: 450px;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 24px;
+  padding: 24px;
 }
 
-/* --- Постер --- */
 .film-poster-wrapper {
-  flex-shrink: 0;
-  width: var(--poster-width);
-}
-
-.film-poster {
   width: 100%;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-  transition: all var(--transition-base);
-  display: block;
 }
 
-.film-poster:hover {
-  box-shadow: 0 0 40px rgba(200, 16, 46, 0.2);
+.film-poster,
+.film-poster-placeholder {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  display: block;
+  object-fit: cover;
+  border: 1px solid rgba(80, 80, 86, 0.65);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.42);
 }
 
 .film-poster-placeholder {
-  width: 100%;
-  aspect-ratio: 2/3;
-  background: var(--color-bg-tertiary);
-  border: 3px solid var(--color-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 60px;
-  color: var(--color-text-primary);
+  display: grid;
+  place-items: center;
+  color: var(--color-text-muted);
+  font-size: 3rem;
 }
 
-/* --- Секция с названием --- */
 .film-title-section {
-  flex: 1;
-  padding-top: var(--spacing-xxl);
+  min-width: 0;
+  align-self: center;
 }
 
 .film-title {
-  font-family: var(--font-title);
-  font-size: 3rem;
-  margin: 0 0 var(--spacing-sm);
-  color: var(--color-text-primary);
-  /* text-transform: uppercase; */
-  letter-spacing: 1px;
-  line-height: 1.1;
-  text-shadow: 2px 2px 0 var(--color-accent);
+  max-width: 920px;
+  margin: 0 0 8px;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: clamp(1.75rem, 3vw, 2.65rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  text-shadow:
+    2px 2px 0 var(--color-red-dark),
+    4px 4px 0 rgba(0, 0, 0, 0.76);
 }
 
 .film-year {
-  font-size: 2rem;
-  color: var(--color-text-primary);
-  font-weight: normal;
+  margin: 0 0 12px;
+  color: var(--color-accent);
+  font-family: var(--font-accent);
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  line-height: 1;
+  letter-spacing: 0.06em;
 }
 
 .film-alternative-name,
 .film-en-name {
-  font-size: 1.5rem;
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-xs);
-  /* font-style: italic; */
+  margin-bottom: 6px;
+  color: var(--color-text-soft);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 700;
 }
 
-/* --- Мета-информация --- */
 .film-meta {
   display: flex;
-  gap: var(--spacing-xl);
-  margin: var(--spacing-lg) 0;
-  color: var(--color-text-light);
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
 }
 
-.meta-item {
-  display: flex;
+.meta-item,
+.age-rating {
+  min-height: 30px;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1rem;
-  text-transform: uppercase;
-  /* letter-spacing: 1px; */
-  color: var(--color-text-primary);
+  padding: 5px 10px;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-pill);
+  background: rgba(15, 15, 16, 0.48);
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
 }
 
 .age-rating {
-  background: var(--color-accent);
-  color: var(--color-text-light);
-  padding: 3px var(--spacing-sm);
-  font-weight: bold;
+  color: var(--color-accent);
 }
 
-/* ========================================
-   ЖАНРЫ И СТРАНЫ (ТЕКСТ В СТРОКУ)
-   ======================================== */
-
-/* --- Общие стили для мета-строк --- */
 .film-genres-section,
 .film-countries-section {
-  margin: var(--spacing-md) 0;
+  margin: 10px 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
 }
 
 .genres-label,
 .countries-label {
-  color: var(--color-text-primary);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  margin-right: var(--spacing-sm);
+  margin-right: 6px;
+  color: var(--color-text-soft);
+  font-weight: 800;
 }
 
 .film-genres,
 .film-countries {
   display: inline;
-  color: var(--color-text-primary);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-style: italic;
 }
 
 .genre-text,
 .country-text {
-  color: var(--color-text-primary);
-  text-decoration: none;
-  transition: color var(--transition-fast);
-}
-
-.genre-text:hover,
-.country-text:hover {
-  color: var(--color-accent);
+  color: var(--color-text-soft);
 }
 
 .genre-separator,
 .country-separator {
-  color: #666666;
-  margin: 0 4px;
+  color: var(--color-text-muted);
 }
 
-/* ========================================
-   РЕЙТИНГИ
-   ======================================== */
+.film-short-description {
+  max-width: 820px;
+  margin-top: 16px;
+  color: var(--color-text-soft);
+  font-family: var(--font-text);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
 .film-ratings {
   display: flex;
-  gap: 35px;
-  margin-top: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
 }
 
 .rating-item {
-  text-align: center;
-  position: relative;
+  min-width: 96px;
+  padding: 10px 12px;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 15, 16, 0.52);
 }
 
 .rating-label {
   display: block;
-  font-family: var(--font-heading);
-  font-size: 1rem;
+  margin-bottom: 5px;
   color: var(--color-text-muted);
-  margin-bottom: var(--spacing-xs);
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
 }
 
 .rating-value {
-  font-family: var(--font-heading);
-  font-size: 2.5rem;
-  font-weight: bold;
+  color: var(--color-accent);
+  font-family: var(--font-accent);
+  font-size: 1.55rem;
+  line-height: 1;
 }
 
 .rating-votes {
-  font-size: 0.8rem;
+  margin-left: 5px;
   color: var(--color-text-muted);
-  margin-left: var(--spacing-xs);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
 }
 
-.rating-item.kp .rating-value {
-  color: var(--color-rating-kp);
+/* Shared sections */
+
+.film-actions,
+.film-info-section,
+.film-persons-section,
+.film-reviews-section,
+.film-videos-section,
+.film-facts-section,
+.similar-films-section {
+  overflow: hidden;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-glass);
+  box-shadow: var(--shadow-card);
 }
 
-.rating-item.imdb .rating-value {
-  color: var(--color-rating-imdb);
+.film-section-head {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(80, 80, 86, 0.5);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(48, 48, 52, 0.98) 0%,
+      rgba(38, 38, 42, 0.98) 56%,
+      rgba(23, 23, 25, 0.98) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    inset 4px 0 0 rgba(167, 142, 0, 0.28);
 }
 
-.rating-item.user .rating-value {
-  color: var(--color-rating-user);
+.film-section-head--reviews {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(48, 42, 56, 0.98) 0%,
+      rgba(36, 31, 43, 0.98) 58%,
+      rgba(23, 23, 25, 0.98) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    inset 4px 0 0 rgba(74, 29, 102, 0.5);
 }
 
-/* ========================================
-   БЛОК ДЕЙСТВИЙ (ОЦЕНКА / ИЗБРАННОЕ)
-   ======================================== */
+.film-section-head h2 {
+  margin: 0 0 4px;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 800;
+}
+
+.film-section-head p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.film-section-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.film-reviews-section .film-section-btn:hover {
+  border-color: var(--color-purple-table-head);
+  background: var(--color-purple-soft);
+  box-shadow: var(--shadow-purple-glow);
+}
+
+/* Actions */
+
 .film-actions {
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border: ;
-  padding: var(--spacing-xl);
-  margin-bottom: var(--spacing-xxl);
-  box-shadow: 0 2px 0 var(--color-accent);
+  padding: 18px;
 }
 
-/* --- Секция оценки --- */
 .rating-section {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
   flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
 .rating-section .rating-label {
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  color: var(--color-text-primary);
-  letter-spacing: 2px;
-  margin-bottom: 0;
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-accent);
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow:
+    1px 1px 0 var(--color-red-dark),
+    2px 2px 0 rgba(0, 0, 0, 0.72);
 }
 
 .rating-stars {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
 .star-btn {
-  background: none;
-  border: none;
-  font-size: 32px;
-  color: #444444;
-  cursor: pointer;
-  transition: all var(--transition-fast);
   padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(143, 138, 130, 0.42);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-fast),
+    filter var(--transition-fast);
+}
+
+.star-btn:hover,
+.star-btn.hover,
+.star-btn.active {
+  color: var(--color-accent);
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.22));
 }
 
 .star-btn:hover {
-  transform: scale(1.2);
-  color: var(--color-accent-gold);
-}
-
-.star-btn.active {
-  color: var(--color-accent-gold);
-}
-
-.star-btn.hover {
-  color: var(--color-accent-dark);
-}
-
-.star-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  transform: translateY(-1px) scale(1.1);
 }
 
 .current-rating {
-  font-family: var(--font-heading);
-  font-size: 1.4rem;
-  color: var(--color-text-primary);
+  color: var(--color-accent);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 900;
 }
 
-/* --- Кнопки действий --- */
 .action-buttons {
   display: flex;
-  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
 }
 
 .action-btn {
-  background: transparent;
-  border: 2px solid var(--color-border);
-  border-radius: 10px;
-  color: var(--color-text-primary);
-  font-family: var(--font-heading);
-  padding: 12px 24px;
+  position: relative;
+  z-index: 0;
+  width: 230px;
+  min-width: 230px;
+  max-width: 230px;
+  min-height: 58px;
+  flex: 0 0 230px;
+  overflow: hidden;
+  padding: 15px 18px;
+  border: 1px solid rgba(80, 80, 86, 0.65);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(38, 38, 42, 0.98) 0%,
+      rgba(15, 15, 16, 0.92) 100%
+    );
+  color: var(--color-text-muted);
+  font-family: var(--font-accent);
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 1.1rem;
-  /* letter-spacing: 2px; */
-  /* text-transform: uppercase; */
-  transition: all var(--transition-base);
-  flex: 1;
-  justify-content: center;
+  transform: none;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.action-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background:
+    radial-gradient(
+      circle at 20% 0%,
+      rgba(255, 215, 0, 0.16) 0%,
+      transparent 42%
+    );
+  transition: opacity var(--transition-fast);
 }
 
 .action-btn:hover {
-  background: var(--color-accent);
-  color: var(--color-text-light);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 0 var(--color-accent-dark);
+  border-color: var(--color-accent-tired);
+  color: var(--color-text);
+  box-shadow: var(--shadow-gold-glow);
+  transform: none;
+}
+
+.action-btn:hover::before {
+  opacity: 1;
+}
+
+.action-btn:active {
+  width: 230px;
+  min-width: 230px;
+  max-width: 230px;
+  min-height: 58px;
+  flex-basis: 230px;
+  transform: none;
 }
 
 .action-btn.active {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-text-light);
+  width: 230px;
+  min-width: 230px;
+  max-width: 230px;
+  min-height: 58px;
+  flex: 0 0 230px;
+  border-color: var(--color-accent-table-head);
+  background:
+    linear-gradient(
+      180deg,
+      var(--color-accent) 0%,
+      var(--color-accent-table-head) 54%,
+      var(--color-accent-table-head-dark) 100%
+    );
+  color: #15120c;
+  text-shadow:
+    1px 1px 0 rgba(138, 3, 3, 0.82),
+    2px 2px 0 rgba(0, 0, 0, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(138, 3, 3, 0.48),
+    0 0 18px rgba(255, 215, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset -3px -3px 0 rgba(138, 3, 3, 0.42);
+  transform: none;
 }
 
-.action-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.action-btn.active:hover,
+.action-btn.active:active {
+  width: 230px;
+  min-width: 230px;
+  max-width: 230px;
+  min-height: 58px;
+  flex-basis: 230px;
+  transform: none;
+}
+
+.action-btn.active::before {
+  opacity: 1;
+  background:
+    radial-gradient(
+      circle at 18% 0%,
+      rgba(255, 255, 255, 0.28) 0%,
+      transparent 46%
+    );
 }
 
 .action-icon {
-  font-size: 1.3rem;
+  position: relative;
+  z-index: 1;
+  margin-right: 7px;
 }
 
-/* ========================================
-   СЕКЦИИ С ИНФОРМАЦИЕЙ (ОБЩИЕ СТИЛИ)
-   ======================================== */
-.film-info-section,
-.film-persons-section,
-.film-videos-section,
-.film-facts-section,
-.similar-films-section {
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  padding: var(--spacing-xl);
-  margin-bottom: var(--spacing-xxl);
+/* Info */
+
+.film-info-section {
+  display: grid;
 }
 
-.film-persons-section h2,
-.film-videos-section h2,
-.film-facts-section h2,
-.similar-films-section h2 {
-  font-family: var(--font-heading);
-  margin: 0 0 var(--spacing-xl);
-  font-size: 1.8rem;
-  color: var(--color-text-primary);
-  letter-spacing: 2px;
-  text-transform: uppercase;
+.film-slogan,
+.film-description,
+.film-details {
+  padding: 16px;
 }
 
-.similar-films-section h2 {
-  font-size: 1.5rem;
-}
-
-/* ========================================
-   СЕКЦИЯ: ОПИСАНИЕ И ДЕТАЛИ
-   ======================================== */
-
-/* --- Слоган --- */
 .film-slogan {
-  font-family: var(--font-body);
-  font-size: 1.3rem;
+  color: var(--color-accent);
+  font-family: var(--font-text);
+  font-size: var(--text-md);
   font-style: italic;
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-lg);
-  text-align: center;
-  padding: var(--spacing-md);
-  border-left: 4px solid var(--color-accent);
-  border-right: 4px solid var(--color-accent);
-  background: rgba(200, 16, 46, 0.05);
+  line-height: 1.6;
+  border-bottom: 1px solid rgba(80, 80, 86, 0.42);
 }
 
-/* --- Краткое описание --- */
-.film-short-description {
-  color: var(--color-text-primary);
-  line-height: 1.7;
-  margin-bottom: var(--spacing-xl);
-  font-size: 1rem;
-}
-
-/* --- Заголовки секций --- */
 .film-description h3,
 .film-details h3 {
-  font-family: var(--font-heading);
-  margin: 0 0 var(--spacing-lg);
-  font-size: 1.8rem;
-  color: var(--color-text-primary);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  position: relative;
-  display: inline-block;
+  margin: 0 0 10px;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 800;
 }
 
-.film-description h3::after,
-.film-details h3::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-dark) 50%, transparent 100%);
-}
-
-/* --- Текст описания --- */
 .description-text {
-  line-height: 1.7;
-  color: var(--color-text-primary);
+  margin: 0;
+  color: var(--color-text-soft);
+  font-family: var(--font-text);
+  font-size: var(--text-sm);
+  line-height: 1.75;
+  white-space: pre-line;
 }
 
-.description-text.collapsed {
-  max-height: 150px;
-  overflow: hidden;
-  position: relative;
-}
-
-.description-text.collapsed::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(to bottom, transparent, var(--color-bg-secondary));
-}
-
-.show-more-btn {
-  background: none;
-  border: 1px solid var(--color-accent);
-  color: var(--color-text-primary);
-  font-family: var(--font-heading);
-  cursor: pointer;
-  margin-top: var(--spacing-md);
-  padding: 8px var(--spacing-lg);
-  font-size: 1rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  transition: all var(--transition-fast);
-}
-
-.show-more-btn:hover {
-  background: var(--color-accent);
-  color: var(--color-text-light);
-}
-
-/* --- Сетка деталей --- */
 .details-grid {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--spacing-md) var(--spacing-xl);
-  margin-top: var(--spacing-lg);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgba(80, 80, 86, 0.42);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 15, 16, 0.38);
 }
 
 .detail-label {
-  font-family: var(--font-heading);
-  color: var(--color-text-primary);
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .detail-value {
-  color: var(--color-text-primary);
-  font-style: italic;
+  color: var(--color-text-soft);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-align: right;
 }
 
-/* ========================================
-   СЕКЦИЯ: УЧАСТНИКИ (АКТЁРЫ / РЕЖИССЁРЫ)
-   ======================================== */
+/* Persons */
+
+.film-persons-section {
+  display: grid;
+}
+
 .profession-group {
-  margin-bottom: var(--spacing-xxl);
+  padding: 16px;
+  border-bottom: 1px solid rgba(80, 80, 86, 0.42);
 }
 
 .profession-group:last-child {
-  margin-bottom: 0;
+  border-bottom: none;
 }
 
 .profession-title {
-  font-family: var(--font-heading);
-  font-size: 1.3rem;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-md);
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--color-accent);
-  text-transform: uppercase;
-  letter-spacing: 2px;
   display: flex;
   align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 800;
 }
 
 .person-count {
-  font-size: 1rem;
+  min-width: 26px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  background: rgba(15, 15, 16, 0.54);
   color: var(--color-text-muted);
-  font-weight: normal;
-  margin-left: var(--spacing-sm);
+  font-size: var(--text-xs);
 }
 
 .persons-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--spacing-md);
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.persons-scroll-wrap {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.persons-scroll {
+  min-width: 0;
+  display: flex;
+  gap: 10px;
+  overflow: hidden;
+  scroll-behavior: smooth;
+}
+
+.persons-scroll .person-card {
+  min-width: 220px;
+  max-width: 220px;
+}
+
+.persons-scroll-btn {
+  width: 36px;
+  border: 1px solid rgba(80, 80, 86, 0.65);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(38, 38, 42, 0.98) 0%,
+      rgba(15, 15, 16, 0.92) 100%
+    );
+  color: var(--color-text-muted);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.persons-scroll-btn:hover {
+  border-color: var(--color-accent-table-head);
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+  box-shadow: var(--shadow-gold-glow);
+  transform: translateY(-1px);
 }
 
 .person-card {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  background: #1e1e1e;
-  border: 1px solid var(--color-border-light);
-  padding: 12px;
-  transition: all var(--transition-fast);
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgba(80, 80, 86, 0.42);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 15, 16, 0.38);
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .person-card:hover {
-  border-color: var(--color-accent);
-  background: var(--color-bg-hover);
-  transform: translateX(3px);
+  border-color: var(--color-accent-tired);
+  background: rgba(168, 143, 42, 0.08);
+  transform: translateY(-1px);
 }
 
 .person-photo-wrapper {
-  width: 55px;
-  height: 55px;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
   overflow: hidden;
-  background: var(--color-bg-tertiary);
-  flex-shrink: 0;
-  border: 2px solid var(--color-accent);
+  border: 1px solid rgba(80, 80, 86, 0.55);
   border-radius: 50%;
+  background: var(--color-surface);
 }
 
 .person-photo {
@@ -745,112 +805,498 @@
 .person-photo-placeholder {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-bg-hover);
-  color: var(--color-text-primary);
-  font-family: var(--font-heading);
-  font-size: 1.5rem;
+  display: grid;
+  place-items: center;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-weight: 900;
 }
 
 .person-info {
-  flex: 1;
   min-width: 0;
 }
 
-.person-name {
-  font-weight: 600;
-  margin-bottom: 3px;
-  color: var(--color-text-primary);
-  white-space: nowrap;
+.person-name,
+.person-en-name,
+.person-role {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.person-name {
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 800;
 }
 
 .person-en-name {
-  font-size: 11px;
+  margin-top: 3px;
   color: var(--color-text-muted);
-  margin-bottom: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
 }
 
 .person-role {
-  font-size: 11px;
+  margin-top: 3px;
   color: var(--color-accent);
-  font-style: italic;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
 }
 
-.show-more-persons-btn {
-  background: none;
-  border: 1px solid var(--color-accent);
-  color: var(--color-text-primary);
-  font-family: var(--font-heading);
-  padding: var(--spacing-sm) var(--spacing-lg);
+/* Reviews */
+
+.film-reviews-section {
+  display: grid;
+}
+
+.film-review-stats-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(80, 80, 86, 0.42);
+}
+
+.film-review-stats-inline__total,
+.film-review-stats-inline__item {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border: 1px solid rgba(80, 80, 86, 0.45);
+  border-radius: var(--radius-pill);
+  background: rgba(15, 15, 16, 0.42);
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+
+.film-review-stats-inline strong {
+  color: var(--color-text);
+}
+
+.film-review-stats-inline small {
+  color: var(--color-text-muted);
+}
+
+.film-review-stats-inline__item--positive strong {
+  color: var(--color-green-bright);
+}
+
+.film-review-stats-inline__item--neutral strong {
+  color: var(--color-accent);
+}
+
+.film-review-stats-inline__item--negative strong {
+  color: #ff6b5f;
+}
+
+.film-reviews-list {
+  display: grid;
+}
+
+.review-card {
+  display: grid;
+  grid-template-columns: 5px minmax(0, 1fr);
+  border-bottom: 1px solid rgba(80, 80, 86, 0.42);
+  background: transparent;
+}
+
+.review-card:last-child {
+  border-bottom: none;
+}
+
+.review-card__side {
+  background: var(--color-accent-table-head);
+}
+
+.review-card--positive .review-card__side {
+  background: var(--color-green-table-head);
+}
+
+.review-card--neutral .review-card__side {
+  background: var(--color-accent-table-head);
+}
+
+.review-card--negative .review-card__side {
+  background: var(--color-red-table-head);
+}
+
+.review-card__content {
+  min-width: 0;
+  padding: 14px 16px;
+}
+
+.review-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.review-card__author {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
   cursor: pointer;
-  margin-top: var(--spacing-md);
-  font-size: 1rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: all var(--transition-fast);
 }
 
-.show-more-persons-btn:hover {
-  background: var(--color-accent);
-  color: var(--color-text-light);
+.review-card__avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  object-fit: cover;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: 50%;
+  background: var(--color-surface);
 }
 
-/* ========================================
-   СЕКЦИЯ: ВИДЕО (ТРЕЙЛЕРЫ)
-   ======================================== */
+.review-card__author-info {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.review-card__author-name {
+  overflow: hidden;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-card__date {
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+}
+
+.review-card__type,
+.review-card__spoiler {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(15, 15, 16, 0.5);
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+
+.review-card__type--positive {
+  color: var(--color-green-bright);
+}
+
+.review-card__type--neutral {
+  color: var(--color-accent);
+}
+
+.review-card__type--negative {
+  color: #ff6b5f;
+}
+
+.review-card__title {
+  margin: 0 0 8px;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 900;
+}
+
+.review-card__spoiler {
+  display: inline-flex;
+  margin-bottom: 8px;
+  color: #ff6b5f;
+}
+
+.review-card__text {
+  margin: 0;
+  color: var(--color-text-soft);
+  font-family: var(--font-text);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.review-card--compact .review-card__text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+.review-card__footer {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 12px;
+}
+
+.review-card__comments-btn,
+.review-card__comments-count {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+
+.review-card__comments-btn {
+  cursor: pointer;
+}
+
+.review-card__comments-btn:hover {
+  color: var(--color-accent);
+}
+
+.review-form {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-bottom: 1px solid rgba(80, 80, 86, 0.42);
+  background: rgba(15, 15, 16, 0.38);
+}
+
+.review-form__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.review-form__title {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 900;
+}
+
+.review-form__input,
+.review-form__textarea,
+.review-comment-form__input {
+  width: 100%;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 15, 16, 0.62);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  outline: none;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.review-form__input,
+.review-comment-form__input {
+  min-height: 38px;
+  padding: 8px 11px;
+}
+
+.review-form__textarea {
+  resize: vertical;
+  min-height: 140px;
+  padding: 10px 11px;
+  line-height: 1.6;
+}
+
+.review-form__input:focus,
+.review-form__textarea:focus,
+.review-comment-form__input:focus {
+  border-color: var(--color-accent-tired);
+  box-shadow: 0 0 0 2px rgba(168, 143, 42, 0.14);
+}
+
+.review-form__types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.review-form__type {
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.review-form__type--positive.review-form__type--active {
+  border-color: var(--color-green-table-head);
+  color: var(--color-green-bright);
+  background: rgba(37, 105, 25, 0.16);
+}
+
+.review-form__type--neutral.review-form__type--active {
+  border-color: var(--color-accent-table-head);
+  color: var(--color-accent);
+  background: rgba(168, 143, 42, 0.14);
+}
+
+.review-form__type--negative.review-form__type--active {
+  border-color: var(--color-red-table-head);
+  color: #ff6b5f;
+  background: rgba(151, 17, 17, 0.14);
+}
+
+.review-form__spoiler {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+
+.review-form__error {
+  margin: 0;
+  color: #ff6b5f;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+
+.review-form__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Comments */
+
+.review-comments {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(80, 80, 86, 0.42);
+}
+
+.review-comments__list {
+  display: grid;
+  gap: 8px;
+}
+
+.review-comment {
+  padding: 10px;
+  border: 1px solid rgba(80, 80, 86, 0.42);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 15, 16, 0.38);
+}
+
+.review-comment__author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 900;
+}
+
+.review-comment__avatar {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.review-comment__text,
+.review-comments__empty {
+  margin: 0;
+  color: var(--color-text-soft);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.review-comment-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Videos */
+
+.film-videos-section,
+.film-facts-section {
+  padding-bottom: 16px;
+}
+
+.film-videos-section > h2,
+.film-facts-section > h2,
+.similar-films-section > h2 {
+  margin: 0;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(80, 80, 86, 0.5);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(48, 48, 52, 0.98) 0%,
+      rgba(38, 38, 42, 0.98) 56%,
+      rgba(23, 23, 25, 0.98) 100%
+    );
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 800;
+  box-shadow: inset 4px 0 0 rgba(167, 142, 0, 0.28);
+}
+
+.similar-films-section > h2 {
+  background:
+    linear-gradient(
+      180deg,
+      var(--color-red-table-head) 0%,
+      var(--color-red-table-head) 42%,
+      var(--color-red-table-head-dark) 100%
+    );
+  box-shadow: none;
+}
+
 .video-category {
-  margin-bottom: var(--spacing-xxl);
-}
-
-.video-category:last-child {
-  margin-bottom: 0;
+  padding: 16px 16px 0;
 }
 
 .category-title {
-  font-family: var(--font-heading);
-  font-size: 1.3rem;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-md);
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--color-accent);
-  text-transform: uppercase;
-  letter-spacing: 2px;
+  margin: 0 0 12px;
+  color: var(--color-text-soft);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 800;
 }
 
 .videos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--spacing-lg);
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
 }
 
 .video-card {
-  background: var(--color-bg-tertiary);
-  border: 1px solid var(--color-border-light);
   overflow: hidden;
-  transition: all var(--transition-base);
-}
-
-.video-card:hover {
-  border-color: var(--color-accent);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 0 rgba(200, 16, 46, 0.2);
+  border: 1px solid rgba(80, 80, 86, 0.42);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 15, 16, 0.38);
 }
 
 .video-thumbnail {
-  position: relative;
-  aspect-ratio: 16/9;
-  background: var(--color-bg-primary);
-  cursor: pointer;
+  aspect-ratio: 16 / 9;
+  background: var(--color-surface);
 }
 
 .thumbnail-img {
@@ -859,231 +1305,107 @@
   object-fit: cover;
 }
 
-.play-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity var(--transition-base);
-}
-
-.video-thumbnail:hover .play-overlay {
-  opacity: 1;
-}
-
-.play-icon {
-  width: 55px;
-  height: 55px;
-  background: rgba(200, 16, 46, 0.9);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: var(--color-text-light);
-  border: 2px solid var(--color-accent-dark);
-}
-
-.external-link {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.external-link-btn {
-  color: var(--color-accent);
-  text-decoration: none;
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  padding: var(--spacing-md);
-  text-align: center;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.external-link-btn:hover {
-  color: var(--color-accent-dark);
-}
-
 .video-info {
-  padding: 12px;
+  padding: 10px;
 }
 
 .video-name {
-  font-weight: 500;
-  margin-bottom: var(--spacing-xs);
-  line-height: 1.3;
-  color: var(--color-text-primary);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 800;
 }
 
 .video-meta {
-  display: flex;
-  gap: 12px;
-  font-size: 11px;
+  margin-top: 4px;
   color: var(--color-text-muted);
-  text-transform: uppercase;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
 }
 
-.video-type {
-  color: var(--color-accent);
-}
+/* Facts */
 
-/* --- Модальное окно видео --- */
-.video-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(5px);
-}
-
-.video-modal {
-  position: relative;
-  width: 90%;
-  max-width: 1000px;
-  aspect-ratio: 16/9;
-  background: #000000;
-  border: 3px solid var(--color-accent);
-  overflow: hidden;
-}
-
-.modal-close-btn {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  width: 45px;
-  height: 45px;
-  background: var(--color-accent);
-  border: 2px solid var(--color-accent-dark);
-  color: var(--color-text-light);
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  transition: all var(--transition-fast);
-}
-
-.modal-close-btn:hover {
-  background: var(--color-accent-dark);
-  color: var(--color-text-light);
-}
-
-.modal-video-player {
-  width: 100%;
-  height: 100%;
-}
-
-/* ========================================
-   СЕКЦИЯ: ФАКТЫ
-   ======================================== */
 .facts-list {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
 }
 
 .fact-item {
-  padding: 18px;
-  background: #1e1e1e;
-  border-left: 4px solid var(--color-accent);
-  line-height: 1.6;
+  padding: 12px;
+  border-left: 4px solid var(--color-accent-table-head);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 15, 16, 0.38);
 }
 
 .fact-item.spoiler {
-  border-left-color: var(--color-accent-dark);
-  background: #1a1515;
-}
-
-.spoiler-badge {
-  display: inline-block;
-  background: var(--color-accent);
-  color: var(--color-text-light);
-  font-family: var(--font-heading);
-  font-size: 11px;
-  padding: 3px 12px;
-  margin-right: 12px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  border-left-color: var(--color-red-table-head);
 }
 
 .fact-item p {
-  margin: 12px 0 0;
-  color: var(--color-text-primary);
+  margin: 0;
+  color: var(--color-text-soft);
+  font-family: var(--font-text);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+.spoiler-badge {
+  display: inline-flex;
+  margin-bottom: 8px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(151, 17, 17, 0.18);
+  color: #ff6b5f;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 900;
 }
 
 .toggle-spoilers-btn {
-  background: none;
-  border: 1px solid var(--color-accent);
-  color: var(--color-text-primary);
-  font-family: var(--font-heading);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  cursor: pointer;
-  margin-top: var(--spacing-lg);
-  font-size: 1rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: all var(--transition-fast);
+  margin-left: 16px;
 }
 
-.toggle-spoilers-btn:hover {
-  background: var(--color-accent);
-  color: var(--color-text-light);
-}
+/* Similar */
 
-/* ========================================
-   СЕКЦИЯ: ПОХОЖИЕ ФИЛЬМЫ (САЙДБАР)
-   ======================================== */
 .similar-films-section {
   position: sticky;
-  top: 110px;
+  top: 24px;
 }
 
 .similar-films-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+  display: grid;
 }
 
 .similar-film-card {
-  display: flex;
-  gap: var(--spacing-md);
-  text-decoration: none;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid rgba(80, 80, 86, 0.42);
   color: inherit;
-  padding: 12px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-tertiary);
-  transition: all var(--transition-fast);
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.similar-film-card:last-child {
+  border-bottom: none;
 }
 
 .similar-film-card:hover {
-  border-color: var(--color-accent);
-  background: var(--color-bg-hover);
-  transform: translateX(5px);
+  background: rgba(151, 17, 17, 0.1);
 }
 
 .similar-film-poster {
-  width: 55px;
-  height: 80px;
-  flex-shrink: 0;
+  width: 52px;
+  height: 74px;
   overflow: hidden;
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-accent);
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
 }
 
 .similar-film-poster img {
@@ -1092,207 +1414,365 @@
   object-fit: cover;
 }
 
-.similar-film-poster .no-poster {
+.no-poster {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  color: var(--color-accent);
+  display: grid;
+  place-items: center;
 }
 
 .similar-film-info {
-  flex: 1;
   min-width: 0;
 }
 
 .similar-film-name {
-  font-weight: 600;
-  margin-bottom: var(--spacing-xs);
-  color: var(--color-text-primary);
-  white-space: nowrap;
   overflow: hidden;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 800;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.similar-film-meta {
-  display: flex;
-  gap: var(--spacing-sm);
-  font-size: 11px;
-  color: var(--color-text-muted);
-  margin-bottom: var(--spacing-xs);
-}
-
-.similar-film-year {
-  color: var(--color-accent);
-}
-
+.similar-film-meta,
 .similar-film-ratings {
   display: flex;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-xs);
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
 }
 
 .similar-film-ratings .rating {
-  font-size: 11px;
-  padding: 2px 8px;
-  background: rgba(200, 16, 46, 0.15);
-  color: var(--color-text-primary);
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  background: rgba(15, 15, 16, 0.5);
+  color: var(--color-text-soft);
 }
 
-.show-more-films-btn {
-  width: 100%;
-  background: none;
-  border: 1px solid var(--color-accent);
-  color: var(--color-text-primary);
-  font-family: var(--font-heading);
-  padding: 12px;
-  cursor: pointer;
-  margin-top: var(--spacing-md);
-  font-size: 1rem;
-  letter-spacing: 2px;
+/* Reviews page */
+
+.film-reviews-page__head {
+  margin-bottom: 18px;
+}
+
+.film-reviews-page__head h1 {
+  margin: 14px 0 6px;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  transition: all var(--transition-fast);
+  text-shadow:
+    3px 3px 0 var(--color-red-dark),
+    5px 5px 0 rgba(0, 0, 0, 0.75);
 }
 
-.show-more-films-btn:hover {
-  background: var(--color-accent);
-  color: var(--color-text-light);
+.film-reviews-page__head p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
 }
 
-/* ========================================
-   АДАПТИВНОСТЬ
-   ======================================== */
+.film-reviews-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 18px;
+  align-items: start;
+}
 
-/* --- Планшеты (1024px) --- */
-@media (max-width: 1024px) {
-  .film-content {
-    flex-direction: column;
+.film-reviews-page__main {
+  min-width: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.film-reviews-page__aside {
+  position: sticky;
+  top: 24px;
+}
+
+.film-reviews-toolbar,
+.reviews-stats-panel {
+  overflow: hidden;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-glass);
+  box-shadow: var(--shadow-card);
+}
+
+.film-reviews-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+}
+
+.film-reviews-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.film-reviews-filter {
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid rgba(80, 80, 86, 0.65);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.film-reviews-filter:hover,
+.film-reviews-filter--active {
+  border-color: var(--color-purple-table-head);
+  background: var(--color-purple-soft);
+  color: var(--color-text);
+}
+
+.reviews-stats-panel {
+  padding: 16px;
+}
+
+.reviews-stats-panel h2 {
+  margin: 0 0 14px;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 900;
+}
+
+.reviews-stats-panel__total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(80, 80, 86, 0.42);
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 800;
+}
+
+.reviews-stats-panel__total strong {
+  color: var(--color-accent);
+}
+
+.reviews-stats-panel__item {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.reviews-stats-panel__row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+
+.reviews-stats-panel__bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: rgba(80, 80, 86, 0.45);
+}
+
+.reviews-stats-panel__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-accent-table-head);
+}
+
+.reviews-stats-panel__item--positive .reviews-stats-panel__bar span {
+  background: var(--color-green-table-head);
+}
+
+.reviews-stats-panel__item--negative .reviews-stats-panel__bar span {
+  background: var(--color-red-table-head);
+}
+
+.reviews-stats-panel__item small {
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+}
+
+.film-empty-block,
+.film-reviews-sentinel {
+  padding: 18px;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-glass);
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.film-reviews-sentinel {
+  border: none;
+  background: transparent;
+}
+
+/* Scrollbars */
+
+.persons-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.persons-scroll {
+  scrollbar-width: none;
+}
+
+@keyframes filmSpin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  .film-sidebar {
-    width: 100%;
+}
+
+/* Responsive */
+
+@media (max-width: 1180px) {
+  .film-content,
+  .film-reviews-page__layout {
+    grid-template-columns: 1fr;
   }
-  
+
+  .film-sidebar,
+  .film-reviews-page__aside {
+    max-width: none;
+    justify-self: stretch;
+    position: static;
+  }
+
   .similar-films-section {
     position: static;
   }
 }
 
-/* --- Маленькие ноутбуки (900px) --- */
-@media (max-width: 900px) {
-  .film-title {
-    font-size: 2.5rem;
-  }
-  
-  .film-poster-wrapper {
-    width: var(--poster-width-tablet);
-  }
-  
-  .film-header-content {
-    gap: var(--spacing-xl);
-  }
-}
-
-/* --- Планшеты (768px) --- */
 @media (max-width: 768px) {
-  .film-header-content {
-    flex-direction: column;
-    padding: var(--spacing-lg);
-  }
-  
-  .film-poster-wrapper {
-    width: var(--poster-width-mobile);
-    margin: 0 auto;
-  }
-  
-  .film-title {
-    font-size: 2rem;
-    text-align: center;
-  }
-  
-  .film-title-section {
-    padding-top: var(--spacing-sm);
-    text-align: center;
-  }
-  
-  .film-meta {
-    justify-content: center;
-  }
-  
-  .film-genres-section,
-  .film-countries-section {
-    text-align: center;
-  }
-  
-  .film-ratings {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  
-  .rating-section {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .action-buttons {
-    flex-direction: column;
-  }
-  
-  .persons-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .videos-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .film-backdrop {
-    height: 350px;
-  }
-  
-  .film-header-content {
-    min-height: 350px;
-  }
-}
-
-/* --- Мобильные (480px) --- */
-@media (max-width: 480px) {
-  .film-title {
-    font-size: 1.6rem;
-  }
-  
-  .film-poster-wrapper {
-    width: var(--poster-width-small);
-  }
-  
-  .rating-value {
-    font-size: 2rem;
-  }
-  
-  .film-ratings {
-    gap: var(--spacing-lg);
-  }
-  
-  .back-button {
-    font-size: 1rem;
-    padding: 8px 16px;
-  }
-  
-  .film-info-section,
-  .film-actions,
-  .film-persons-section,
-  .film-videos-section,
-  .film-facts-section {
+  .film-page,
+  .film-reviews-page {
     padding: 18px;
   }
-  
-  .person-card {
-    padding: var(--spacing-sm);
+
+  .film-header-content {
+    grid-template-columns: 1fr;
   }
-  
-  .video-modal {
-    width: 98%;
+
+  .film-poster-wrapper {
+    max-width: 240px;
+    margin: 0 auto;
+  }
+
+  .film-title-section {
+    text-align: center;
+  }
+
+  .film-meta,
+  .film-ratings,
+  .action-buttons,
+  .film-review-stats-inline,
+  .film-reviews-toolbar {
+    justify-content: center;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .film-section-head,
+  .film-reviews-toolbar,
+  .review-card__top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .film-section-head__actions {
+    justify-content: flex-start;
+  }
+
+  .review-comment-form {
+    flex-direction: column;
+  }
+
+  .persons-scroll-wrap {
+    grid-template-columns: 32px minmax(0, 1fr) 32px;
+  }
+
+  .persons-scroll-btn {
+    width: 32px;
+    font-size: 1.6rem;
+  }
+
+  .action-btn,
+  .action-btn:active,
+  .action-btn.active,
+  .action-btn.active:hover,
+  .action-btn.active:active {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: 1 1 100%;
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .film-title {
+    font-size: 2rem;
+  }
+
+  .film-ratings {
+    gap: 8px;
+  }
+
+  .rating-item {
+    min-width: 0;
+    flex: 1 1 120px;
+  }
+
+  .persons-scroll .person-card {
+    min-width: 190px;
+    max-width: 190px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-loading__spinner {
+    animation: none;
+  }
+
+  .film-error__button,
+  .film-back-link,
+  .film-section-btn,
+  .review-form__submit,
+  .review-comment-form__submit,
+  .person-card,
+  .persons-scroll-btn,
+  .action-btn,
+  .star-btn,
+  .review-form__input,
+  .review-form__textarea,
+  .review-comment-form__input {
+    transition: none;
+  }
+
+  .persons-scroll {
+    scroll-behavior: auto;
   }
 }
