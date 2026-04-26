@@ -629,6 +629,35 @@
   display: grid;
 }
 
+.profile-table__body--scroll {
+  max-height: 406px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.profile-table__body--compilations-scroll {
+  max-height: 520px;
+}
+
+.profile-table__body--scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.profile-table__body--scroll::-webkit-scrollbar-track {
+  background: var(--color-bg-soft);
+}
+
+.profile-table__body--scroll::-webkit-scrollbar-thumb {
+  border: 2px solid var(--color-bg-soft);
+  border-radius: var(--radius-pill);
+  background: rgba(143, 138, 130, 0.42);
+}
+
+.profile-table__body--scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--profile-section-color);
+}
+
 .profile-table__row {
   width: 100%;
   min-height: 58px;
@@ -872,6 +901,11 @@
   .profile-table__head-row,
   .profile-table__head-row--compilation {
     display: none;
+  }
+
+  .profile-table__body--scroll,
+  .profile-table__body--compilations-scroll {
+    max-height: 520px;
   }
 
   .profile-table__row,

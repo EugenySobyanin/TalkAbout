@@ -1,4 +1,3 @@
-import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const getFilmPoster = (film) => {
@@ -18,14 +17,6 @@ function ProfileFilmsTable({
   mode = 'watched',
 }) {
   const navigate = useNavigate()
-  const [visibleCount, setVisibleCount] = useState(7)
-
-  const visibleItems = useMemo(
-    () => items.slice(0, visibleCount),
-    [items, visibleCount]
-  )
-
-  const canShowMore = items.length > visibleCount
 
   const getStatusLabel = (item) => {
     return item.rating ? `${item.rating}/10` : '—'
@@ -38,19 +29,9 @@ function ProfileFilmsTable({
           <h2 className="profile-block__title">{title}</h2>
           <p className="profile-block__count">Всего: {items.length}</p>
         </div>
-
-        {canShowMore && (
-          <button
-            type="button"
-            className="profile-block__btn"
-            onClick={() => setVisibleCount((prev) => prev + 7)}
-          >
-            Показать ещё
-          </button>
-        )}
       </div>
 
-      {visibleItems.length > 0 ? (
+      {items.length > 0 ? (
         <div className="profile-table">
           <div className="profile-table__head-row">
             <div>Фильм</div>
@@ -58,8 +39,8 @@ function ProfileFilmsTable({
             <div>Оценка</div>
           </div>
 
-          <div className="profile-table__body">
-            {visibleItems.map((item) => (
+          <div className="profile-table__body profile-table__body--scroll">
+            {items.map((item) => (
               <button
                 key={item.id}
                 type="button"

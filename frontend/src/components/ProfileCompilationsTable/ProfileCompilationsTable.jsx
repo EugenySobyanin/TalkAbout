@@ -16,11 +16,7 @@ function ProfileCompilationsTable({
   emptyText = 'Подборок пока нет',
 }) {
   const navigate = useNavigate()
-  const [visibleCount, setVisibleCount] = useState(7)
   const [openedIds, setOpenedIds] = useState([])
-
-  const visibleItems = items.slice(0, visibleCount)
-  const canShowMore = items.length > visibleCount
 
   const toggleCompilation = (id) => {
     setOpenedIds((prev) => (
@@ -37,19 +33,9 @@ function ProfileCompilationsTable({
           <h2 className="profile-block__title">Подборки</h2>
           <p className="profile-block__count">Всего: {items.length}</p>
         </div>
-
-        {canShowMore && (
-          <button
-            type="button"
-            className="profile-block__btn"
-            onClick={() => setVisibleCount((prev) => prev + 7)}
-          >
-            Показать ещё
-          </button>
-        )}
       </div>
 
-      {visibleItems.length > 0 ? (
+      {items.length > 0 ? (
         <div className="profile-table">
           <div className="profile-table__head-row profile-table__head-row--compilation">
             <div>Название</div>
@@ -58,8 +44,8 @@ function ProfileCompilationsTable({
             <div />
           </div>
 
-          <div className="profile-table__body">
-            {visibleItems.map((item) => {
+          <div className="profile-table__body profile-table__body--scroll profile-table__body--compilations-scroll">
+            {items.map((item) => {
               const isOpen = openedIds.includes(item.id)
 
               return (
