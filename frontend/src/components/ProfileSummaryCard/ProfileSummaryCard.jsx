@@ -3,6 +3,8 @@ function ProfileSummaryCard({
   isOwner = false,
   onAvatarChange,
   avatarUploading = false,
+  onFollowToggle,
+  followLoading = false,
 }) {
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0]
@@ -88,6 +90,25 @@ function ProfileSummaryCard({
               </div>
             ))}
           </div>
+
+          {!isOwner && typeof onFollowToggle === 'function' && (
+            <div className="profile-summary__actions">
+              <button
+                type="button"
+                className={`profile-follow-btn ${
+                  profile.is_subscribed ? 'profile-follow-btn--subscribed' : ''
+                }`}
+                onClick={onFollowToggle}
+                disabled={followLoading}
+              >
+                {followLoading
+                  ? 'Обработка...'
+                  : profile.is_subscribed
+                    ? 'Отписаться'
+                    : 'Подписаться'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>

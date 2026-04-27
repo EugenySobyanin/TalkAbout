@@ -2,7 +2,6 @@ from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from activities.models import Review, CommentReview
@@ -139,7 +138,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
         pagination_class=ReviewCommentPagination,
     )
     def comments(self, request, pk=None):
-        review = self.get_object()
+        review = get_object_or_404(
+            Review.objects.select_related('author', 'film'),
+            pk=pk,
+        )
 
         if request.method == 'GET':
             comments = review.comments.select_related('author').all()

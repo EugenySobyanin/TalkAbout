@@ -1,0 +1,221 @@
+.film-reviews-list--page {
+  gap: 12px;
+}
+
+.film-review-preview {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: transparent;
+}
+
+.film-review-preview .review-card {
+  overflow: hidden;
+  border: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: var(--radius-md);
+  border-bottom: 1px solid rgba(80, 80, 86, 0.55);
+  box-shadow: var(--shadow-card);
+}
+
+.film-review-preview--positive .review-card {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(36, 120, 34, 0.08) 0%,
+      rgba(15, 15, 16, 0.44) 100%
+    );
+}
+
+.film-review-preview--neutral .review-card {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 215, 0, 0.075) 0%,
+      rgba(15, 15, 16, 0.44) 100%
+    );
+}
+
+.film-review-preview--negative .review-card {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(204, 0, 0, 0.075) 0%,
+      rgba(15, 15, 16, 0.44) 100%
+    );
+}
+
+.film-review-preview--positive .review-card__side {
+  background: var(--color-green-table-head);
+}
+
+.film-review-preview--neutral .review-card__side {
+  background: var(--color-accent-table-head);
+}
+
+.film-review-preview--negative .review-card__side {
+  background: var(--color-red-table-head);
+}
+
+.film-review-preview--collapsed .review-card__text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+}
+
+.film-review-preview--expanded .review-card__text {
+  display: block;
+  overflow: visible;
+}
+
+.film-review-preview__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -1px;
+  padding: 0 16px 14px;
+  border-right: 1px solid rgba(80, 80, 86, 0.55);
+  border-bottom: 1px solid rgba(80, 80, 86, 0.55);
+  border-left: 1px solid rgba(80, 80, 86, 0.55);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  background: rgba(15, 15, 16, 0.54);
+}
+
+.film-review-preview:has(.film-review-preview__actions) .review-card {
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.film-review-read-more {
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid rgba(80, 80, 86, 0.65);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(38, 38, 42, 0.98) 0%,
+      rgba(15, 15, 16, 0.92) 100%
+    );
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.film-review-read-more:hover {
+  color: var(--color-text);
+  text-shadow:
+    1px 1px 0 var(--color-red-dark),
+    2px 2px 0 rgba(0, 0, 0, 0.62);
+  transform: translateY(-1px);
+}
+
+.film-review-read-more--positive:hover {
+  border-color: var(--color-green-table-head);
+  box-shadow: var(--shadow-green-glow);
+}
+
+.film-review-read-more--neutral:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-gold-glow);
+}
+
+.film-review-read-more--negative:hover {
+  border-color: var(--color-red-bright);
+  box-shadow: var(--shadow-red-glow);
+}
+
+/* Цветные фильтры */
+
+.film-reviews-filter {
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.film-reviews-filter:hover,
+.film-reviews-filter--active {
+  transform: translateY(-1px);
+}
+
+.film-reviews-filter--all:hover,
+.film-reviews-filter--all.film-reviews-filter--active {
+  border-color: var(--color-text-soft);
+  background: rgba(243, 238, 230, 0.08);
+  color: var(--color-text);
+}
+
+.film-reviews-filter--positive:hover,
+.film-reviews-filter--positive.film-reviews-filter--active {
+  border-color: var(--color-green-table-head);
+  background: rgba(37, 105, 25, 0.16);
+  color: var(--color-green-bright);
+  box-shadow: var(--shadow-green-glow);
+}
+
+.film-reviews-filter--neutral:hover,
+.film-reviews-filter--neutral.film-reviews-filter--active {
+  border-color: var(--color-accent-table-head);
+  background: rgba(255, 215, 0, 0.1);
+  color: var(--color-accent);
+  box-shadow: var(--shadow-gold-glow);
+}
+
+.film-reviews-filter--negative:hover,
+.film-reviews-filter--negative.film-reviews-filter--active {
+  border-color: var(--color-red-bright);
+  background: rgba(204, 0, 0, 0.12);
+  color: #ff6b5f;
+  box-shadow: var(--shadow-red-glow);
+}
+
+/* Более выразительный hover у самих карточек */
+
+.film-review-preview--positive .review-card:hover {
+  border-color: var(--color-green-table-head);
+  box-shadow:
+    var(--shadow-card),
+    var(--shadow-green-glow);
+}
+
+.film-review-preview--neutral .review-card:hover {
+  border-color: var(--color-accent-table-head);
+  box-shadow:
+    var(--shadow-card),
+    var(--shadow-gold-glow);
+}
+
+.film-review-preview--negative .review-card:hover {
+  border-color: var(--color-red-bright);
+  box-shadow:
+    var(--shadow-card),
+    var(--shadow-red-glow);
+}
+
+@media (max-width: 768px) {
+  .film-review-preview__actions {
+    justify-content: stretch;
+    padding: 0 12px 12px;
+  }
+
+  .film-review-read-more {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-reviews-filter,
+  .film-review-read-more {
+    transition: none;
+  }
+}

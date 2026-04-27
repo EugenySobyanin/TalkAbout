@@ -57,16 +57,25 @@ class PhotoUser(models.Model):
 
 class Follow(models.Model):
     """Подписки пользователя."""
+
     follower = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='user_subscriptions'  # Подписки
+        related_name='user_subscriptions'
     )
     following = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='user_subscribers'  # Подписчики
+        related_name='user_subscribers'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('follower', 'following'),
+                name='unique_user_follow'
+            )
+        ]
 
     def __str__(self):
         return (f'{self.follower.first_name} {self.follower.last_name} '

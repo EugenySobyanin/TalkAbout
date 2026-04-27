@@ -9,6 +9,8 @@ function ProfileView({
   isOwner = false,
   onAvatarChange,
   avatarUploading = false,
+  onFollowToggle,
+  followLoading = false,
 }) {
   return (
     <div className="profile-page">
@@ -19,6 +21,8 @@ function ProfileView({
             isOwner={isOwner}
             onAvatarChange={onAvatarChange}
             avatarUploading={avatarUploading}
+            onFollowToggle={onFollowToggle}
+            followLoading={followLoading}
           />
 
           <div className="profile-page__films-grid">

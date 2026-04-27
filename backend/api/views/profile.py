@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Prefetch
-from rest_framework import generics, permissions
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from activities.models import UserFilmActivity
 from compilations.models import Compilation
@@ -67,3 +70,49 @@ class MeProfileView(generics.RetrieveAPIView):
                 queryset=Follow.objects.select_related('follower')
             ),
         ).get(pk=self.request.user.pk)
+
+
+class FollowUserView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        following_user = get_object_or_404(User, pk=user_id)
+
+        if following_user.pk == request.user.pk:
+            return Response(
+                {'detail': 'Нельзя подписаться на самого себя.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        follow, created = Follow.objects.get_or_create(
+            follower=request.user,
+            following=following_user
+        )
+
+        return Response(
+            {
+                'is_subscribed': True,
+                'created': created,
+                'subscribers_count': following_user.user_subscribers.count(),
+                'subscriptions_count': request.user.user_subscriptions.count(),
+            },
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
+        )
+
+    def delete(self, request, user_id):
+        following_user = get_object_or_404(User, pk=user_id)
+
+        deleted_count, _ = Follow.objects.filter(
+            follower=request.user,
+            following=following_user
+        ).delete()
+
+        return Response(
+            {
+                'is_subscribed': False,
+                'deleted': deleted_count > 0,
+                'subscribers_count': following_user.user_subscribers.count(),
+                'subscriptions_count': request.user.user_subscriptions.count(),
+            },
+            status=status.HTTP_200_OK
+        )

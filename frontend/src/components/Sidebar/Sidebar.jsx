@@ -28,16 +28,8 @@ function Sidebar() {
       label: 'Подписки',
     },
     {
-      path: '/feed',
-      label: 'Лента',
-    },
-    {
       path: '/compilations',
       label: 'Подборки',
-    },
-    {
-      path: '/recommendations',
-      label: 'Рекомендации',
     },
   ]
 

@@ -99,7 +99,7 @@ function PickerResultsPage() {
     <div className="picker-results-page">
       <div className="picker-results-toolbar">
         <div>
-          <p className="picker-results-eyebrow">Frame25</p>
+          {/* <p className="picker-results-eyebrow">Frame25</p> */}
           <h1 className="picker-results-title">Результаты подбора</h1>
 
           {filtersSummary.length > 0 && (

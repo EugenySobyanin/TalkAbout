@@ -5,6 +5,9 @@ import { getFilmReviews } from '../../api/reviews'
 import ReviewCard from '../FilmPage/components/ReviewCard'
 import ReviewForm from '../FilmPage/components/ReviewForm'
 import '../FilmPage/FilmPage.css'
+import './FilmReviewsPage.css'
+
+const LONG_REVIEW_LIMIT = 520
 
 const FILTERS = [
   {
@@ -55,6 +58,7 @@ function FilmReviewsPage() {
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
+  const [expandedReviewIds, setExpandedReviewIds] = useState([])
 
   const loadFilm = async () => {
     const filmData = await getFilmDetails(id)
@@ -88,6 +92,7 @@ function FilmReviewsPage() {
   const loadInitial = async () => {
     try {
       setLoading(true)
+      setExpandedReviewIds([])
 
       await Promise.all([
         loadFilm(),
@@ -158,6 +163,16 @@ function FilmReviewsPage() {
     })
   }
 
+  const toggleReviewExpanded = (reviewId) => {
+    setExpandedReviewIds((prev) => {
+      if (prev.includes(reviewId)) {
+        return prev.filter((id) => id !== reviewId)
+      }
+
+      return [...prev, reviewId]
+    })
+  }
+
   if (loading) {
     return (
       <div className="film-reviews-page">
@@ -200,7 +215,7 @@ function FilmReviewsPage() {
                 <button
                   key={item.value}
                   type="button"
-                  className={`film-reviews-filter ${
+                  className={`film-reviews-filter film-reviews-filter--${item.value || 'all'} ${
                     filter === item.value ? 'film-reviews-filter--active' : ''
                   }`}
                   onClick={() => setFilter(item.value)}
@@ -227,14 +242,37 @@ function FilmReviewsPage() {
           )}
 
           {reviews.length > 0 ? (
-            <div className="film-reviews-list">
-              {reviews.map((review) => (
-                <ReviewCard
-                  key={review.id}
-                  review={review}
-                  allowComments
-                />
-              ))}
+            <div className="film-reviews-list film-reviews-list--page">
+              {reviews.map((review) => {
+                const isLongReview = String(review.text || '').length > LONG_REVIEW_LIMIT
+                const isExpanded = expandedReviewIds.includes(review.id)
+
+                return (
+                  <div
+                    key={review.id}
+                    className={`film-review-preview film-review-preview--${review.review_type} ${
+                      isExpanded ? 'film-review-preview--expanded' : 'film-review-preview--collapsed'
+                    }`}
+                  >
+                    <ReviewCard
+                      review={review}
+                      allowComments
+                    />
+
+                    {isLongReview && (
+                      <div className="film-review-preview__actions">
+                        <button
+                          type="button"
+                          className={`film-review-read-more film-review-read-more--${review.review_type}`}
+                          onClick={() => toggleReviewExpanded(review.id)}
+                        >
+                          {isExpanded ? 'Свернуть' : 'Читать полностью'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           ) : (
             <div className="film-empty-block">

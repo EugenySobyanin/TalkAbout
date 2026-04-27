@@ -93,9 +93,9 @@ function AppContent() {
         <Route path="/profile" element={withProtectedLayout(<ProfilePage />)} />
         <Route path="/diary" element={withProtectedLayout(<DiaryPage />)} />
         <Route path="/subscriptions" element={withProtectedLayout(<SubscriptionsPage />)} />
-        <Route path="/feed" element={withProtectedLayout(<FeedPage />)} />
+        {/* <Route path="/feed" element={withProtectedLayout(<FeedPage />)} /> */}
         <Route path="/compilations" element={withProtectedLayout(<CompilationsPage />)} />
-        <Route path="/recommendations" element={withProtectedLayout(<RecommendationsPage />)} />
+        {/* <Route path="/recommendations" element={withProtectedLayout(<RecommendationsPage />)} /> */}
 
         <Route path="/film/:id" element={withLayout(<FilmPage />)} />
         <Route path="/film/:id/reviews" element={withLayout(<FilmReviewsPage />)} />

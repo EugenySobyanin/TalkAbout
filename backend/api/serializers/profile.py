@@ -139,6 +139,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
     subscriptions = serializers.SerializerMethodField()
     subscribers = serializers.SerializerMethodField()
 
+    is_subscribed = serializers.SerializerMethodField()
+    is_own_profile = serializers.SerializerMethodField()
+
     activities_count = serializers.SerializerMethodField()
     watched_count = serializers.SerializerMethodField()
     planned_count = serializers.SerializerMethodField()
@@ -168,6 +171,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'subscribers_count',
             'photos_count',
 
+            'is_subscribed',
+            'is_own_profile',
+
             'activities',
             'watched_activities',
             'planned_activities',
@@ -176,6 +182,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'subscriptions',
             'subscribers',
         )
+
+    def is_owner(self, obj):
+        """Вспомогательный метод."""
+        request = self.context.get('request')
+
+        if not request or not request.user.is_authenticated:
+            return False
+
+        return request.user.pk == obj.pk
 
     def get_full_name(self, obj):
         return f'{obj.first_name} {obj.last_name}'.strip()
@@ -191,6 +206,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def get_activities(self, obj):
         queryset = obj.activities.select_related('film').order_by('-updated_at')
+
+        if not self.is_owner(obj):
+            queryset = queryset.filter(
+                is_public_for_planned=True
+            ) | queryset.filter(
+                is_public_for_watched=True
+            )
+
+            queryset = queryset.distinct().order_by('-updated_at')
+
         return UserFilmActivityProfileSerializer(
             queryset,
             many=True,
@@ -200,7 +225,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_watched_activities(self, obj):
         queryset = obj.activities.filter(
             is_watched=True
-        ).select_related('film').order_by('-watched_at', '-updated_at')
+        ).select_related('film')
+
+        if not self.is_owner(obj):
+            queryset = queryset.filter(is_public_for_watched=True)
+
+        queryset = queryset.order_by('-watched_at', '-updated_at')
+
         return UserFilmActivityProfileSerializer(
             queryset,
             many=True,
@@ -210,7 +241,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_planned_activities(self, obj):
         queryset = obj.activities.filter(
             is_planned=True
-        ).select_related('film').order_by('-planned_at', '-updated_at')
+        ).select_related('film')
+
+        if not self.is_owner(obj):
+            queryset = queryset.filter(is_public_for_planned=True)
+
+        queryset = queryset.order_by('-planned_at', '-updated_at')
+
         return UserFilmActivityProfileSerializer(
             queryset,
             many=True,
@@ -218,7 +255,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         ).data
 
     def get_compilations(self, obj):
-        queryset = obj.collections.prefetch_related('films').order_by('-created_at')
+        queryset = obj.collections.prefetch_related('films')
+
+        if not self.is_owner(obj):
+            queryset = queryset.filter(is_public=True)
+
+        queryset = queryset.order_by('-created_at')
+
         return CompilationProfileSerializer(
             queryset,
             many=True,
@@ -269,3 +312,25 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def get_photos_count(self, obj):
         return obj.user_photos.count()
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+
+        if not request or not request.user.is_authenticated:
+            return False
+
+        if request.user.pk == obj.pk:
+            return False
+
+        return Follow.objects.filter(
+            follower=request.user,
+            following=obj
+        ).exists()
+
+    def get_is_own_profile(self, obj):
+        request = self.context.get('request')
+
+        if not request or not request.user.is_authenticated:
+            return False
+
+        return request.user.pk == obj.pk

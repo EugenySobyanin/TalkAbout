@@ -157,3 +157,24 @@ export const getPickedFilms = async (filters = {}, page = 1) => {
     }
   }
 }
+
+export const getFilmPersons = async (search = '') => {
+  const normalizedSearch = search.trim()
+
+  if (normalizedSearch.length < 2) {
+    return []
+  }
+
+  try {
+    const response = await api.get('/persons/', {
+      params: {
+        search: normalizedSearch,
+      },
+    })
+
+    return response.data
+  } catch (error) {
+    console.error('Film persons fetch error:', error)
+    return []
+  }
+}

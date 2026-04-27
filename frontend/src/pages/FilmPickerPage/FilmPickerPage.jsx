@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   getFilmGenres,
   getFilmCountries,
+  getFilmPersons,
 } from '../../api/films'
 import RangeField from '../../components/RangeField/RangeField'
 import SearchableMultiSelect from '../../components/SearchableMultiSelect/SearchableMultiSelect'
@@ -20,6 +21,7 @@ const initialFormData = {
   age_rating: '',
   genres: [],
   countries: [],
+  persons: [],
 }
 
 const quickPresets = [
@@ -56,24 +58,67 @@ const quickPresets = [
   },
 ]
 
+const normalizeOptions = (data) => {
+  if (Array.isArray(data)) {
+    return data
+  }
+
+  if (Array.isArray(data?.results)) {
+    return data.results
+  }
+
+  return []
+}
+
+const normalizePersonOptions = (data) => {
+  return normalizeOptions(data)
+    .map((person) => ({
+      ...person,
+      id: Number(person.id),
+      name:
+        person.name ||
+        person.full_name ||
+        person.en_name ||
+        person.original_name ||
+        `Персона #${person.id}`,
+    }))
+    .filter((person) => person.id && person.name)
+}
+
 function FilmPickerPage() {
   const navigate = useNavigate()
 
   const [genres, setGenres] = useState([])
   const [countries, setCountries] = useState([])
+  const [persons, setPersons] = useState([])
+
   const [loading, setLoading] = useState(true)
+  const [personsLoading, setPersonsLoading] = useState(false)
+
+  const [personSearch, setPersonSearch] = useState('')
+  const [selectedPersons, setSelectedPersons] = useState([])
+
   const [formData, setFormData] = useState(initialFormData)
 
   useEffect(() => {
     const loadFiltersData = async () => {
       try {
-        const [genresData, countriesData] = await Promise.all([
+        const [genresResult, countriesResult] = await Promise.allSettled([
           getFilmGenres(),
           getFilmCountries(),
         ])
 
-        setGenres(genresData)
-        setCountries(countriesData)
+        if (genresResult.status === 'fulfilled') {
+          setGenres(normalizeOptions(genresResult.value))
+        } else {
+          console.error('Ошибка загрузки жанров:', genresResult.reason)
+        }
+
+        if (countriesResult.status === 'fulfilled') {
+          setCountries(normalizeOptions(countriesResult.value))
+        } else {
+          console.error('Ошибка загрузки стран:', countriesResult.reason)
+        }
       } catch (error) {
         console.error('Ошибка загрузки справочников:', error)
       } finally {
@@ -83,6 +128,32 @@ function FilmPickerPage() {
 
     loadFiltersData()
   }, [])
+
+  useEffect(() => {
+    const search = personSearch.trim()
+
+    if (search.length < 2) {
+      setPersons([])
+      setPersonsLoading(false)
+      return
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        setPersonsLoading(true)
+
+        const data = await getFilmPersons(search)
+        setPersons(normalizePersonOptions(data))
+      } catch (error) {
+        console.error('Ошибка поиска персон:', error)
+        setPersons([])
+      } finally {
+        setPersonsLoading(false)
+      }
+    }, 350)
+
+    return () => clearTimeout(timeoutId)
+  }, [personSearch])
 
   const activeFiltersCount = useMemo(() => {
     return Object.values(formData).reduce((count, value) => {
@@ -117,8 +188,49 @@ function FilmPickerPage() {
     }))
   }
 
+  const handlePersonToggle = (person) => {
+    const personId = Number(person.id)
+
+    setFormData((prev) => {
+      const alreadySelected = prev.persons.includes(personId)
+
+      return {
+        ...prev,
+        persons: alreadySelected
+          ? prev.persons.filter((id) => id !== personId)
+          : [...prev.persons, personId],
+      }
+    })
+
+    setSelectedPersons((prev) => {
+      const alreadySelected = prev.some((item) => Number(item.id) === personId)
+
+      if (alreadySelected) {
+        return prev.filter((item) => Number(item.id) !== personId)
+      }
+
+      return [...prev, person]
+    })
+  }
+
+  const handlePersonRemove = (personId) => {
+    const normalizedPersonId = Number(personId)
+
+    setFormData((prev) => ({
+      ...prev,
+      persons: prev.persons.filter((id) => Number(id) !== normalizedPersonId),
+    }))
+
+    setSelectedPersons((prev) => (
+      prev.filter((person) => Number(person.id) !== normalizedPersonId)
+    ))
+  }
+
   const handleReset = () => {
     setFormData(initialFormData)
+    setPersonSearch('')
+    setPersons([])
+    setSelectedPersons([])
   }
 
   const handleSubmit = (event) => {
@@ -153,8 +265,13 @@ function FilmPickerPage() {
     <div className="movie-picker-page">
       <div className="movie-picker-toolbar">
         <div>
-          <p className="movie-picker-eyebrow">Frame25</p>
-          <h1 className="movie-picker-title">Подбор фильма</h1>
+          <h1 className="movie-picker-title">
+            <span className="movie-picker-title__white">Подбор</span> фильма
+          </h1>
+
+          <p className="movie-picker-subtitle">
+            Собери свой идеальный вечер: жанр, страна, персона, эпоха и рейтинг.
+          </p>
         </div>
 
         <div className="movie-picker-summary">
@@ -276,7 +393,7 @@ function FilmPickerPage() {
           </section>
         </div>
 
-        <section className="picker-panel">
+        <section className="picker-panel picker-panel--yellow picker-panel--categories">
           <div className="picker-panel__head">
             <div>
               <h2 className="picker-panel__title">Жанры и страны</h2>
@@ -304,6 +421,85 @@ function FilmPickerPage() {
               placeholder="Найти страну"
               emptyText="Страны не найдены"
             />
+          </div>
+        </section>
+
+        <section className="picker-panel picker-panel--persons">
+          <div className="picker-panel__head">
+            <div>
+              <h2 className="picker-panel__title">Персоны</h2>
+              <p className="picker-panel__text">
+                Фильтрация по актёрам, режиссёрам и другим участникам фильма.
+              </p>
+            </div>
+          </div>
+
+          <div className="movie-picker-persons">
+            <div className="search-multi">
+              <label className="search-multi__label">Персоны</label>
+
+              <div className="search-multi__box">
+                <input
+                  type="text"
+                  value={personSearch}
+                  onChange={(event) => setPersonSearch(event.target.value)}
+                  placeholder="Введите минимум 2 символа"
+                  className="search-multi__input"
+                />
+
+                {selectedPersons.length > 0 && (
+                  <div className="search-multi__chips">
+                    {selectedPersons.map((person) => (
+                      <button
+                        key={person.id}
+                        type="button"
+                        className="search-multi__chip"
+                        onClick={() => handlePersonRemove(person.id)}
+                      >
+                        {person.name || person.en_name}
+                        <span className="search-multi__chip-x">×</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="search-multi__options">
+                  {personSearch.trim().length < 2 ? (
+                    <div className="search-multi__empty">
+                      Начните вводить имя персоны
+                    </div>
+                  ) : personsLoading ? (
+                    <div className="search-multi__empty">
+                      Поиск...
+                    </div>
+                  ) : persons.length > 0 ? (
+                    persons.map((person) => {
+                      const isSelected = formData.persons.includes(Number(person.id))
+
+                      return (
+                        <button
+                          key={person.id}
+                          type="button"
+                          className={`search-multi__option ${
+                            isSelected ? 'search-multi__option--selected' : ''
+                          }`}
+                          onClick={() => handlePersonToggle(person)}
+                        >
+                          <span>{person.name || person.en_name}</span>
+                          {isSelected && (
+                            <span className="search-multi__check">✓</span>
+                          )}
+                        </button>
+                      )
+                    })
+                  ) : (
+                    <div className="search-multi__empty">
+                      Персоны не найдены
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

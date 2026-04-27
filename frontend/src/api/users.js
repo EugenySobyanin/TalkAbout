@@ -67,3 +67,23 @@ export const getUserTopFilms = async (userId) => {
     return []
   }
 }
+
+export const followUser = async (userId) => {
+  try {
+    const response = await api.post(`/users/${userId}/follow/`)
+    return response.data
+  } catch (error) {
+    console.error('Follow user error:', error)
+    throw error
+  }
+}
+
+export const unfollowUser = async (userId) => {
+  try {
+    const response = await api.delete(`/users/${userId}/follow/`)
+    return response.data
+  } catch (error) {
+    console.error('Unfollow user error:', error)
+    throw error
+  }
+}

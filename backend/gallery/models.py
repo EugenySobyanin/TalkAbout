@@ -309,77 +309,6 @@ class Film(models.Model):
     def __str__(self):
         return f'{self.name} {self.year if self.year else ""}'
 
-    """
-    По сути, надобность в переопределении методов save и delete отпала
-    при изменении данных картинок:
-    теперь они хранятся ссылками, а не физически на сервере.
-    """
-    # def save(self, *args, **kwargs):
-    #     # Запоминаем старые пути файлов, если объект уже существует
-    #     old_files = {}
-    #     if self.pk:
-    #         old_instance = Film.objects.get(pk=self.pk)
-    #         for field_name in ['poster', 'logo', 'backdrop']:
-    #             old_file = getattr(old_instance, field_name)
-    #             if old_file:
-    #                 old_files[field_name] = old_file.name
-
-    #     # Первое сохранение объекта (получаем ID)
-    #     super().save(*args, **kwargs)
-
-    #     # Обрабатываем каждое поле с изображением
-    #     for field_name in ['poster', 'logo', 'backdrop']:
-    #         current_file = getattr(self, field_name)
-
-    #         if current_file and 'temp' in current_file.name:
-    #             # Формируем новый путь
-    #             old_path = current_file.name
-    #             new_path = old_path.replace('temp', f'film_{self.pk}')
-
-    #             # Перемещаем файл, если он существует
-    #             if default_storage.exists(old_path):
-    #                 # Копируем файл в новое место
-    #                 with default_storage.open(old_path, 'rb') as old_file:
-    #                     default_storage.save(new_path, old_file)
-
-    #                 # Удаляем временный файл
-    #                 default_storage.delete(old_path)
-
-    #                 # Обновляем путь в модели
-    #                 getattr(self, field_name).name = new_path
-
-    #     # Сохраняем модель с обновленными путями (без рекурсии)
-    #     super().save(update_fields=['poster', 'logo', 'backdrop'])
-
-    #     # Удаляем старые файлы, которые были заменены
-    #     for field_name, old_path in old_files.items():
-    #         current_file = getattr(self, field_name)
-    #         if (current_file and old_path != current_file.name and
-    #            default_storage.exists(old_path)):
-    #             default_storage.delete(old_path)
-
-    # def delete(self, *args, **kwargs):
-    #     """
-    #     Удаляет модель и папку фильма с постером, лого и обоями.
-
-    #     При удалении фильма удаляется вся папка с ее фотографиями:
-    #     media/films/film_<ID>/
-    #     """
-    #     # Запоминаем путь к папке персоны перед удалением
-    #     film_folder_path = f'films/film_{self.pk}'
-
-    #     # Удаляем саму модель из базы данных
-    #     super().delete(*args, **kwargs)
-
-    #     # Удаляем папку со всеми файлами фотографий
-    #     try:
-    #         if default_storage.exists(film_folder_path):
-    #             # Удаляем всю папку рекурсивно
-    #             delete_folder_with_all_files(film_folder_path)
-    #     except Exception as e:
-    #         # Логируем ошибку, но не прерываем выполнение
-    #         print(f"Error deleting film folder: {e}")  # Добавить логирование ===============================================================
-
 
 class Type(BaseWithSlug):
     """Тип кинопроизведения.
@@ -565,79 +494,6 @@ class Person(models.Model):
 
     def __str__(self):
         return f'{cut_str(self.name, CUT_PERSON_NAME)}'
-
-    # def save(self, *args, **kwargs):
-    #     # Запоминаем старый файл, если объект уже существует и фото изменяется
-    #     old_photo_path = None
-    #     if self.pk:
-    #         try:
-    #             old_instance = Person.objects.get(pk=self.pk)
-    #             if (old_instance.photo and
-    #                 (not self.photo or
-    #                  old_instance.photo.name != self.photo.name)):
-    #                 old_photo_path = old_instance.photo.name
-    #         except Person.DoesNotExist:
-    #             pass
-
-    #     # Сохраняем объект чтобы получить ID
-    #     super().save(*args, **kwargs)
-
-    #     # Обрабатываем перемещение нового файла из temp
-    #     if self.photo and 'temp' in self.photo.name:
-    #         # Запоминаем старый путь
-    #         old_path = self.photo.name
-
-    #         # Копируем файл с использованием менеджера контекста
-    #         try:
-    #             with default_storage.open(old_path, 'rb') as source_file:
-    #                 # Перемещаем файл в постоянную папку
-    #                 new_name = old_path.replace('temp', f'person_{self.pk}')
-    #                 default_storage.save(new_name, source_file)
-
-    #             # Обновляем путь в модели
-    #             self.photo.name = new_name
-    #             super().save(update_fields=['photo'])
-
-    #             # Пытаемся удалить временный файл
-    #             if default_storage.exists(old_path):
-    #                 default_storage.delete(old_path)
-
-    #         except Exception as e:
-    #             # Логируем ошибку, но не прерываем выполнение
-    #             print(f"Error moving file: {e}")  # Добавить логирование =====================================================================
-
-    #     # Удаляем старый файл, если он был заменен новым
-    #     if old_photo_path and default_storage.exists(old_photo_path):
-    #         try:
-    #             # Не удаляем если старый файл тот же,
-    #             # что и новый (при обновлении других полей)
-    #             if not self.photo or old_photo_path != self.photo.name:
-    #                 default_storage.delete(old_photo_path)
-    #         except Exception as e:
-    #             # Логируем ошибку удаления старого файла  # Добавляем логирование ============================================================
-    #             print(f"Error deleting old file: {e}")
-
-    # def delete(self, *args, **kwargs):
-    #     """
-    #     Удаляет модель и связанные с ней файлы фотографий.
-
-    #     При удалении персоны удаляется вся папка с ее фотографиями:
-    #     media/persons/person_<ID>/
-    #     """
-    #     # Запоминаем путь к папке персоны перед удалением
-    #     person_folder_path = f'persons/person_{self.pk}'
-
-    #     # Удаляем саму модель из базы данных
-    #     super().delete(*args, **kwargs)
-
-    #     # Удаляем папку со всеми файлами фотографий
-    #     try:
-    #         if default_storage.exists(person_folder_path):
-    #             # Удаляем всю папку рекурсивно
-    #             delete_folder_with_all_files(person_folder_path)
-    #     except Exception as e:
-    #         # Логируем ошибку, но не прерываем выполнение
-    #         print(f"Error deleting person folder: {e}")  # Добавить логирование ===============================================================
 
     @property
     def age(self):
@@ -891,44 +747,6 @@ class Fees(models.Model):
     def __str__(self):
         return (f'{self.pk} - {cut_str(self.film.name, CUT_FILM_NAME)} '
                 f'собрал {self.value} {self.currency} в {self.place}')
-
-
-# class AgregatorInfo(models.Model):
-#     """Данные агрегаторов.
-
-#     Агрегаторы: кинопоиск, imdb, критики.
-#     Связь One To Many
-#     Одна записись из AgregatorIngo может быть связан с одним Film
-#     Один Film может быть связан со многими AgregatorInfo.
-#     """
-
-#     film = models.ForeignKey(
-#         Film,
-#         on_delete=models.SET_NULL,
-#         null=True,
-#         verbose_name='Фильм',
-#         related_name='agregators'
-#     )
-#     rating = models.FloatField(
-#         'Значение',
-#         null=True,
-#         blank=True,
-#         validators=[
-#             MinValueValidator(0),
-#             MaxValueValidator(10)
-#         ]
-#     )
-#     votes = models.PositiveIntegerField('Количество оценок')
-#     source = models.CharField('Ресурс', max_length=NAME_MAX_LENGTH)
-
-#     class Meta:
-#         verbose_name = 'Данные агрегатора'
-#         verbose_name_plural = 'Данные агрегаторов'
-#         ordering = ['film', 'source', 'pk']
-
-#     def __str__(self) -> str:
-#         return (f'{self.pk} - {self.source} - '
-#                 f'{cut_str(self.film.name, CUT_FILM_NAME)}')
 
 
 class SequelsAndPrequels(models.Model):

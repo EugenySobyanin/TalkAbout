@@ -5,7 +5,8 @@ from api.views.activities import ActivityViewSet
 from api.views.reviews import ReviewViewSet, ReviewCommentViewSet
 from api.views.compilations import CompilationViewSet
 from api.views.films import FilmViewSet, TypeList, GenreList, CountryList, MyTopFilmsView, UserTopFilmsView
-from api.views.profile import UserProfileView, MeProfileView
+from api.views.profile import UserProfileView, MeProfileView, FollowUserView
+from api.views.persons import PersonViewSet
 
 
 router = routers.DefaultRouter()
@@ -15,6 +16,7 @@ router.register(r'compilations', CompilationViewSet, basename='compilation')
 router.register(r'films', FilmViewSet, basename='film')
 router.register(r'reviews', ReviewViewSet, basename='review')
 router.register(r'review-comments', ReviewCommentViewSet, basename='review-comment')
+router.register(r'persons', PersonViewSet, basename='person')
 
 
 urlpatterns = [
@@ -24,6 +26,7 @@ urlpatterns = [
 
     path('users/<int:user_id>/profile/', UserProfileView.as_view(), name='user-profile'),
     path('users/me/profile/', MeProfileView.as_view(), name='me-profile'),
+    path('users/<int:user_id>/follow/', FollowUserView.as_view(), name='user-follow'),
 
     path('users/me/top-films/', MyTopFilmsView.as_view(), name='me-top-films'),
     path('users/<int:user_id>/top-films/', UserTopFilmsView.as_view(), name='user-top-films'),

@@ -46,7 +46,11 @@ class ActivityViewSet(viewsets.ModelViewSet):
             if user_id is not None:
                 filters['is_public_for_watched'] = True
 
-        return UserFilmActivity.objects.filter(**filters)
+        return UserFilmActivity.objects.filter(**filters).order_by(
+            '-updated_at',
+            '-created_at',
+            '-id',
+        )
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
